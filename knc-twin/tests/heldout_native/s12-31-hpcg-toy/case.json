@@ -1,0 +1,102 @@
+{
+  "description": "HPCG 3.1 ComputeSPMV_ref and ComputeSYMGS_ref as GCC-KNC and the GCC 5.1.1 donor compiled them (eight builds: today's code, prefix-free NOPs, no loop alignment, bounded skip, no second scheduling pass), whole functions from the linked bench binary, on the 8x8x8 27-point problem (512 rows, 10648 nonzeros, about 190 KiB: L2-resident) with the bench's data layout. Expected y and x computed independently in exact arithmetic with x87 rounding.",
+  "kind": "compiled_kernel",
+  "rank_groups": [
+    {
+      "name": "HPCG toy SpMV builds",
+      "variants": [
+        "spmv/donor",
+        "spmv/donor_pf",
+        "spmv/knc",
+        "spmv/knc_pf",
+        "spmv/knc_noalign",
+        "spmv/knc_skip7",
+        "spmv/knc_nosched",
+        "spmv/knc_nosched_noalign"
+      ]
+    },
+    {
+      "name": "HPCG toy SymGS builds",
+      "variants": [
+        "symgs/donor",
+        "symgs/donor_pf",
+        "symgs/knc",
+        "symgs/knc_pf",
+        "symgs/knc_noalign",
+        "symgs/knc_skip7",
+        "symgs/knc_nosched",
+        "symgs/knc_nosched_noalign"
+      ]
+    }
+  ],
+  "scale": "core",
+  "scenario_name": "arrays resident in L2 (touched by the preceding run), output vector in L1, default memory sub-models, branches predicted from their history",
+  "schema": "knc-twin.heldout-case/3",
+  "unit": "the bench's timed call (SpMV: two passes; SymGS: one call)",
+  "variants": [
+    {
+      "kernel": "kernels/donor_spmv.json",
+      "name": "spmv/donor"
+    },
+    {
+      "kernel": "kernels/donor_pf_spmv.json",
+      "name": "spmv/donor_pf"
+    },
+    {
+      "kernel": "kernels/knc_spmv.json",
+      "name": "spmv/knc"
+    },
+    {
+      "kernel": "kernels/knc_pf_spmv.json",
+      "name": "spmv/knc_pf"
+    },
+    {
+      "kernel": "kernels/knc_noalign_spmv.json",
+      "name": "spmv/knc_noalign"
+    },
+    {
+      "kernel": "kernels/knc_skip7_spmv.json",
+      "name": "spmv/knc_skip7"
+    },
+    {
+      "kernel": "kernels/knc_nosched_spmv.json",
+      "name": "spmv/knc_nosched"
+    },
+    {
+      "kernel": "kernels/knc_nosched_noalign_spmv.json",
+      "name": "spmv/knc_nosched_noalign"
+    },
+    {
+      "kernel": "kernels/donor_symgs.json",
+      "name": "symgs/donor"
+    },
+    {
+      "kernel": "kernels/donor_pf_symgs.json",
+      "name": "symgs/donor_pf"
+    },
+    {
+      "kernel": "kernels/knc_symgs.json",
+      "name": "symgs/knc"
+    },
+    {
+      "kernel": "kernels/knc_pf_symgs.json",
+      "name": "symgs/knc_pf"
+    },
+    {
+      "kernel": "kernels/knc_noalign_symgs.json",
+      "name": "symgs/knc_noalign"
+    },
+    {
+      "kernel": "kernels/knc_skip7_symgs.json",
+      "name": "symgs/knc_skip7"
+    },
+    {
+      "kernel": "kernels/knc_nosched_symgs.json",
+      "name": "symgs/knc_nosched"
+    },
+    {
+      "kernel": "kernels/knc_nosched_noalign_symgs.json",
+      "name": "symgs/knc_nosched_noalign"
+    }
+  ]
+}

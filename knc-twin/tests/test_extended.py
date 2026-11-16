@@ -145,8 +145,9 @@ class TestX87Semantics(unittest.TestCase):
                    expected={"memory": [{"addr": "0x2000", "f64": [1.4142135623730951]}]})
         interp, check = run(k)
         self.assertEqual(check["status"], "ok", check["mismatches"])
-        with self.assertRaises(MissingParameter):
-            simulate(k)  # latency.x87_sqrt is unknown in the measured profile
+        res, sim, _ = simulate(k)  # latency.x87_sqrt is a labelled prior (Pentium timing), not a measurement
+        self.assertEqual(sim.p.param("latency.x87_sqrt").status, "assumed")
+        self.assertGreaterEqual(res["completion_cycles"], 70)
         k2 = kernel(None, streams=[{"context": 0, "asm": "fstpl (%rsi)"}], init={"registers": {"rsi": "0x2000"}})
         with self.assertRaises(Exception):
             run(k2)
@@ -194,16 +195,18 @@ class TestVectorForms(unittest.TestCase):
         self.assertEqual(check["status"], "ok", check["mismatches"][:1])
 
     def test_scatter_semantics_and_missing_occupancy(self):
-        k = kernel([{"op": "vscatterdps", "ops": [{"base": "rax", "vindex": "zmm1", "scale": 4}, "zmm0"], "mask": "k1"}],
+        k = kernel([{"op": "vscatterdps", "ops": [{"base": "rax", "vindex": "zmm1", "scale": 4}, "zmm0"], "mask": "k1", "label": "again"},
+                    {"op": "jknzd", "ops": ["k1", "again"]}],
                    init={"memory": [{"addr": "0x2000", "u32": [0] * 64}], "registers": {"rax": "0x2000", "k1": "0x000f", "zmm1": {"u32": [0, 16, 32, 48] + [0] * 12}, "zmm0": {"u32": [7, 8, 9, 10] + [0] * 12}}},
                    expected={"memory": [{"addr": "0x2000", "u32": [7]}, {"addr": "0x2040", "u32": [8]}, {"addr": "0x20c0", "u32": [10]}], "registers": {"0": {"k1": 0}}})
         interp, check = run(k)
         self.assertEqual(check["status"], "ok", check["mismatches"][:1])
-        self.assertEqual(len(interp.traces[0][0].lines), 4)
+        scatters = [e for e in interp.traces[0] if e.insn.op == "vscatterdps"]
+        self.assertEqual([len(e.lines) for e in scatters], [1, 1, 1, 1], "one cache line per execution")
         with self.assertRaises(MissingParameter):
             simulate(k)
         res, _, _ = simulate(k, prof=profile("synthetic-demo"))
-        self.assertEqual(res["completion_cycles"], 4 * 7)
+        self.assertGreaterEqual(res["completion_cycles"], 4 * 7)
 
     def test_byte_registers_and_partial_writes(self):
         k = kernel(None, streams=[{"context": 0, "asm": """
@@ -238,7 +241,8 @@ class TestVectorForms(unittest.TestCase):
 
 class TestMemorySubmodels(unittest.TestCase):
     def cold(self, extra):
-        sc = {"memory": dict({"type": "line_tracking", "cold_level": "memory"}, **extra), "branch": {"type": "all_predicted"}}
+        sc = {"memory": dict({"type": "line_tracking", "cold_level": "memory", "tlb": "off", "hardware_prefetcher": "off", "memory_service": "unlimited"}, **extra),
+              "branch": {"type": "all_predicted"}}
         ins = [{"op": "vmovaps", "ops": ["zmm%d" % (i % 8), {"base": "rax", "disp": 4096 * i}], "id": "ld%d" % i} for i in range(70)]
         return kernel(ins, init={"registers": {"rax": "0x100000"}}, memory_default=0, scenario=sc)
 
@@ -251,8 +255,8 @@ class TestMemorySubmodels(unittest.TestCase):
 
     def test_hardware_prefetcher_hides_sequential_misses(self):
         ins = [{"op": "vmovaps", "ops": ["zmm%d" % (i % 8), {"base": "rax", "disp": 64 * i}], "id": "ld%d" % i} for i in range(32)]
-        sc_off = {"memory": {"type": "line_tracking", "cold_level": "memory"}, "branch": {"type": "all_predicted"}}
-        sc_on = {"memory": {"type": "line_tracking", "cold_level": "memory", "hardware_prefetcher": "modeled"}, "branch": {"type": "all_predicted"}}
+        sc_off = {"memory": {"type": "line_tracking", "cold_level": "memory", "tlb": "off", "hardware_prefetcher": "off", "memory_service": "unlimited"}, "branch": {"type": "all_predicted"}}
+        sc_on = {"memory": {"type": "line_tracking", "cold_level": "memory", "tlb": "off", "hardware_prefetcher": "modeled", "memory_service": "unlimited"}, "branch": {"type": "all_predicted"}}
         k_off = kernel(ins, init={"registers": {"rax": "0x100000"}}, memory_default=0, scenario=sc_off)
         k_on = kernel(ins, init={"registers": {"rax": "0x100000"}}, memory_default=0, scenario=sc_on)
         off, _, _ = simulate(k_off)
@@ -268,7 +272,7 @@ class TestMemorySubmodels(unittest.TestCase):
         res, sim, _ = simulate(k)
         self.assertGreaterEqual(res["memory"]["stats"]["memory_service_waits"], 6)
         log = {e["id"]: e for e in sim.issue_log}
-        self.assertGreaterEqual(log["ld"]["done"], 357 + 7 * 20, "the eighth line arrives after seven service intervals")
+        self.assertGreaterEqual(log["ld"]["done"], profile().get("latency.memory") + 7 * 20, "the eighth line arrives after seven service intervals")
 
     def test_result_class_labels(self):
         from knc_model.cli import memory_result_class

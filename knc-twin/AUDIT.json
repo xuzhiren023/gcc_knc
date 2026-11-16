@@ -38,24 +38,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 12,
+                "functional_exact": 13,
                 "instructions": 13,
-                "isa_known": 12,
+                "isa_known": 13,
                 "memory_records": 1,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 13,
                 "timing_only_or_missing": [],
-                "timing_params_known": 12,
-                "unsupported": [
-                  "unsupported: instruction L66: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 13,
+                "unsupported": []
               }
             }
           ],
@@ -113,24 +109,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 12,
+                "functional_exact": 13,
                 "instructions": 13,
-                "isa_known": 12,
+                "isa_known": 13,
                 "memory_records": 1,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 13,
                 "timing_only_or_missing": [],
-                "timing_params_known": 12,
-                "unsupported": [
-                  "unsupported: instruction L147: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 13,
+                "unsupported": []
               }
             }
           ],
@@ -229,24 +221,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 4,
+                "functional_exact": 5,
                 "instructions": 5,
-                "isa_known": 4,
+                "isa_known": 5,
                 "memory_records": 1,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 5,
                 "timing_only_or_missing": [],
-                "timing_params_known": 4,
-                "unsupported": [
-                  "unsupported: instruction L247: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 5,
+                "unsupported": []
               }
             }
           ],
@@ -303,24 +291,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 12,
+                "functional_exact": 13,
                 "instructions": 13,
-                "isa_known": 12,
+                "isa_known": 13,
                 "memory_records": 1,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 13,
                 "timing_only_or_missing": [],
-                "timing_params_known": 12,
-                "unsupported": [
-                  "unsupported: instruction L331: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 13,
+                "unsupported": []
               }
             }
           ],
@@ -799,24 +783,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 10,
+                "functional_exact": 11,
                 "instructions": 11,
-                "isa_known": 10,
+                "isa_known": 11,
                 "memory_records": 1,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 11,
                 "timing_only_or_missing": [],
-                "timing_params_known": 10,
-                "unsupported": [
-                  "unsupported: instruction L530: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 11,
+                "unsupported": []
               }
             }
           ],
@@ -1631,24 +1611,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 30,
+                "functional_exact": 31,
                 "instructions": 31,
-                "isa_known": 30,
+                "isa_known": 31,
                 "memory_records": 12,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 31,
                 "timing_only_or_missing": [],
-                "timing_params_known": 30,
-                "unsupported": [
-                  "unsupported: instruction L1074: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 31,
+                "unsupported": []
               }
             },
             {
@@ -2703,24 +2679,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 30,
+                "functional_exact": 31,
                 "instructions": 31,
-                "isa_known": 30,
+                "isa_known": 31,
                 "memory_records": 12,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 31,
                 "timing_only_or_missing": [],
-                "timing_params_known": 30,
-                "unsupported": [
-                  "unsupported: instruction L1074: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 31,
+                "unsupported": []
               }
             },
             {
@@ -3775,24 +3747,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 30,
+                "functional_exact": 31,
                 "instructions": 31,
-                "isa_known": 30,
+                "isa_known": 31,
                 "memory_records": 12,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 31,
                 "timing_only_or_missing": [],
-                "timing_params_known": 30,
-                "unsupported": [
-                  "unsupported: instruction L1074: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 31,
+                "unsupported": []
               }
             },
             {
@@ -4607,24 +4575,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 58,
+                "functional_exact": 59,
                 "instructions": 59,
-                "isa_known": 58,
+                "isa_known": 59,
                 "memory_records": 20,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 59,
                 "timing_only_or_missing": [],
-                "timing_params_known": 58,
-                "unsupported": [
-                  "unsupported: instruction L812: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 59,
+                "unsupported": []
               }
             },
             {
@@ -4823,24 +4787,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 26,
+                "functional_exact": 27,
                 "instructions": 27,
-                "isa_known": 26,
+                "isa_known": 27,
                 "memory_records": 10,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 27,
                 "timing_only_or_missing": [],
-                "timing_params_known": 26,
-                "unsupported": [
-                  "unsupported: instruction L1341: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 27,
+                "unsupported": []
               }
             }
           ],
@@ -5419,24 +5379,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 10,
+                "functional_exact": 11,
                 "instructions": 11,
-                "isa_known": 10,
+                "isa_known": 11,
                 "memory_records": 1,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 11,
                 "timing_only_or_missing": [],
-                "timing_params_known": 10,
-                "unsupported": [
-                  "unsupported: instruction L841: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 11,
+                "unsupported": []
               }
             }
           ],
@@ -5828,25 +5784,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 26,
+                "functional_exact": 28,
                 "instructions": 28,
-                "isa_known": 26,
+                "isa_known": 28,
                 "memory_records": 10,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 28,
                 "timing_only_or_missing": [],
-                "timing_params_known": 26,
-                "unsupported": [
-                  "unsupported: instruction L487: ret is a region boundary (REGION BOUNDARY: a region ends before ret)",
-                  "unsupported: instruction L498: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 28,
+                "unsupported": []
               }
             },
             {
@@ -6213,24 +6164,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 30,
+                "functional_exact": 31,
                 "instructions": 31,
-                "isa_known": 30,
+                "isa_known": 31,
                 "memory_records": 12,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 31,
                 "timing_only_or_missing": [],
-                "timing_params_known": 30,
-                "unsupported": [
-                  "unsupported: instruction L1071: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 31,
+                "unsupported": []
               }
             },
             {
@@ -6735,7 +6682,7 @@
               "functional": true,
               "isa": true,
               "parser": true,
-              "timing": false
+              "timing": true
             },
             "functional_exact": 149,
             "instructions": 149,
@@ -6743,10 +6690,8 @@
             "memory_records": 62,
             "mnemonics_unknown": [],
             "parser_ok": 149,
-            "timing_only_or_missing": [
-              "missing parameter(s): latency.x87_control"
-            ],
-            "timing_params_known": 146,
+            "timing_only_or_missing": [],
+            "timing_params_known": 149,
             "unsupported": []
           }
         },
@@ -7114,7 +7059,7 @@
                   "functional": true,
                   "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
                 "functional_exact": 15,
                 "instructions": 15,
@@ -7122,10 +7067,8 @@
                 "memory_records": 3,
                 "mnemonics_unknown": [],
                 "parser_ok": 15,
-                "timing_only_or_missing": [
-                  "missing parameter(s): latency.x87_control"
-                ],
-                "timing_params_known": 14,
+                "timing_only_or_missing": [],
+                "timing_params_known": 15,
                 "unsupported": []
               }
             },
@@ -7137,24 +7080,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 5,
+                "functional_exact": 6,
                 "instructions": 6,
-                "isa_known": 5,
+                "isa_known": 6,
                 "memory_records": 2,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 6,
                 "timing_only_or_missing": [],
-                "timing_params_known": 5,
-                "unsupported": [
-                  "unsupported: instruction L2244: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 6,
+                "unsupported": []
               }
             }
           ],
@@ -7163,7 +7102,7 @@
               "functional": true,
               "isa": true,
               "parser": true,
-              "timing": false
+              "timing": true
             },
             "functional_exact": 29,
             "instructions": 29,
@@ -7171,10 +7110,8 @@
             "memory_records": 5,
             "mnemonics_unknown": [],
             "parser_ok": 29,
-            "timing_only_or_missing": [
-              "missing parameter(s): latency.x87_control"
-            ],
-            "timing_params_known": 28,
+            "timing_only_or_missing": [],
+            "timing_params_known": 29,
             "unsupported": []
           }
         },
@@ -7253,6 +7190,82 @@
               }
             },
             {
+              "label": ".Lknc_gather209",
+              "lines": [
+                169,
+                171
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter211",
+              "lines": [
+                173,
+                175
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter212",
+              "lines": [
+                176,
+                178
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
               "label": ".L13",
               "lines": [
                 212,
@@ -7307,7 +7320,23 @@
                 394
               ],
               "summary": {
-                "error": "line 31: only 'lock add' is accepted among lock-prefixed instructions"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 257,
+                "instructions": 257,
+                "isa_known": 257,
+                "memory_records": 123,
+                "mnemonics_unknown": [],
+                "parser_ok": 257,
+                "timing_only_or_missing": [
+                  "missing parameter(s): latency.fence, latency.fence"
+                ],
+                "timing_params_known": 255,
+                "unsupported": []
               }
             },
             {
@@ -7407,6 +7436,80 @@
               }
             },
             {
+              "label": ".Lknc_gather873",
+              "lines": [
+                692,
+                694
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_gather874",
+              "lines": [
+                695,
+                697
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter878",
+              "lines": [
+                701,
+                703
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
               "label": ".L24",
               "lines": [
                 776,
@@ -7479,6 +7582,54 @@
               }
             },
             {
+              "label": ".Lknc_gather1238",
+              "lines": [
+                991,
+                993
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_gather1239",
+              "lines": [
+                994,
+                996
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
               "label": ".L61",
               "lines": [
                 1069,
@@ -7503,6 +7654,154 @@
               }
             },
             {
+              "label": ".Lknc_gather1423",
+              "lines": [
+                1154,
+                1156
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_gather1424",
+              "lines": [
+                1157,
+                1159
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter1429",
+              "lines": [
+                1164,
+                1166
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_gather1432",
+              "lines": [
+                1169,
+                1171
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_gather1435",
+              "lines": [
+                1174,
+                1176
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter1448",
+              "lines": [
+                1189,
+                1191
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
               "label": ".L53",
               "lines": [
                 1226,
@@ -7523,6 +7822,54 @@
                 "parser_ok": 23,
                 "timing_only_or_missing": [],
                 "timing_params_known": 23,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_gather1555",
+              "lines": [
+                1282,
+                1284
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_gather1556",
+              "lines": [
+                1285,
+                1287
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
                 "unsupported": []
               }
             },
@@ -7696,7 +8043,24 @@
             }
           ],
           "summary": {
-            "error": "line 270: only 'lock add' is accepted among lock-prefixed instructions"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": false
+            },
+            "functional_exact": 1637,
+            "instructions": 1637,
+            "isa_known": 1637,
+            "memory_records": 721,
+            "mnemonics_unknown": [],
+            "parser_ok": 1637,
+            "timing_only_or_missing": [
+              "missing parameter(s): latency.fence, latency.fence",
+              "missing parameter(s): occupancy.scatter_cycles_per_line"
+            ],
+            "timing_params_known": 1628,
+            "unsupported": []
           }
         },
         {
@@ -7727,35 +8091,29 @@
               }
             },
             {
-              "label": ".L180",
+              "label": ".Lknc_scatter2265",
               "lines": [
-                1889,
-                1935
+                1911,
+                1913
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
-                  "parser": false,
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
                   "timing": false
                 },
-                "functional_exact": 34,
-                "instructions": 36,
-                "isa_known": 34,
-                "memory_records": 4,
-                "mnemonics_unknown": [
-                  "jknzd",
-                  "ret"
-                ],
-                "parser_ok": 35,
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
                 "timing_only_or_missing": [
                   "missing parameter(s): occupancy.scatter_cycles_per_line"
                 ],
-                "timing_params_known": 33,
-                "unsupported": [
-                  "invalid: instruction L1913 operand 0: cannot interpret operand '__knc_twin_end'",
-                  "unsupported: instruction L1919: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 2,
+                "unsupported": []
               }
             },
             {
@@ -7785,28 +8143,22 @@
           ],
           "summary": {
             "complete": {
-              "functional": false,
-              "isa": false,
+              "functional": true,
+              "isa": true,
               "parser": true,
               "timing": false
             },
-            "functional_exact": 94,
+            "functional_exact": 96,
             "instructions": 96,
-            "isa_known": 94,
+            "isa_known": 96,
             "memory_records": 14,
-            "mnemonics_unknown": [
-              "call"
-            ],
+            "mnemonics_unknown": [],
             "parser_ok": 96,
             "timing_only_or_missing": [
-              "missing parameter(s): latency.scalar_idiv, latency.scalar_idiv",
               "missing parameter(s): occupancy.scatter_cycles_per_line"
             ],
-            "timing_params_known": 92,
-            "unsupported": [
-              "unsupported: instruction L1839: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-              "unsupported: instruction L1841: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)"
-            ]
+            "timing_params_known": 95,
+            "unsupported": []
           }
         },
         {
@@ -7885,6 +8237,56 @@
               }
             },
             {
+              "label": ".Lknc_gather2599",
+              "lines": [
+                2204,
+                2206
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter2601",
+              "lines": [
+                2208,
+                2210
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
               "label": ".L197",
               "lines": [
                 2248,
@@ -7935,32 +8337,22 @@
           ],
           "summary": {
             "complete": {
-              "functional": false,
-              "isa": false,
+              "functional": true,
+              "isa": true,
               "parser": true,
               "timing": false
             },
-            "functional_exact": 278,
+            "functional_exact": 283,
             "instructions": 283,
-            "isa_known": 278,
+            "isa_known": 283,
             "memory_records": 65,
-            "mnemonics_unknown": [
-              "call"
-            ],
+            "mnemonics_unknown": [],
             "parser_ok": 283,
             "timing_only_or_missing": [
-              "missing parameter(s): latency.scalar_idiv, latency.scalar_idiv",
-              "missing parameter(s): latency.x87_sqrt, latency.x87_sqrt",
               "missing parameter(s): occupancy.scatter_cycles_per_line"
             ],
-            "timing_params_known": 274,
-            "unsupported": [
-              "unsupported: instruction L1975: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-              "unsupported: instruction L1977: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-              "unsupported: instruction L2100: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-              "unsupported: instruction L2107: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-              "unsupported: instruction L2108: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)"
-            ]
+            "timing_params_known": 282,
+            "unsupported": []
           }
         },
         {
@@ -8039,6 +8431,56 @@
               }
             },
             {
+              "label": ".Lknc_gather3030",
+              "lines": [
+                2597,
+                2599
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter3032",
+              "lines": [
+                2601,
+                2603
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
               "label": ".L229",
               "lines": [
                 2664,
@@ -8088,7 +8530,23 @@
             }
           ],
           "summary": {
-            "error": "line 170: symbolic immediate '$.LC9' not supported"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": false
+            },
+            "functional_exact": 336,
+            "instructions": 336,
+            "isa_known": 336,
+            "memory_records": 88,
+            "mnemonics_unknown": [],
+            "parser_ok": 336,
+            "timing_only_or_missing": [
+              "missing parameter(s): occupancy.scatter_cycles_per_line"
+            ],
+            "timing_params_known": 335,
+            "unsupported": []
           }
         },
         {
@@ -8102,24 +8560,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 7,
+                "functional_exact": 8,
                 "instructions": 8,
-                "isa_known": 7,
+                "isa_known": 8,
                 "memory_records": 2,
-                "mnemonics_unknown": [
-                  "call"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 8,
                 "timing_only_or_missing": [],
-                "timing_params_known": 7,
-                "unsupported": [
-                  "unsupported: instruction L2833: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)"
-                ]
+                "timing_params_known": 8,
+                "unsupported": []
               }
             },
             {
@@ -8129,7 +8583,21 @@
                 2953
               ],
               "summary": {
-                "error": "line 7: symbolic immediate '$conj_grad_._omp_fn.0' not supported"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 26,
+                "instructions": 26,
+                "isa_known": 26,
+                "memory_records": 10,
+                "mnemonics_unknown": [],
+                "parser_ok": 26,
+                "timing_only_or_missing": [],
+                "timing_params_known": 26,
+                "unsupported": []
               }
             },
             {
@@ -8139,7 +8607,21 @@
                 3028
               ],
               "summary": {
-                "error": "line 7: symbolic immediate '$conj_grad_._omp_fn.0' not supported"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 38,
+                "instructions": 38,
+                "isa_known": 38,
+                "memory_records": 15,
+                "mnemonics_unknown": [],
+                "parser_ok": 38,
+                "timing_only_or_missing": [],
+                "timing_params_known": 38,
+                "unsupported": []
               }
             },
             {
@@ -8149,7 +8631,21 @@
                 3031
               ],
               "summary": {
-                "error": "line 7: symbolic immediate '$conj_grad_._omp_fn.0' not supported"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 38,
+                "instructions": 38,
+                "isa_known": 38,
+                "memory_records": 15,
+                "mnemonics_unknown": [],
+                "parser_ok": 38,
+                "timing_only_or_missing": [],
+                "timing_params_known": 38,
+                "unsupported": []
               }
             },
             {
@@ -8159,7 +8655,21 @@
                 3037
               ],
               "summary": {
-                "error": "line 5: symbolic immediate '$MAIN__._omp_fn.3' not supported"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 25,
+                "instructions": 25,
+                "isa_known": 25,
+                "memory_records": 8,
+                "mnemonics_unknown": [],
+                "parser_ok": 25,
+                "timing_only_or_missing": [],
+                "timing_params_known": 25,
+                "unsupported": []
               }
             },
             {
@@ -8169,7 +8679,21 @@
                 3275
               ],
               "summary": {
-                "error": "line 8: symbolic immediate '$.LC9' not supported"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 62,
+                "instructions": 62,
+                "isa_known": 62,
+                "memory_records": 20,
+                "mnemonics_unknown": [],
+                "parser_ok": 62,
+                "timing_only_or_missing": [],
+                "timing_params_known": 62,
+                "unsupported": []
               }
             },
             {
@@ -8179,19 +8703,61 @@
                 3297
               ],
               "summary": {
-                "error": "line 8: symbolic immediate '$.LC9' not supported"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 62,
+                "instructions": 62,
+                "isa_known": 62,
+                "memory_records": 20,
+                "mnemonics_unknown": [],
+                "parser_ok": 62,
+                "timing_only_or_missing": [],
+                "timing_params_known": 62,
+                "unsupported": []
               }
             }
           ],
           "summary": {
-            "error": "line 35: symbolic immediate '$__cg_data_MOD_timeron' not supported"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": true
+            },
+            "functional_exact": 511,
+            "instructions": 511,
+            "isa_known": 511,
+            "memory_records": 172,
+            "mnemonics_unknown": [],
+            "parser_ok": 511,
+            "timing_only_or_missing": [],
+            "timing_params_known": 511,
+            "unsupported": []
           }
         },
         {
           "function": "conj_grad_",
           "loops": [],
           "summary": {
-            "error": "line 19: symbolic immediate '$conj_grad_._omp_fn.0' not supported"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": true
+            },
+            "functional_exact": 23,
+            "instructions": 23,
+            "isa_known": 23,
+            "memory_records": 7,
+            "mnemonics_unknown": [],
+            "parser_ok": 23,
+            "timing_only_or_missing": [],
+            "timing_params_known": 23,
+            "unsupported": []
           }
         },
         {
@@ -8300,7 +8866,23 @@
                 3697
               ],
               "summary": {
-                "error": "line 757: symbolic immediate '$.LC9' not supported"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 767,
+                "instructions": 767,
+                "isa_known": 767,
+                "memory_records": 279,
+                "mnemonics_unknown": [],
+                "parser_ok": 767,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 764,
+                "unsupported": []
               }
             },
             {
@@ -8328,6 +8910,56 @@
               }
             },
             {
+              "label": ".Lknc_gather4269",
+              "lines": [
+                3765,
+                3767
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter4271",
+              "lines": [
+                3769,
+                3771
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
               "label": ".L326",
               "lines": [
                 3804,
@@ -8335,25 +8967,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 21,
+                "functional_exact": 23,
                 "instructions": 23,
-                "isa_known": 21,
+                "isa_known": 23,
                 "memory_records": 5,
-                "mnemonics_unknown": [
-                  "call"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 23,
                 "timing_only_or_missing": [],
-                "timing_params_known": 21,
-                "unsupported": [
-                  "unsupported: instruction L3816: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-                  "unsupported: instruction L3821: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)"
-                ]
+                "timing_params_known": 23,
+                "unsupported": []
               }
             },
             {
@@ -8531,7 +9158,23 @@
                 4167
               ],
               "summary": {
-                "error": "line 287: symbolic immediate '$.LC9' not supported"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 395,
+                "instructions": 395,
+                "isa_known": 395,
+                "memory_records": 109,
+                "mnemonics_unknown": [],
+                "parser_ok": 395,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 393,
+                "unsupported": []
               }
             },
             {
@@ -8559,6 +9202,56 @@
               }
             },
             {
+              "label": ".Lknc_gather4864",
+              "lines": [
+                4234,
+                4236
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter4866",
+              "lines": [
+                4238,
+                4240
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
               "label": ".L366",
               "lines": [
                 4271,
@@ -8566,25 +9259,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 45,
+                "functional_exact": 47,
                 "instructions": 47,
-                "isa_known": 45,
+                "isa_known": 47,
                 "memory_records": 22,
-                "mnemonics_unknown": [
-                  "call"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 47,
                 "timing_only_or_missing": [],
-                "timing_params_known": 45,
-                "unsupported": [
-                  "unsupported: instruction L4302: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-                  "unsupported: instruction L4310: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)"
-                ]
+                "timing_params_known": 47,
+                "unsupported": []
               }
             },
             {
@@ -8608,6 +9296,80 @@
                 "parser_ok": 16,
                 "timing_only_or_missing": [],
                 "timing_params_known": 16,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_gather5058",
+              "lines": [
+                4395,
+                4397
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_gather5059",
+              "lines": [
+                4398,
+                4400
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter5062",
+              "lines": [
+                4403,
+                4405
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
                 "unsupported": []
               }
             },
@@ -8733,7 +9495,23 @@
             }
           ],
           "summary": {
-            "error": "line 59: bad displacement '__tinfo_MOD_ilow@gottpoff'"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": false
+            },
+            "functional_exact": 1081,
+            "instructions": 1081,
+            "isa_known": 1081,
+            "memory_records": 411,
+            "mnemonics_unknown": [],
+            "parser_ok": 1081,
+            "timing_only_or_missing": [
+              "missing parameter(s): occupancy.scatter_cycles_per_line"
+            ],
+            "timing_params_known": 1078,
+            "unsupported": []
           }
         },
         {
@@ -8793,31 +9571,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
-                  "parser": false,
-                  "timing": false
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
                 },
-                "functional_exact": 36,
+                "functional_exact": 40,
                 "instructions": 40,
-                "isa_known": 36,
-                "memory_records": 22,
-                "mnemonics_unknown": [
-                  "add",
-                  "call",
-                  "mov"
-                ],
-                "parser_ok": 38,
-                "timing_only_or_missing": [
-                  "missing parameter(s): latency.x87_control"
-                ],
-                "timing_params_known": 33,
-                "unsupported": [
-                  "invalid: instruction L4731 operand 1: cannot interpret operand 'fs:0'",
-                  "invalid: instruction L4733 operand 1: cannot interpret operand 'fs:0'",
-                  "unsupported: instruction L4737: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-                  "unsupported: instruction L4744: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)"
-                ]
+                "isa_known": 40,
+                "memory_records": 24,
+                "mnemonics_unknown": [],
+                "parser_ok": 40,
+                "timing_only_or_missing": [],
+                "timing_params_known": 40,
+                "unsupported": []
               }
             },
             {
@@ -8828,31 +9595,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
-                  "parser": false,
-                  "timing": false
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
                 },
-                "functional_exact": 36,
+                "functional_exact": 40,
                 "instructions": 40,
-                "isa_known": 36,
-                "memory_records": 22,
-                "mnemonics_unknown": [
-                  "add",
-                  "call",
-                  "mov"
-                ],
-                "parser_ok": 38,
-                "timing_only_or_missing": [
-                  "missing parameter(s): latency.x87_control"
-                ],
-                "timing_params_known": 33,
-                "unsupported": [
-                  "invalid: instruction L4731 operand 1: cannot interpret operand 'fs:0'",
-                  "invalid: instruction L4733 operand 1: cannot interpret operand 'fs:0'",
-                  "unsupported: instruction L4737: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-                  "unsupported: instruction L4744: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)"
-                ]
+                "isa_known": 40,
+                "memory_records": 24,
+                "mnemonics_unknown": [],
+                "parser_ok": 40,
+                "timing_only_or_missing": [],
+                "timing_params_known": 40,
+                "unsupported": []
               }
             },
             {
@@ -8881,7 +9637,21 @@
             }
           ],
           "summary": {
-            "error": "line 31: bad displacement '__cg_data_MOD_tran@gottpoff'"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": true
+            },
+            "functional_exact": 84,
+            "instructions": 84,
+            "isa_known": 84,
+            "memory_records": 36,
+            "mnemonics_unknown": [],
+            "parser_ok": 84,
+            "timing_only_or_missing": [],
+            "timing_params_known": 84,
+            "unsupported": []
           }
         },
         {
@@ -8919,28 +9689,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
-                  "parser": false,
-                  "timing": false
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
                 },
-                "functional_exact": 47,
+                "functional_exact": 51,
                 "instructions": 51,
-                "isa_known": 47,
-                "memory_records": 19,
-                "mnemonics_unknown": [
-                  "call",
-                  "cmp"
-                ],
-                "parser_ok": 50,
+                "isa_known": 51,
+                "memory_records": 20,
+                "mnemonics_unknown": [],
+                "parser_ok": 51,
                 "timing_only_or_missing": [],
-                "timing_params_known": 47,
-                "unsupported": [
-                  "invalid: instruction L4950 operand 0: cannot interpret operand 'fs:(%rax)'",
-                  "unsupported: instruction L4947: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-                  "unsupported: instruction L4984: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-                  "unsupported: instruction L4989: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)"
-                ]
+                "timing_params_known": 51,
+                "unsupported": []
               }
             },
             {
@@ -8974,12 +9736,40 @@
                 5037
               ],
               "summary": {
-                "error": "line 21: symbolic immediate '$.LC55' not supported"
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 50,
+                "instructions": 50,
+                "isa_known": 50,
+                "memory_records": 18,
+                "mnemonics_unknown": [],
+                "parser_ok": 50,
+                "timing_only_or_missing": [],
+                "timing_params_known": 50,
+                "unsupported": []
               }
             }
           ],
           "summary": {
-            "error": "line 50: bad displacement '__tinfo_MOD_num_threads@gottpoff'"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": true
+            },
+            "functional_exact": 191,
+            "instructions": 191,
+            "isa_known": 191,
+            "memory_records": 78,
+            "mnemonics_unknown": [],
+            "parser_ok": 191,
+            "timing_only_or_missing": [],
+            "timing_params_known": 191,
+            "unsupported": []
           }
         },
         {
@@ -9010,6 +9800,56 @@
               }
             },
             {
+              "label": ".Lknc_gather6046",
+              "lines": [
+                5286,
+                5288
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": true
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [],
+                "timing_params_known": 3,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter6049",
+              "lines": [
+                5291,
+                5293
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
+                "unsupported": []
+              }
+            },
+            {
               "label": ".L546",
               "lines": [
                 5335,
@@ -9030,6 +9870,32 @@
                 "parser_ok": 8,
                 "timing_only_or_missing": [],
                 "timing_params_known": 8,
+                "unsupported": []
+              }
+            },
+            {
+              "label": ".Lknc_scatter6145",
+              "lines": [
+                5369,
+                5371
+              ],
+              "summary": {
+                "complete": {
+                  "functional": true,
+                  "isa": true,
+                  "parser": true,
+                  "timing": false
+                },
+                "functional_exact": 3,
+                "instructions": 3,
+                "isa_known": 3,
+                "memory_records": 1,
+                "mnemonics_unknown": [],
+                "parser_ok": 3,
+                "timing_only_or_missing": [
+                  "missing parameter(s): occupancy.scatter_cycles_per_line"
+                ],
+                "timing_params_known": 2,
                 "unsupported": []
               }
             },
@@ -9083,7 +9949,23 @@
             }
           ],
           "summary": {
-            "error": "line 25: bad displacement '__cg_data_MOD_tran@gottpoff'"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": false
+            },
+            "functional_exact": 432,
+            "instructions": 432,
+            "isa_known": 432,
+            "memory_records": 135,
+            "mnemonics_unknown": [],
+            "parser_ok": 432,
+            "timing_only_or_missing": [
+              "missing parameter(s): occupancy.scatter_cycles_per_line"
+            ],
+            "timing_params_known": 430,
+            "unsupported": []
           }
         },
         {
@@ -9094,7 +9976,7 @@
               "functional": true,
               "isa": true,
               "parser": true,
-              "timing": false
+              "timing": true
             },
             "functional_exact": 12,
             "instructions": 12,
@@ -9102,10 +9984,8 @@
             "memory_records": 9,
             "mnemonics_unknown": [],
             "parser_ok": 12,
-            "timing_only_or_missing": [
-              "missing parameter(s): latency.x87_control"
-            ],
-            "timing_params_known": 9,
+            "timing_only_or_missing": [],
+            "timing_params_known": 12,
             "unsupported": []
           }
         },
@@ -9113,7 +9993,21 @@
           "function": "main",
           "loops": [],
           "summary": {
-            "error": "line 7: symbolic immediate '$options.51.0' not supported"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": true
+            },
+            "functional_exact": 10,
+            "instructions": 10,
+            "isa_known": 10,
+            "memory_records": 0,
+            "mnemonics_unknown": [],
+            "parser_ok": 10,
+            "timing_only_or_missing": [],
+            "timing_params_known": 10,
+            "unsupported": []
           }
         }
       ]
@@ -9180,24 +10074,20 @@
               ],
               "summary": {
                 "complete": {
-                  "functional": false,
-                  "isa": false,
+                  "functional": true,
+                  "isa": true,
                   "parser": true,
-                  "timing": false
+                  "timing": true
                 },
-                "functional_exact": 13,
+                "functional_exact": 14,
                 "instructions": 14,
-                "isa_known": 13,
+                "isa_known": 14,
                 "memory_records": 7,
-                "mnemonics_unknown": [
-                  "ret"
-                ],
+                "mnemonics_unknown": [],
                 "parser_ok": 14,
                 "timing_only_or_missing": [],
-                "timing_params_known": 13,
-                "unsupported": [
-                  "unsupported: instruction L150: ret is a region boundary (REGION BOUNDARY: a region ends before ret)"
-                ]
+                "timing_params_known": 14,
+                "unsupported": []
               }
             },
             {
@@ -9299,34 +10189,41 @@
           ],
           "summary": {
             "complete": {
-              "functional": false,
-              "isa": false,
+              "functional": true,
+              "isa": true,
               "parser": true,
-              "timing": false
+              "timing": true
             },
-            "functional_exact": 163,
+            "functional_exact": 165,
             "instructions": 165,
-            "isa_known": 163,
+            "isa_known": 165,
             "memory_records": 56,
-            "mnemonics_unknown": [
-              "call"
-            ],
+            "mnemonics_unknown": [],
             "parser_ok": 165,
-            "timing_only_or_missing": [
-              "missing parameter(s): latency.scalar_idiv, latency.scalar_idiv"
-            ],
-            "timing_params_known": 162,
-            "unsupported": [
-              "unsupported: instruction L17: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)",
-              "unsupported: instruction L19: call is a region boundary (REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported)"
-            ]
+            "timing_only_or_missing": [],
+            "timing_params_known": 165,
+            "unsupported": []
           }
         },
         {
           "function": "_Z15ComputeSPMV_refRK19SparseMatrix_STRUCTR13Vector_STRUCTS3_",
           "loops": [],
           "summary": {
-            "error": "line 25: symbolic immediate '$_Z15ComputeSPMV_refRK19SparseMatrix_STRUCTR13Vector_STRUCTS3_._omp_fn.0' not supported"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": true
+            },
+            "functional_exact": 35,
+            "instructions": 35,
+            "isa_known": 35,
+            "memory_records": 10,
+            "mnemonics_unknown": [],
+            "parser_ok": 35,
+            "timing_only_or_missing": [],
+            "timing_params_known": 35,
+            "unsupported": []
           }
         }
       ]
@@ -9531,13 +10428,27 @@
             }
           ],
           "summary": {
-            "error": "line 395: symbolic immediate '$.LC0' not supported"
+            "complete": {
+              "functional": true,
+              "isa": true,
+              "parser": true,
+              "timing": true
+            },
+            "functional_exact": 321,
+            "instructions": 321,
+            "isa_known": 321,
+            "memory_records": 129,
+            "mnemonics_unknown": [],
+            "parser_ok": 321,
+            "timing_only_or_missing": [],
+            "timing_params_known": 321,
+            "unsupported": []
           }
         }
       ]
     },
     {
-      "file": "C:/tmp/kt/knc-char/kernels.s",
+      "file": "C:/Users/xuzhi/AppData/Local/Temp/claude/C--Users-xuzhi-Documents-gcc-knc/9ca339a7-cf71-4687-86a8-5a8d0f85cdc8/scratchpad/char/kernels.s",
       "functions": [
         {
           "function": "char_kernel_0",
@@ -9754,55 +10665,20 @@
           "loops": [],
           "summary": {
             "complete": {
-              "functional": false,
-              "isa": false,
+              "functional": true,
+              "isa": true,
               "parser": true,
-              "timing": false
+              "timing": true
             },
-            "functional_exact": 41,
+            "functional_exact": 73,
             "instructions": 73,
-            "isa_known": 41,
+            "isa_known": 73,
             "memory_records": 2,
-            "mnemonics_unknown": [
-              "vpmadd231d"
-            ],
+            "mnemonics_unknown": [],
             "parser_ok": 73,
             "timing_only_or_missing": [],
-            "timing_params_known": 41,
-            "unsupported": [
-              "unsupported: instruction L876: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L877: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L878: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L879: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L880: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L881: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L882: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L883: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L884: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L885: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L886: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L887: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L888: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L889: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L890: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L891: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L892: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L893: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L894: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L895: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L896: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L897: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L898: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L899: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L900: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L901: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L902: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L903: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L904: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L905: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L906: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L907: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost"
-            ]
+            "timing_params_known": 73,
+            "unsupported": []
           }
         },
         {
@@ -9810,55 +10686,20 @@
           "loops": [],
           "summary": {
             "complete": {
-              "functional": false,
-              "isa": false,
+              "functional": true,
+              "isa": true,
               "parser": true,
-              "timing": false
+              "timing": true
             },
-            "functional_exact": 41,
+            "functional_exact": 73,
             "instructions": 73,
-            "isa_known": 41,
+            "isa_known": 73,
             "memory_records": 2,
-            "mnemonics_unknown": [
-              "vpmadd231d"
-            ],
+            "mnemonics_unknown": [],
             "parser_ok": 73,
             "timing_only_or_missing": [],
-            "timing_params_known": 41,
-            "unsupported": [
-              "unsupported: instruction L959: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L960: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L961: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L962: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L963: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L964: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L965: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L966: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L967: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L968: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L969: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L970: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L971: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L972: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L973: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L974: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L975: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L976: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L977: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L978: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L979: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L980: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L981: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L982: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L983: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L984: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L985: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L986: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L987: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L988: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L989: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost",
-              "unsupported: instruction L990: mnemonic 'vpmadd231d' is not in the supported subset; it gets no default cost"
-            ]
+            "timing_params_known": 73,
+            "unsupported": []
           }
         },
         {
@@ -11928,19 +12769,19 @@
           "loops": [],
           "summary": {
             "complete": {
-              "functional": false,
+              "functional": true,
               "isa": true,
               "parser": true,
               "timing": false
             },
-            "functional_exact": 77,
+            "functional_exact": 78,
             "instructions": 78,
             "isa_known": 78,
             "memory_records": 36,
             "mnemonics_unknown": [],
             "parser_ok": 78,
             "timing_only_or_missing": [
-              "timing only: lock add used as a publication fence; latency.fence must be known; missing parameter(s): latency.fence"
+              "missing parameter(s): latency.fence, latency.fence"
             ],
             "timing_params_known": 77,
             "unsupported": []
@@ -11951,19 +12792,19 @@
           "loops": [],
           "summary": {
             "complete": {
-              "functional": false,
+              "functional": true,
               "isa": true,
               "parser": true,
               "timing": false
             },
-            "functional_exact": 77,
+            "functional_exact": 78,
             "instructions": 78,
             "isa_known": 78,
             "memory_records": 36,
             "mnemonics_unknown": [],
             "parser_ok": 78,
             "timing_only_or_missing": [
-              "timing only: lock add used as a publication fence; latency.fence must be known; missing parameter(s): latency.fence"
+              "missing parameter(s): latency.fence, latency.fence"
             ],
             "timing_params_known": 77,
             "unsupported": []
@@ -11974,19 +12815,19 @@
           "loops": [],
           "summary": {
             "complete": {
-              "functional": false,
+              "functional": true,
               "isa": true,
               "parser": true,
               "timing": false
             },
-            "functional_exact": 77,
+            "functional_exact": 78,
             "instructions": 78,
             "isa_known": 78,
             "memory_records": 36,
             "mnemonics_unknown": [],
             "parser_ok": 78,
             "timing_only_or_missing": [
-              "timing only: lock add used as a publication fence; latency.fence must be known; missing parameter(s): latency.fence"
+              "missing parameter(s): latency.fence, latency.fence"
             ],
             "timing_params_known": 77,
             "unsupported": []
@@ -17482,11 +18323,11 @@
   ],
   "totals": {
     "functions": 455,
-    "instructions": 215111,
-    "loop_instructions": 5432,
-    "loop_instructions_covered_timing": 4848,
-    "loops": 317,
-    "loops_complete_functional": 295,
-    "loops_complete_timing": 294
+    "instructions": 219772,
+    "loop_instructions": 7209,
+    "loop_instructions_covered_timing": 5751,
+    "loops": 357,
+    "loops_complete_functional": 357,
+    "loops_complete_timing": 341
   }
 }

@@ -6,10 +6,23 @@
 gcc_knc project's card (S6-03 2026-11-06; S8-01/S8-10/S8-12/S8-17 2026-11-07..09; identifiers
 in the profile's `native_measurement_ids`). The engine's predictions were then compared with
 the 119 measured rows of that characterization (`validation.md`): rows that set a parameter are
-labeled calibration, the rest are held out. No prediction of a *compiler-generated* region has
-yet been compared with a native run of that region; `tests/heldout_native/` holds the
-characterization comparison only. The other card profiles are uncalibrated (literature or
-documented values). `synthetic-demo` is synthetic.
+labeled calibration, the rest are held out. Compiled code is validated in
+`tests/heldout_native/` (S12-31 row loops and HPCG kernels, S12-30 sparse products, from the
+binaries that ran on the card); `validation.md` reports the error, the ranking reliability and
+the decision bar. The core timing layer `core-x100-measured` is shared by the 3120 and 5110P
+profiles as transferred values (same core design, not re-measured there): every result on them
+is an unvalidated estimate. `synthetic-demo` is synthetic.
+
+## The habit
+
+`knc_twin.py calibration-plan` prints, for a profile, the staged microbenchmarks that settle its
+assumed or derived parameters (each a loop body for the `tests/bench/knc-char` catalog, about a
+second of card time at 1/2/4 threads), the open misses they would explain, and the held-out
+cases to add (`references/calibration-plan.json`). After each card window: run the open items
+that fit, import them (`import-native`), add the window's compiled runs as held-out cases with
+their inputs and logs, record the prediction before the comparison, rerun
+`scripts/validate_heldout.py`. The bar for relying on the twin to choose between variants is
+part of that report.
 
 Passing `selftest` means the model behaves as specified; it is not hardware validation.
 
@@ -66,18 +79,21 @@ Passing `selftest` means the model behaves as specified; it is not hardware vali
 
 ## Native requests worth sending now
 
-Listed with the parameter or rule each would settle (`validation.md`, open misses):
+`knc_twin.py calibration-plan --out DIR` lists them with the parameter each settles, a loop body
+and the variants; the list is `references/calibration-plan.json`. In order of what blocks real
+regions today: the fence and locked-instruction cost, scatter occupancy, the x87 memory-operand
+split (the S12-31 and S12-30 loops are 3% slow), the L1 conflict-miss behaviour (the S12-30 small
+cases are 14 to 18% slow), the store-to-load rules at one and two threads, `fsqrt`/`idiv`/x87
+control priors, sign-extension cost, taken-branch bubble at two threads, gather cost between one
+and sixteen lines, prefetcher depth and stride.
 
-- a dependent plain vector-load chain (`vmovaps` load, `vaddps` use) at one thread:
-  `latency.vector_load_l1` 5 derived vs 3 documented;
-- independent store/reload pairs with and without aliasing: the store-to-load path for
-  non-dependent pairs (spill_reload.rt 5 measured vs 9 modeled);
-- `dec/jnz` and `sub/jnz` loops against `cmp/jne`: flag-producer pairing beyond cmp/test;
-- scatter completion cost by lines touched: `occupancy.scatter_cycles_per_line`;
-- `lock add` in a dependent chain: `latency.fence`; `fsqrt`, `idiv`, `fldcw/fnstsw` latencies;
-- a scattered 16-line gather chain: per-line occupancy (7 modeled vs about 11 measured);
-- a four-thread sequential stream: HWP depth and memory service (85 modeled vs 78 measured per
-  thread), and the branch-dense four-thread case (prefetch-buffer refill, 17 vs 12).
+## Other cards
+
+No 3120 or 5110P has been measured by the project; the `--profile 3100`/`5100` runs are the 7120
+card with fewer threads and less memory. On a real card of either model, one run of the
+characterization catalog (about ten minutes) gives its memory latency, service rate and
+bandwidths and checks that the core layer transfers; until then their profiles say
+`transferred_core_measurements`.
 
 ## Comparing like with like
 

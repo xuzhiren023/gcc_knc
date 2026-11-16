@@ -38,7 +38,7 @@ CASES = [
     ("bounds-loop-2acc", "loop MII, two accumulators (resource-bound)", ["bounds", "reduce_2acc.json", "--loop"]),
     ("bounds-search", "exhaustive reorder search on a small block", ["bounds", "agi_gap1.json", "--search"]),
     ("card-stream", "card scenario: bandwidth-bound stream", ["bounds", "--scale", "card", "--params", "card_params_stream.json"]),
-    ("card-readonly-missing", "card scenario needing an unknown bandwidth: needs_parameters", ["bounds", "--scale", "card", "--params", "card_params_readonly_missing.json"]),
+    ("card-readonly-missing", "card scenario on a profile without a measured bandwidth (3120): needs_parameters", ["bounds", "--scale", "card", "--params", "card_params_readonly_missing.json", "--profile", "card-3120-documented"]),
     ("card-readonly-sweep", "card scenario with a declared bandwidth sweep", ["bounds", "--scale", "card", "--params", "card_params_readonly_sweep.json"]),
     ("pair", "pair scenario with a concurrency sweep", ["bounds", "--scale", "pair", "--params", "pair_params.json"]),
     ("unsupported-insn", "unknown mnemonic: unsupported", ["simulate", "unknown_insn.json"]),
@@ -51,7 +51,13 @@ CASES = [
     ("gcc-x87-f", "GCC-KNC x87 double function, adapter output, exact check", ["functional", os.path.join(FX, "gcc", "x87test_f.json")]),
     ("gcc-x87-g", "GCC-KNC x87 float dot-product loop with prefetches, timing", ["simulate", os.path.join(FX, "gcc", "x87test_g.json")]),
     ("gcc-int-h", "GCC-KNC scalar integer loop, loop bounds", ["bounds", os.path.join(FX, "gcc", "x87test_h.json")]),
-    ("batch-gate-csr", "real candidate batch: S12-30 gate CSR variants, frozen profile, queue routing", ["batch", os.path.join(FX, "batch", "manifest.json")]),
+    ("batch-gate-csr", "real candidate batch: S12-30 gate CSR variants from the gate's objects, frozen profile, queue routing", ["batch", os.path.join(FX, "batch", "manifest.json")]),
+    ("binary-hpcg-spmv", "HPCG ComputeSPMV_ref from the linked S12-31 bench binary (layout, padding, call and ret), toy problem", ["simulate", os.path.join(ROOT, "tests", "heldout_native", "s12-31-hpcg-toy", "kernels", "knc_spmv.json"), "--max-seconds", "600"]),
+    ("binary-mb-gas13", "S12-31 row loop behind a 13-byte assembler NOP with 66/2e prefixes (decode delay modeled)", ["simulate", os.path.join(ROOT, "tests", "heldout_native", "s12-31-microbench", "kernels", "gas_13.json")]),
+    ("binary-mb-adj0", "the same loop with the compare next to its jump (x87 issues alone)", ["simulate", os.path.join(ROOT, "tests", "heldout_native", "s12-31-microbench", "kernels", "adj_0.json")]),
+    ("rollup-hpcg", "program roll-up: S12-31 rule A over the HPCG pilot's SpMV and SymGS shares", ["rollup", os.path.join(FX, "rollup", "manifest.json")]),
+    ("calibration-plan", "what the next card window should measure", ["calibration-plan"]),
+    ("profile-3120", "the same kernel on the 3120 profile: transferred core timing, unvalidated", ["simulate", "saxpy_loop.json", "--profile", "card-3120-documented"]),
 ]
 
 

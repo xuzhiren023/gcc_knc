@@ -1,7 +1,7 @@
 {
  "schema": "knc-twin.kernel/1",
  "name": "gather_scattered",
- "description": "vgatherdps each lane in a different cache line (stride 64 bytes); expected lanes are the gathered indices themselves",
+ "description": "vgatherdps each lane in a different cache line (stride 64 bytes), in the completion loop the hardware needs (one cache line per execution); expected lanes are the gathered indices themselves",
  "unit_of_work": {
   "description": "one 16-lane gather",
   "count": 1
@@ -301,6 +301,7 @@
    "instructions": [
     {
      "id": "g",
+     "label": "again",
      "op": "vgatherdps",
      "ops": [
       "zmm0",
@@ -310,8 +311,15 @@
        "scale": 4
       }
      ],
-     "mask": "k1",
-     "lines": 16
+     "mask": "k1"
+    },
+    {
+     "id": "loop",
+     "op": "jknzd",
+     "ops": [
+      "k1",
+      "again"
+     ]
     },
     {
      "id": "use",

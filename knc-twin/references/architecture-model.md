@@ -18,9 +18,20 @@ and are checked row by row in `validation.md`.
   head instruction's operands ready, resources free), the one that issued least recently wins;
   ties go to the lower context number (round-robin picker, R02 ch.4, R17 slide 10). A context
   that is stalled never issues out of order and never lets later instructions bypass the head.
-- Instruction fetch always hits; the two-entry prefetch buffer and its refill bubble (R02 ch.4)
-  are not modeled. The C10 fixed-direction row at four threads (17 measured vs 12 modeled) is the
-  visible cost of this omission for branch-dense code.
+- Front end (0.3.0). With code layout (records carrying `encoding` from `scripts/from_binary.py`):
+  an instruction with k two-cycle prefixes (66, 67, lock, segment, rep: R02 p.56) cannot issue
+  before `frontend.slow_prefix_decode_cycles` x k cycles after its context's previous issue, so
+  one such prefix is hidden by the two-cycle spacing and each further one costs two cycles
+  (S12-31 padding rows: the assembler's 10- to 15-byte NOPs with 66/2e prefixes); such an
+  instruction does not pair. Alignment padding executes as the NOPs it is. The loop-top offset
+  and 16- or 64-byte boundary crossings cost nothing (S12-31 mis_4..mis_60 within 0.45 ns per
+  row). Without layout these effects are not modeled and the result says so.
+- Each taken branch costs the core `frontend.taken_branch_core_bubble_cycles` (1, derived from
+  the S8-01 C10 fixed-direction row at four threads: 17.02 vs 12.4 without it) for the
+  prefetch-buffer refill (R02 ch.4); at one thread the same-context spacing hides it.
+- Instruction cache: assumed resident (hot region). `scenario.frontend.icache` `cold_l2` or
+  `cold_memory` adds a 32 KiB 8-way instruction cache whose first touch of each code line stalls
+  the context for the data-side L2 or memory latency (assumed equal for code).
 
 ## Pairing (V pipe)
 
@@ -31,9 +42,17 @@ and are checked row by row in `validation.md`.
 - A pair must have no register, address, mask or flag dependency between its members, except
   `cmp/jcc` and `test/jcc` (R02 p.56). `dec/jnz` and `sub/jnz` are not paired (not documented;
   native request candidate).
-- A `nop` in the U slot takes no V partner (S6-03 agi.gap1-4: each nop beyond the first costs a
-  full issue slot); an unconditional `jmp` does not issue in the V slot (S8-01 C10 fixed row:
-  cmp/je, add, jmp are three issue events). Conditional branches do pair as `cmp/jcc`.
+- A `nop` takes no partner on either side (S6-03 agi.gap1-4; S12-31 one_15: fifteen
+  single-byte NOPs cost one issue each); an unconditional `jmp` does not issue in the V slot
+  (S8-01 C10 fixed row: cmp/je, add, jmp are three issue events). Conditional branches do pair as
+  `cmp/jcc`.
+- An x87 instruction issues alone (`pairing.x87_pairs_with_scalar` false): S12-31 measured
+  `fmull; add; cmp; faddp; jg` at five issues per iteration and `fmull; faddp; add; cmp; jg` at
+  four (44.8 ns per 27-product row, one issue per iteration); the compare must be the first of
+  its pair (an independent instruction before it takes it as partner, mov_adj_0). Whether other
+  scalar instructions pair with x87 is not measured (calibration-plan x87-pairing).
+- A load and a store can issue together (`pairing.load_store_pair`, derived from spill_reload.rt
+  at four threads: 1.07 cycles per store plus reload); the L1 port limit counts loads.
 - Encoding rules (R02 p.56: at most 8 bytes, not displacement and immediate together, no
   MVEX/VEX form with a 32-bit displacement) apply when a record carries `encoding` hints;
   otherwise the record is assumed pairable and the assumption is recorded.
@@ -55,17 +74,24 @@ and are checked row by row in `validation.md`.
   scalar load latency.
 - A vector arithmetic instruction with a memory source ("folded load") pays no extra latency on
   an L1 hit (S6-03 C9) and stalls like a load otherwise.
-- Store-to-load through the same line: the load waits `latency.store_to_load_same_line` (7,
-  derived from the C9 memory chain) after the store issued. Independent store/reload pairs are
-  therefore over-charged (spill_reload.rt 9 modeled vs 5 measured): a known open miss.
+- Stores and loads (0.3.0): a load may issue `store.load_after_store_interlock_cycles` (4,
+  derived from spill_reload.rt at two and four threads and the C9 memory chains at one thread)
+  after any store of its context; a load of a line stored recently gets the stored data
+  `latency.store_to_load_same_line` (7) cycles after the store plus the load latency, without
+  blocking issue. Open: spill_reload.rt at one thread is 5.09 (one cycle more), and the
+  two-thread C9 chains 12.0/11.0 against 8 to 9 modeled.
 - Address-generation interlock: a register written at cycle t can be used as an address from
   t + 3 (R01 p.19, R17 slide 13; S6-03 agi.gap0).
 - L1 data port: `l1.accesses_per_cycle` (1, R17 slide 13; alternative 2) loads+stores per cycle.
-- Gathers occupy a gather unit for `occupancy.gather_cycles_per_line` (7) cycles per distinct
-  line while other instructions keep issuing; the data is ready after
-  `latency.gather_first_line` (15) + 7 per further line; the completion mask is readable after
-  `latency.gather_mask_cycles` (2). Scattered 16-line gathers measure about 11 per line, so the
-  model is optimistic there (gather_scattered rows). Scatters need
+- Gathers and scatters complete one cache line per execution (R05 section V.D): the lanes that
+  share the line of the lowest pending lane are done and the others stay in the mask, so the
+  `jknzd` loop the compiler emits re-executes the instruction once per line. Each execution
+  occupies the gather unit `occupancy.gather_cycles_per_line` (7) cycles; its data is ready
+  after `latency.gather_first_line` (11, derived from gather_all.lat minus the index operation)
+  and a re-execution waits for it because the lanes merge into the destination, which gives the
+  measured 175 cycles for sixteen lines (16 x 11, gather_scattered.rt). The completion mask is
+  readable after `latency.gather_mask_cycles` (2). `numerical_policy.gather_completion` `all`
+  restores one-shot completion for hand-written kernels. Scatters need
   `occupancy.scatter_cycles_per_line`, unknown in every bundled profile.
 - `vprefetch1/2/nta` issue at most one per `occupancy.vprefetch_l2_core_cycles` (2) core cycles
   (S8-01 C2 measured 2.25). `vprefetch0` costs only its issue slot.
@@ -73,8 +99,19 @@ and are checked row by row in `validation.md`.
   when the line is in L1 or L2 and `store.nr_stall_cycles_memory` (157) otherwise, and occupy a
   shared store path for `store.nr_occupancy_core_cycles` (9) (S6-03 store_stream rows). A
   non-resident line written by a no-read store is left in L2 (assumed).
-- Fences (`lock add`, `mfence`), `fldcw/fnstcw/fnstsw`, `fsqrt`, `idiv` need latencies that are
-  unknown in every bundled profile: a region using them stops with `missing_parameter`.
+- `fsqrt` (70), `idiv`/`div` (46) and `fldcw/fnstcw/fnstsw` (7) carry labelled priors from the
+  published Pentium (P5) instruction timings in `knc-common` (status assumed; the P5 figures that
+  could be checked on the card agree: FDIV 39, IMUL 10); the calibration plan stages the
+  microbenchmarks that replace them. Fences and locked read-modify-write instructions (`lock
+  add/sub/and/or/xor/inc/dec/xadd/cmpxchg/xchg`) need `latency.fence`, unknown in every bundled
+  profile: a region using them stops with `missing_parameter`.
+- Calls and returns (0.3.0). A `call` to a label in the region pushes the return address and
+  continues there; `ret` pops it and continues at the return site (or ends the stream at the
+  entry sentinel when the kernel's `entry` is `function`). A call to a callee outside the region
+  needs a costed stub in the kernel's `calls`: the context stalls for the declared cycles (plus
+  `cycles_per_byte` for mem* models), the callee's own cache and resource use is not modeled,
+  and a result with stub calls is never a calibrated forecast. A direct call is never
+  mispredicted; a `ret` is predicted when it returns where it returned last time (assumed).
 
 ## x87
 
@@ -85,7 +122,12 @@ control word's rounding and precision control, extended-precision arithmetic wit
 `fsubrp %st,%st(1)` = st1-st0; `fsubrl m` = m-st0), checked against GCC-KNC output
 (`fixtures/gcc/x87test.s`). The functional trace gives the timing engine the physical registers
 each instruction reads and writes, so x87 chains are scoreboarded like vector chains; a static
-trace falls back to serializing x87 instructions. x87 instructions issue on U only.
+trace falls back to serializing x87 instructions. x87 instructions issue on U only and alone.
+An x87 instruction with a memory operand holds its context until its result is complete
+(`x87.mem_operand_serializes`, derived from the S12-31 loop-body orders): `fldl m` delivers
+after `latency.x87_load` (3) and `fmull m` after `latency.x87_mem_operand_load` (1) plus the
+multiply (3); only the sum of the two latencies is measured (7 cycles per `fldl; fmull` pair).
+`fxam`, `ftst`, `frndint` are exact; `fsqrt` is correctly rounded in the control word's precision.
 
 ## Memory
 
@@ -99,7 +141,8 @@ trace falls back to serializing x87 instructions. x87 instructions issue on U on
   charged all misses in parallel (optimistic).
 - Scenarios: `fixed_level` (every access at one level), `classified` (address ranges), and
   `line_tracking` (set-associative true-LRU L1 32 KB/8-way and inclusive L2 512 KB/8-way, cold
-  lines at `cold_level`, optional warm ranges). Optional sub-models under `line_tracking`:
+  lines at `cold_level`, optional warm ranges). Sub-models under `line_tracking`, each `auto`
+  (on when the profile has its parameters: the default since 0.3.0), `modeled` or `off`:
   - `tlb: modeled`: 64-entry fully associative first-level DTLB for 4 KiB pages
     (`tlb.l1_entries_4k`, measured C4) with `tlb.l1_miss_penalty_cycles` (29, measured C4 and
     R06 Table II); warm ranges also warm the TLB; the second-level TLB and page walks are not
@@ -134,15 +177,31 @@ policy, compares to masks, blends, conversions (dq<->ps, pd->dq, ps<->pd, round)
 swizzles, broadcasts, up/down conversions (float16/uint8/sint8/uint16/sint16), masked loads
 and stores (merge semantics: IMCI has no zeroing masks), vloadunpack/vpackstore halves with the
 64-byte boundary rule, dword/qword gather and scatter with completion masks, `vpermd`,
-`vpermf32x4`, and the x87 stack. Python floats are never used as the IMCI implementation; see
+`vpermf32x4`, `vgetexpps/pd`, `vgetmantps/pd` (intervals and sign control), `vscaleps`, `vgmaxps/pd`,
+`vgminps/pd` (R27 FpMax/FpMin: NaN yields the other operand), the full `vpcmpd`/`vpcmpud` predicate
+family, `vpblendmd/q`, `vfixupnanps/pd`, `stmxcsr`, and the x87 stack including `fcoms/fcoml/fcomps/fcompl`
+(0.3.1, for PhiWeather's WRF loops). MXCSR is modeled: rounding mode, FTZ and DAZ from the numerical
+policy, all exceptions masked, and the sticky flags (invalid, denormal, zero-divide, overflow,
+underflow, inexact) that each vector FP instruction's active lanes raise unless it carries `{sae}`;
+`stmxcsr` stores it, and the divide/sqrt sequences GCC-KNC emits read its rounding bits from there.
+`vrcp23ps` and `vrsqrt23ps` are APPROXIMATE: the hardware guarantees 0.912 and 0.775 ulp (R27
+pp.577, 588), not a bit pattern, so the twin substitutes the correctly rounded value with the
+manual's special-value and flag behaviour and marks every result that depends on them
+(`functional_exactness`, `approximate_instructions`); the calibration plan captures the hardware
+tables that make them exact. Python floats are never used as the IMCI implementation; see
 `fp.py`. NaN propagation follows the x86 first-operand rule (assumed); default NaN is the x86
-real indefinite. Timing-only instructions (approximations, `vcvtfxpntpd2*` are exact now;
-`vrcp23ps`, `vrsqrt23ps`, `vlog2ps`, `vexp223ps`, `vscaleps`) make `functional` fail with
-`unsupported` and are only usable in static traces.
+real indefinite. Timing-only instructions (`vlog2ps`, `vexp223ps`) make `functional` fail with
+`unsupported` and are only usable in static traces; `vmaxps/vminps/vmaxpd/vminpd` are not IMCI
+instructions and are rejected.
 
 ## What this is not
 
-No encodings, no loader, no ABI, no C/Fortran translation, no whole-program binaries; `call`
-and `ret` are region boundaries. Contexts that communicate through memory are rejected by the
-sequential functional model. Pair and card scales are formulas, not simulations
-(`analytic-scales.md`).
+Not a system emulator: no operating system, system calls, files, signals, MPI or shared-memory
+processes; no indirect jumps or calls (jump tables, function pointers: reported as unsupported);
+no whole-program runs (about 20,000 simulated instructions per second). Callees outside the
+region are costed stubs, not executed code. Contexts that communicate through memory are
+rejected by the sequential functional model. No frequency or thermal effects, no coherence
+traffic, no loaded-latency growth beyond the memory-service rate. Pair and card scales are
+formulas, not simulations (`analytic-scales.md`). The binary adapter reads K1OM ELF files and
+`objdump` listings; it is not a loader (data symbols are copied, the stack and arguments come
+from the kernel's init).

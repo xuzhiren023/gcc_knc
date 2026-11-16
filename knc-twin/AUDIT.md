@@ -4,12 +4,12 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 
 | file | function | instrs | parser | isa | functional | timing | unknown mnemonics / blockers | innermost loops (label: instrs, functional, timing) | native s |
 |---|---|---:|---:|---:|---:|---:|---|---|---:|
-| compiler-donor.s | donor_csr_raw | 45 | 45 | 45 | 45 | 45 |  | .L4: 8, yes, yes; .L15: 13, no, no | 2.625 |
-| compiler-donor.s | donor_hpcg_raw | 41 | 41 | 41 | 41 | 41 |  | .L19: 8, yes, yes; .L29: 13, no, no |  |
+| compiler-donor.s | donor_csr_raw | 45 | 45 | 45 | 45 | 45 |  | .L4: 8, yes, yes; .L15: 13, yes, yes | 2.625 |
+| compiler-donor.s | donor_hpcg_raw | 41 | 41 | 41 | 41 | 41 |  | .L19: 8, yes, yes; .L29: 13, yes, yes |  |
 | compiler-donor.s | donor_csr_scalar | 8 | 8 | 8 | 8 | 8 |  |  |  |
 | compiler-donor.s | donor_hpcg_scalar | 8 | 8 | 8 | 8 | 8 |  |  |  |
-| compiler-donor.s | donor_lone_scalar | 21 | 21 | 21 | 21 | 21 |  | .L34: 8, yes, yes; .L33: 5, no, no |  |
-| compiler-donor.s | donor_shape_spmv | 53 | 53 | 53 | 53 | 53 |  | .L40: 8, yes, yes; .L49: 13, no, no |  |
+| compiler-donor.s | donor_lone_scalar | 21 | 21 | 21 | 21 | 21 |  | .L34: 8, yes, yes; .L33: 5, yes, yes |  |
+| compiler-donor.s | donor_shape_spmv | 53 | 53 | 53 | 53 | 53 |  | .L40: 8, yes, yes; .L49: 13, yes, yes |  |
 | compiler-donor.s | donor_shape_forward | 41 | 41 | 41 | 41 | 41 |  | .L53: 8, yes, yes |  |
 | compiler-donor.s | donor_shape_backward | 52 | 52 | 52 | 52 | 52 |  | .L64: 8, yes, yes |  |
 | compiler-knc.s | knc_csr_raw | 113 | 113 | 113 | 113 | 113 |  | .L6: 43, yes, yes; .L7: 8, yes, yes; .L8: 8, yes, yes | 2.525 |
@@ -17,7 +17,7 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 | compiler-knc.s | knc_csr_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-knc.s | knc_hpcg_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-knc.s | knc_lone_scalar | 86 | 86 | 86 | 86 | 86 |  | .L51: 42, yes, yes; .L52: 8, yes, yes; .L53: 8, yes, yes |  |
-| compiler-knc.s | knc_shape_spmv | 41 | 41 | 41 | 41 | 41 |  | .L65: 8, yes, yes; .L74: 11, no, no |  |
+| compiler-knc.s | knc_shape_spmv | 41 | 41 | 41 | 41 | 41 |  | .L65: 8, yes, yes; .L74: 11, yes, yes |  |
 | compiler-knc.s | knc_shape_forward | 44 | 44 | 44 | 44 | 44 |  | .L78: 8, yes, yes |  |
 | compiler-knc.s | knc_shape_backward | 61 | 61 | 61 | 61 | 61 |  | .L89: 8, yes, yes |  |
 | compiler-enabled.s | enabled_csr_raw | 270 | 270 | 270 | 270 | 270 |  | .L7: 14, yes, yes; .L17: 43, yes, yes; .L18: 8, yes, yes; .L55: 25, yes, yes; .L19: 8, yes, yes; .L10: 43, yes, yes; .L11: 8, yes, yes; .L12: 8, yes, yes | 2.525 |
@@ -25,7 +25,7 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 | compiler-enabled.s | enabled_csr_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-enabled.s | enabled_hpcg_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-enabled.s | enabled_lone_scalar | 119 | 119 | 119 | 119 | 119 |  | .L119: 14, yes, yes; .L121: 42, yes, yes; .L122: 8, yes, yes; .L120: 8, yes, yes |  |
-| compiler-enabled.s | enabled_shape_spmv | 155 | 155 | 155 | 155 | 155 |  | .L146: 12, yes, yes; .L139: 31, no, no; .L154: 9, yes, yes; .L149: 8, yes, yes; .L143: 8, yes, yes; .L144: 8, yes, yes |  |
+| compiler-enabled.s | enabled_shape_spmv | 155 | 155 | 155 | 155 | 155 |  | .L146: 12, yes, yes; .L139: 31, yes, yes; .L154: 9, yes, yes; .L149: 8, yes, yes; .L143: 8, yes, yes; .L144: 8, yes, yes |  |
 | compiler-enabled.s | enabled_shape_forward | 138 | 138 | 138 | 138 | 138 |  | .L185: 12, yes, yes; .L188: 8, yes, yes; .L182: 8, yes, yes; .L183: 8, yes, yes |  |
 | compiler-enabled.s | enabled_shape_backward | 179 | 179 | 179 | 179 | 179 |  | .L226: 12, yes, yes; .L223: 8, yes, yes; .L231: 8, yes, yes; .L224: 8, yes, yes |  |
 | compiler-fast.s | fast_csr_raw | 270 | 270 | 270 | 270 | 270 |  | .L7: 14, yes, yes; .L17: 43, yes, yes; .L18: 8, yes, yes; .L55: 25, yes, yes; .L19: 8, yes, yes; .L10: 43, yes, yes; .L11: 8, yes, yes; .L12: 8, yes, yes | 2.55 |
@@ -33,7 +33,7 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 | compiler-fast.s | fast_csr_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-fast.s | fast_hpcg_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-fast.s | fast_lone_scalar | 119 | 119 | 119 | 119 | 119 |  | .L119: 14, yes, yes; .L121: 42, yes, yes; .L122: 8, yes, yes; .L120: 8, yes, yes |  |
-| compiler-fast.s | fast_shape_spmv | 155 | 155 | 155 | 155 | 155 |  | .L146: 12, yes, yes; .L139: 31, no, no; .L154: 9, yes, yes; .L149: 8, yes, yes; .L143: 8, yes, yes; .L144: 8, yes, yes |  |
+| compiler-fast.s | fast_shape_spmv | 155 | 155 | 155 | 155 | 155 |  | .L146: 12, yes, yes; .L139: 31, yes, yes; .L154: 9, yes, yes; .L149: 8, yes, yes; .L143: 8, yes, yes; .L144: 8, yes, yes |  |
 | compiler-fast.s | fast_shape_forward | 138 | 138 | 138 | 138 | 138 |  | .L185: 12, yes, yes; .L188: 8, yes, yes; .L182: 8, yes, yes; .L183: 8, yes, yes |  |
 | compiler-fast.s | fast_shape_backward | 179 | 179 | 179 | 179 | 179 |  | .L226: 12, yes, yes; .L223: 8, yes, yes; .L231: 8, yes, yes; .L224: 8, yes, yes |  |
 | compiler-min4.s | min4_csr_raw | 270 | 270 | 270 | 270 | 270 |  | .L7: 14, yes, yes; .L17: 43, yes, yes; .L18: 8, yes, yes; .L55: 25, yes, yes; .L19: 8, yes, yes; .L10: 43, yes, yes; .L11: 8, yes, yes; .L12: 8, yes, yes | 2.55 |
@@ -41,7 +41,7 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 | compiler-min4.s | min4_csr_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-min4.s | min4_hpcg_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-min4.s | min4_lone_scalar | 119 | 119 | 119 | 119 | 119 |  | .L119: 14, yes, yes; .L121: 42, yes, yes; .L122: 8, yes, yes; .L120: 8, yes, yes |  |
-| compiler-min4.s | min4_shape_spmv | 155 | 155 | 155 | 155 | 155 |  | .L146: 12, yes, yes; .L139: 31, no, no; .L154: 9, yes, yes; .L149: 8, yes, yes; .L143: 8, yes, yes; .L144: 8, yes, yes |  |
+| compiler-min4.s | min4_shape_spmv | 155 | 155 | 155 | 155 | 155 |  | .L146: 12, yes, yes; .L139: 31, yes, yes; .L154: 9, yes, yes; .L149: 8, yes, yes; .L143: 8, yes, yes; .L144: 8, yes, yes |  |
 | compiler-min4.s | min4_shape_forward | 138 | 138 | 138 | 138 | 138 |  | .L185: 12, yes, yes; .L188: 8, yes, yes; .L182: 8, yes, yes; .L183: 8, yes, yes |  |
 | compiler-min4.s | min4_shape_backward | 179 | 179 | 179 | 179 | 179 |  | .L226: 12, yes, yes; .L223: 8, yes, yes; .L231: 8, yes, yes; .L224: 8, yes, yes |  |
 | compiler-manual.s | manual_csr_raw | 185 | 185 | 185 | 185 | 185 |  | .L14: 43, yes, yes; .L15: 8, yes, yes; .L9: 17, yes, yes; .L16: 8, yes, yes | 2.55 |
@@ -49,49 +49,49 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 | compiler-manual.s | manual_csr_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-manual.s | manual_hpcg_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-manual.s | manual_lone_scalar | 121 | 121 | 121 | 121 | 121 |  | .L89: 42, yes, yes; .L90: 8, yes, yes; .L84: 16, yes, yes; .L91: 8, yes, yes |  |
-| compiler-manual.s | manual_shape_spmv | 133 | 133 | 133 | 133 | 133 |  | .L112: 8, yes, yes; .L100: 59, no, no; .L109: 13, yes, yes; .L107: 15, yes, yes |  |
+| compiler-manual.s | manual_shape_spmv | 133 | 133 | 133 | 133 | 133 |  | .L112: 8, yes, yes; .L100: 59, yes, yes; .L109: 13, yes, yes; .L107: 15, yes, yes |  |
 | compiler-manual.s | manual_shape_forward | 136 | 136 | 136 | 136 | 136 |  | .L141: 8, yes, yes; .L138: 13, yes, yes |  |
-| compiler-manual.s | manual_shape_backward | 194 | 194 | 194 | 194 | 194 |  | .L177: 8, yes, yes; .L174: 13, yes, yes; .L204: 27, no, no |  |
+| compiler-manual.s | manual_shape_backward | 194 | 194 | 194 | 194 | 194 |  | .L177: 8, yes, yes; .L174: 13, yes, yes; .L204: 27, yes, yes |  |
 | compiler-twin.s | twin_csr_raw | 240 | 240 | 240 | 240 | 240 |  | .L16: 43, yes, yes; .L17: 8, yes, yes; .L18: 8, yes, yes; .L8: 43, yes, yes; .L9: 8, yes, yes; .L50: 27, yes, yes; .L11: 8, yes, yes | 2.605 |
 | compiler-twin.s | twin_hpcg_raw | 232 | 232 | 232 | 232 | 232 |  | .L67: 42, yes, yes; .L68: 8, yes, yes; .L69: 8, yes, yes; .L60: 42, yes, yes; .L61: 8, yes, yes; .L86: 26, yes, yes; .L63: 8, yes, yes |  |
 | compiler-twin.s | twin_csr_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-twin.s | twin_hpcg_scalar | 9 | 9 | 9 | 9 | 9 |  |  |  |
 | compiler-twin.s | twin_lone_scalar | 86 | 86 | 86 | 86 | 86 |  | .L95: 42, yes, yes; .L96: 8, yes, yes; .L97: 8, yes, yes |  |
-| compiler-twin.s | twin_shape_spmv | 41 | 41 | 41 | 41 | 41 |  | .L109: 8, yes, yes; .L118: 11, no, no |  |
+| compiler-twin.s | twin_shape_spmv | 41 | 41 | 41 | 41 | 41 |  | .L109: 8, yes, yes; .L118: 11, yes, yes |  |
 | compiler-twin.s | twin_shape_forward | 44 | 44 | 44 | 44 | 44 |  | .L122: 8, yes, yes |  |
 | compiler-twin.s | twin_shape_backward | 61 | 61 | 61 | 61 | 61 |  | .L133: 8, yes, yes |  |
 | hpcg-shapes-on.s | sparse_rows | 270 | 270 | 270 | 270 | 270 |  | .L7: 14, yes, yes; .L17: 43, yes, yes; .L18: 8, yes, yes; .L55: 25, yes, yes; .L19: 8, yes, yes; .L10: 43, yes, yes; .L11: 8, yes, yes; .L12: 8, yes, yes |  |
-| hpcg-shapes-on.s | sparse_slice | 133 | 133 | 133 | 133 | 133 |  | .L62: 14, yes, yes; .L65: 43, yes, yes; .L66: 28, no, no; .L67: 8, yes, yes |  |
+| hpcg-shapes-on.s | sparse_slice | 133 | 133 | 133 | 133 | 133 |  | .L62: 14, yes, yes; .L65: 43, yes, yes; .L66: 28, yes, yes; .L67: 8, yes, yes |  |
 | hpcg-shapes-on.s | sparse_hpcg | 345 | 345 | 345 | 345 | 345 |  | .L96: 12, yes, yes; .L108: 43, yes, yes; .L109: 8, yes, yes; .L141: 24, yes, yes; .L110: 8, yes, yes; .L102: 42, yes, yes; .L103: 8, yes, yes; .L98: 42, yes, yes; .L99: 8, yes, yes; .L104: 8, yes, yes; .L100: 8, yes, yes |  |
-| hpcg-shapes-on.s | sparse_struct_spmv | 155 | 155 | 155 | 155 | 155 |  | .L151: 12, yes, yes; .L144: 31, no, no; .L159: 9, yes, yes; .L154: 8, yes, yes; .L148: 8, yes, yes; .L149: 8, yes, yes |  |
+| hpcg-shapes-on.s | sparse_struct_spmv | 155 | 155 | 155 | 155 | 155 |  | .L151: 12, yes, yes; .L144: 31, yes, yes; .L159: 9, yes, yes; .L154: 8, yes, yes; .L148: 8, yes, yes; .L149: 8, yes, yes |  |
 | hpcg-shapes-on.s | sparse_struct_forward | 139 | 139 | 139 | 139 | 139 |  | .L190: 12, yes, yes; .L193: 8, yes, yes; .L187: 8, yes, yes; .L188: 8, yes, yes |  |
 | hpcg-shapes-on.s | sparse_struct_backward | 179 | 179 | 179 | 179 | 179 |  | .L231: 12, yes, yes; .L228: 8, yes, yes; .L236: 8, yes, yes; .L229: 8, yes, yes |  |
 | hpcg-shapes-on.s | explicit_struct | 34 | 34 | 34 | 34 | 34 |  | .L269: 10, yes, yes |  |
-| hpcg-shapes-on.s | alias_bounds | 149 | 149 | 149 | 149 | 146 | missing parameter(s): latency.x87_control | .L285: 14, yes, yes; .L289: 43, yes, yes; .L290: 22, yes, yes; .L291: 8, yes, yes |  |
+| hpcg-shapes-on.s | alias_bounds | 149 | 149 | 149 | 149 | 149 |  | .L285: 14, yes, yes; .L289: 43, yes, yes; .L290: 22, yes, yes; .L291: 8, yes, yes |  |
 | hpcg-shapes-on.s | explicit_csr | 33 | 33 | 33 | 33 | 33 |  | .L324: 6, yes, yes; .L320: 12, yes, yes |  |
 | hpcg-shapes-on.s | explicit_rowlocal | 32 | 32 | 32 | 32 | 32 |  | .L336: 11, yes, yes |  |
 | hpcg-shapes-on.s | explicit_hpcg | 29 | 29 | 29 | 29 | 29 |  | .L344: 9, yes, yes |  |
 | hpcg-shapes-on.s | explicit_loop | 64 | 64 | 64 | 64 | 64 |  | .L360: 39, yes, yes; .L361: 6, yes, yes; .L362: 6, yes, yes |  |
 | hpcg-shapes-on.s | volatile_indices | 86 | 86 | 86 | 86 | 86 |  | .L369: 42, yes, yes; .L370: 9, yes, yes; .L371: 9, yes, yes |  |
-| hpcg-shapes-on.s | sentinel_slice | 29 | 29 | 29 | 29 | 28 | missing parameter(s): latency.x87_control | .L381: 15, yes, no; .L376: 6, no, no |  |
+| hpcg-shapes-on.s | sentinel_slice | 29 | 29 | 29 | 29 | 29 |  | .L381: 15, yes, yes; .L376: 6, yes, yes |  |
 | hpcg-shapes-on.s | explicit_indirect | 11 | 11 | 11 | 11 | 11 |  |  |  |
 | hpcg-shapes-on.s | explicit_stream | 5 | 5 | 5 | 5 | 5 |  |  |  |
-| application-cg.s | conj_grad_._omp_fn.0 | - | - | - | - | - | line 270: only 'lock add' is accepted among lock-prefixed instructions | | |
-| application-cg.s | MAIN__._omp_fn.2 | 96 | 96 | 94 | 94 | 92 | call | .L182: 8, yes, yes; .L180: 36, no, no; .L184: 6, yes, yes |  |
-| application-cg.s | MAIN__._omp_fn.1 | 283 | 283 | 278 | 278 | 274 | call | .L195: 58, yes, yes; .L196: 11, yes, yes; .L202: 14, yes, yes; .L197: 10, yes, yes; .L204: 9, yes, yes |  |
-| application-cg.s | MAIN__._omp_fn.3 | - | - | - | - | - | line 170: symbolic immediate '$.LC9' not supported | | |
-| application-cg.s | MAIN__ | - | - | - | - | - | line 35: symbolic immediate '$__cg_data_MOD_timeron' not supported | | |
-| application-cg.s | conj_grad_ | - | - | - | - | - | line 19: symbolic immediate '$conj_grad_._omp_fn.0' not supported | | |
-| application-cg.s | sparse_ | - | - | - | - | - | line 59: bad displacement '__tinfo_MOD_ilow@gottpoff' | | |
+| application-cg.s | conj_grad_._omp_fn.0 | 1637 | 1637 | 1637 | 1637 | 1628 | missing parameter(s): latency.fence, latency.fence; missing parameter(s): occupancy.scatter_cycles_per_line | .L6: 18, yes, yes; .Lknc_gather209: 3, yes, yes; .Lknc_scatter211: 3, yes, no; .Lknc_scatter212: 3, yes, no; .L13: 31, yes, yes; .L14: 8, yes, yes; .L40: 257, yes, no; .L45: 93, yes, yes; .L47: 9, yes, yes; .L48: 9, yes, yes; .L69: 16, yes, yes; .Lknc_gather873: 3, yes, yes; .Lknc_gather874: 3, yes, yes; .Lknc_scatter878: 3, yes, no; .L24: 93, yes, yes; .L26: 9, yes, yes; .L32: 24, yes, yes; .Lknc_gather1238: 3, yes, yes; .Lknc_gather1239: 3, yes, yes; .L61: 39, yes, yes; .Lknc_gather1423: 3, yes, yes; .Lknc_gather1424: 3, yes, yes; .Lknc_scatter1429: 3, yes, no; .Lknc_gather1432: 3, yes, yes; .Lknc_gather1435: 3, yes, yes; .Lknc_scatter1448: 3, yes, no; .L53: 23, yes, yes; .Lknc_gather1555: 3, yes, yes; .Lknc_gather1556: 3, yes, yes; .L27: 9, yes, yes; .L55: 60, yes, yes; .L63: 28, yes, yes; .L71: 11, yes, yes; .L15: 7, yes, yes; .L34: 64, yes, yes; .L8: 10, yes, yes |  |
+| application-cg.s | MAIN__._omp_fn.2 | 96 | 96 | 96 | 96 | 95 | missing parameter(s): occupancy.scatter_cycles_per_line | .L182: 8, yes, yes; .Lknc_scatter2265: 3, yes, no; .L184: 6, yes, yes |  |
+| application-cg.s | MAIN__._omp_fn.1 | 283 | 283 | 283 | 283 | 282 | missing parameter(s): occupancy.scatter_cycles_per_line | .L195: 58, yes, yes; .L196: 11, yes, yes; .L202: 14, yes, yes; .Lknc_gather2599: 3, yes, yes; .Lknc_scatter2601: 3, yes, no; .L197: 10, yes, yes; .L204: 9, yes, yes |  |
+| application-cg.s | MAIN__._omp_fn.3 | 336 | 336 | 336 | 336 | 335 | missing parameter(s): occupancy.scatter_cycles_per_line | .L227: 58, yes, yes; .L228: 11, yes, yes; .L235: 14, yes, yes; .Lknc_gather3030: 3, yes, yes; .Lknc_scatter3032: 3, yes, no; .L229: 10, yes, yes; .L237: 9, yes, yes |  |
+| application-cg.s | MAIN__ | 511 | 511 | 511 | 511 | 511 |  | .L260: 8, yes, yes; .L262: 26, yes, yes; .L263: 38, yes, yes; .L263: 38, yes, yes; .L264: 25, yes, yes; .L275: 62, yes, yes; .L275: 62, yes, yes |  |
+| application-cg.s | conj_grad_ | 23 | 23 | 23 | 23 | 23 |  |  |  |
+| application-cg.s | sparse_ | 1081 | 1081 | 1081 | 1081 | 1078 | missing parameter(s): occupancy.scatter_cycles_per_line | .L301: 10, yes, yes; .L308: 39, yes, yes; .L309: 7, yes, yes; .L314: 16, yes, yes; .L316: 767, yes, no; .L320: 11, yes, yes; .Lknc_gather4269: 3, yes, yes; .Lknc_scatter4271: 3, yes, no; .L326: 23, yes, yes; .L329: 10, yes, yes; .L329: 10, yes, yes; .L333: 12, yes, yes; .L336: 10, yes, yes; .L347: 40, yes, yes; .L348: 6, yes, yes; .L354: 16, yes, yes; .L356: 395, yes, no; .L360: 11, yes, yes; .Lknc_gather4864: 3, yes, yes; .Lknc_scatter4866: 3, yes, no; .L366: 47, yes, yes; .L371: 16, yes, yes; .Lknc_gather5058: 3, yes, yes; .Lknc_gather5059: 3, yes, yes; .Lknc_scatter5062: 3, yes, no; .L306: 7, yes, yes; .L321: 9, yes, yes; .L349: 6, yes, yes; .L361: 9, yes, yes; .L373: 11, yes, yes |  |
 | application-cg.s | vecset_ | 28 | 28 | 28 | 28 | 28 |  | .L493: 9, yes, yes |  |
-| application-cg.s | sprnvc_ | - | - | - | - | - | line 31: bad displacement '__cg_data_MOD_tran@gottpoff' | | |
-| application-cg.s | makea_ | - | - | - | - | - | line 50: bad displacement '__tinfo_MOD_num_threads@gottpoff' | | |
-| application-cg.s | MAIN__._omp_fn.0 | - | - | - | - | - | line 25: bad displacement '__cg_data_MOD_tran@gottpoff' | | |
-| application-cg.s | icnvrt_ | 12 | 12 | 12 | 12 | 9 | missing parameter(s): latency.x87_control |  |  |
-| application-cg.s | main | - | - | - | - | - | line 7: symbolic immediate '$options.51.0' not supported | | |
-| application-spmv.s | _Z15ComputeSPMV_refRK19SparseMatrix_STRUCTR13Vector_STRUCTS3_._omp_fn.0 | 165 | 165 | 163 | 163 | 162 | call | .L13: 12, yes, yes; .L45: 10, yes, yes; .L41: 14, no, no; .L16: 10, yes, yes; .L8: 8, yes, yes; .L10: 8, yes, yes; .L11: 8, yes, yes |  |
-| application-spmv.s | _Z15ComputeSPMV_refRK19SparseMatrix_STRUCTR13Vector_STRUCTS3_ | - | - | - | - | - | line 25: symbolic immediate '$_Z15ComputeSPMV_refRK19SparseMatrix_STRUCTR13Vector_STRUCTS3_._omp_fn.0' not supported | | |
-| application-symgs.s | _Z16ComputeSYMGS_refRK19SparseMatrix_STRUCTRK13Vector_STRUCTRS2_ | - | - | - | - | - | line 395: symbolic immediate '$.LC0' not supported | | |
+| application-cg.s | sprnvc_ | 84 | 84 | 84 | 84 | 84 |  | .L502: 40, yes, yes; .L502: 40, yes, yes; .L501: 6, yes, yes |  |
+| application-cg.s | makea_ | 191 | 191 | 191 | 191 | 191 |  | .L513: 4, yes, yes; .L518: 51, yes, yes; .L520: 11, yes, yes; .L521: 50, yes, yes |  |
+| application-cg.s | MAIN__._omp_fn.0 | 432 | 432 | 432 | 432 | 430 | missing parameter(s): occupancy.scatter_cycles_per_line | .L539: 39, yes, yes; .Lknc_gather6046: 3, yes, yes; .Lknc_scatter6049: 3, yes, no; .L546: 8, yes, yes; .Lknc_scatter6145: 3, yes, no; .L540: 28, yes, yes; .L548: 6, yes, yes |  |
+| application-cg.s | icnvrt_ | 12 | 12 | 12 | 12 | 12 |  |  |  |
+| application-cg.s | main | 10 | 10 | 10 | 10 | 10 |  |  |  |
+| application-spmv.s | _Z15ComputeSPMV_refRK19SparseMatrix_STRUCTR13Vector_STRUCTS3_._omp_fn.0 | 165 | 165 | 165 | 165 | 165 |  | .L13: 12, yes, yes; .L45: 10, yes, yes; .L41: 14, yes, yes; .L16: 10, yes, yes; .L8: 8, yes, yes; .L10: 8, yes, yes; .L11: 8, yes, yes |  |
+| application-spmv.s | _Z15ComputeSPMV_refRK19SparseMatrix_STRUCTR13Vector_STRUCTS3_ | 35 | 35 | 35 | 35 | 35 |  |  |  |
+| application-symgs.s | _Z16ComputeSYMGS_refRK19SparseMatrix_STRUCTRK13Vector_STRUCTRS2_ | 321 | 321 | 321 | 321 | 321 |  | .L9: 12, yes, yes; .L20: 12, yes, yes; .L13: 8, yes, yes; .L17: 8, yes, yes; .L6: 8, yes, yes; .L18: 8, yes, yes; .L7: 8, yes, yes; .L25: 8, yes, yes |  |
 | kernels.s | char_kernel_0 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_1 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_2 | 73 | 73 | 73 | 73 | 73 |  |  |  |
@@ -102,8 +102,8 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 | kernels.s | char_kernel_7 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_8 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_9 | 73 | 73 | 73 | 73 | 73 |  |  |  |
-| kernels.s | char_kernel_10 | 73 | 73 | 41 | 41 | 41 | vpmadd231d |  |  |
-| kernels.s | char_kernel_11 | 73 | 73 | 41 | 41 | 41 | vpmadd231d |  |  |
+| kernels.s | char_kernel_10 | 73 | 73 | 73 | 73 | 73 |  |  |  |
+| kernels.s | char_kernel_11 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_12 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_13 | 73 | 73 | 73 | 73 | 73 |  |  |  |
 | kernels.s | char_kernel_14 | 73 | 73 | 73 | 73 | 73 |  |  |  |
@@ -202,9 +202,9 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 | kernels.s | char_kernel_107 | 76 | 76 | 76 | 76 | 76 |  |  |  |
 | kernels.s | char_kernel_108 | 76 | 76 | 76 | 76 | 76 |  |  |  |
 | kernels.s | char_kernel_109 | 76 | 76 | 76 | 76 | 76 |  |  |  |
-| kernels.s | char_kernel_110 | 78 | 78 | 78 | 77 | 77 | timing only: lock add used as a publication fence; latency.f |  |  |
-| kernels.s | char_kernel_111 | 78 | 78 | 78 | 77 | 77 | timing only: lock add used as a publication fence; latency.f |  |  |
-| kernels.s | char_kernel_112 | 78 | 78 | 78 | 77 | 77 | timing only: lock add used as a publication fence; latency.f |  |  |
+| kernels.s | char_kernel_110 | 78 | 78 | 78 | 78 | 77 | missing parameter(s): latency.fence, latency.fence |  |  |
+| kernels.s | char_kernel_111 | 78 | 78 | 78 | 78 | 77 | missing parameter(s): latency.fence, latency.fence |  |  |
+| kernels.s | char_kernel_112 | 78 | 78 | 78 | 78 | 77 | missing parameter(s): latency.fence, latency.fence |  |  |
 | kernels.s | char_kernel_113 | 74 | 74 | 74 | 74 | 74 |  |  |  |
 | kernels.s | char_kernel_114 | 74 | 74 | 74 | 74 | 74 |  |  |  |
 | kernels.s | char_kernel_115 | 74 | 74 | 74 | 74 | 74 |  |  |  |
@@ -460,4 +460,4 @@ Per function: instructions, how many the twin reads (parser), knows (isa), execu
 | x87test.s | g | 92 | 92 | 92 | 92 | 92 |  | .L6: 55, yes, yes; .L7: 7, yes, yes; .L8: 7, yes, yes |  |
 | x87test.s | h | 124 | 124 | 124 | 124 | 124 |  | .L16: 90, yes, yes; .L17: 9, yes, yes; .L18: 9, yes, yes |  |
 
-Totals: 455 functions, 215111 instructions; 317 innermost loops with 5432 instructions, 295 loops complete for functional execution, 294 complete for timing (4848 instructions).
+Totals: 455 functions, 219772 instructions; 357 innermost loops with 7209 instructions, 357 loops complete for functional execution, 341 complete for timing (5751 instructions).

@@ -100,10 +100,13 @@ class TestPairing(unittest.TestCase):
         from knc_model.kernel import load_kernel
         k = load_kernel(helpers.fixture("gather_scattered.json"))
         res, sim, _ = simulate(k)
-        self.assertEqual(res["completion_cycles"], 15 + 7 * 15 + 4, "data ready after first-line latency plus per-line occupancy")
+        g = [e["cycle"] for e in sim.issue_log if e["id"] == "g"]
+        self.assertEqual(len(g), 16, "one execution per cache line")
+        self.assertEqual(g[8] - g[7], 11, "a re-executed gather waits for the previous execution's data (latency.gather_first_line)")
+        self.assertEqual(res["completion_cycles"], 15 * 11 + 11 + 4)
         k1 = load_kernel(helpers.fixture("gather_one_line.json"))
         res1, _, _ = simulate(k1)
-        self.assertEqual(res1["completion_cycles"], 15 + 4)
+        self.assertEqual(res1["completion_cycles"], 11 + 4)
         # the completion mask is readable after latency.gather_mask_cycles, not after the data
         k2 = kernel([{"op": "vgatherdps", "ops": ["zmm0", {"base": "rax", "vindex": "zmm1", "scale": 4}], "mask": "k1", "id": "g"},
                      {"op": "kmov", "ops": ["eax", "k1"], "id": "m"}],
@@ -122,13 +125,14 @@ class TestMemory(unittest.TestCase):
         ins.append({"op": "vmovaps", "ops": ["zmm0", {"base": "rax", "disp": 64}], "id": "ld"})
         ins.append(vadd("zmm1", "zmm0", "zmm0", id="use"))
         return kernel(ins, init={"memory": [{"addr": "0x1000", "u32": [1] * 32}], "registers": {"rax": "0x1000"}},
-                      scenario={"memory": {"type": "line_tracking", "cold_level": "memory"}, "branch": {"type": "all_predicted"}})
+                      scenario={"memory": {"type": "line_tracking", "cold_level": "memory", "tlb": "off", "hardware_prefetcher": "off", "memory_service": "unlimited"},
+                                "branch": {"type": "all_predicted"}})
 
     def test_demand_miss_stalls_context(self):
         res, sim, _ = simulate(self.cold_kernel(False))
         ic = issue_cycles(sim)
         p = profile()
-        self.assertEqual(ic[(0, "use", 0)], 357 + (5 - 3), "plain vector load to use = memory latency + (vector_load_l1 - scalar_load_l1)")
+        self.assertEqual(ic[(0, "use", 0)], p.get("latency.memory") + (5 - 3), "plain vector load to use = memory latency + (vector_load_l1 - scalar_load_l1)")
         self.assertGreater(res["per_context"]["0"]["stall_cycles"]["miss_stall"], 300)
 
     def test_prefetch_is_nonblocking_and_hides_latency(self):
@@ -156,7 +160,7 @@ class TestMemory(unittest.TestCase):
         res, sim, _ = simulate(k)
         ic = issue_cycles(sim)
         self.assertLess(ic[(0, "pf7", 0)], 20)
-        self.assertGreaterEqual(ic[(0, "pf8", 0)], 357, "the ninth prefetch waits for a free outstanding-miss slot (limit 8)")
+        self.assertGreaterEqual(ic[(0, "pf8", 0)], profile().get("latency.memory"), "the ninth prefetch waits for a free outstanding-miss slot (limit 8)")
         self.assertGreater(res["per_context"]["0"]["stall_cycles"]["outstanding_limit"], 0)
 
     def test_agi(self):
@@ -230,7 +234,7 @@ class TestBudgetsAndDeterminism(unittest.TestCase):
 
 
 class TestX87MemoryOperand(unittest.TestCase):
-    """An x87 op with a memory source pays the load and then its own latency on the x87 unit."""
+    """An x87 op with a memory source pays the operand read (latency.x87_mem_operand_load) and then its own latency on the x87 unit."""
 
     def chain_cycles_per_op(self, op, n):
         def run(count):
@@ -244,11 +248,11 @@ class TestX87MemoryOperand(unittest.TestCase):
     def test_fdivl_chain_pays_load_plus_divide(self):
         p = profile()
         per_op = self.chain_cycles_per_op("fdivl", 8)
-        self.assertEqual(per_op, p.get("latency.scalar_load_l1") + p.get("latency.x87_div"))
+        self.assertEqual(per_op, p.get("latency.x87_mem_operand_load") + p.get("latency.x87_div"))
 
     def test_fmull_chain_pays_load_plus_multiply(self):
         p = profile()
-        self.assertEqual(self.chain_cycles_per_op("fmull", 8), p.get("latency.scalar_load_l1") + p.get("latency.x87_mul"))
+        self.assertEqual(self.chain_cycles_per_op("fmull", 8), p.get("latency.x87_mem_operand_load") + p.get("latency.x87_mul"))
 
 
 if __name__ == "__main__":

@@ -178,9 +178,11 @@ def _branch_target(raw):
     s = raw.split("#", 1)[0].strip()
     if re.match(r"^[A-Za-z_.$][\w.$]*:", s):
         s = s.split(":", 1)[1].strip()
-    parts = s.split()
+    parts = s.split(None, 1)
     if len(parts) >= 2 and parts[0].startswith("j"):
-        return parts[0], parts[-1]
+        ops = [o.strip() for o in parts[1].split(",")]
+        # jknzd/jkzd take the label first and the mask second; every other jump has the label alone
+        return parts[0], ops[0] if parts[0] in ("jknzd", "jkzd") else ops[-1]
     return None, None
 
 
@@ -222,7 +224,7 @@ def loop_region(func, label):
     for lineno, raw in body:
         mn, tgt = _branch_target(raw)
         if mn and tgt and tgt not in inner_labels and not re.match(r"^\d+[bf]$", tgt):
-            raw = raw.replace(tgt, "__knc_twin_end")
+            raw = re.sub(r"(?<![\w.$])" + re.escape(tgt) + r"(?![\w.$])", "__knc_twin_end", raw, count=1)
         out.append((lineno, raw))
     out.append((func.end, "__knc_twin_end:\n\tnop"))
     return out, inner_labels
@@ -359,18 +361,29 @@ def build_kernel(name, records, data_syms, init_overlay, trip_count=None, loop_l
         if trip_count:
             kernel["loop"]["trip_count"] = trip_count
     if init_overlay:
-        for key in ("init", "expected", "unit_of_work", "numerical_policy", "scenario", "loop", "memory_default", "name", "description"):
-            if key in init_overlay:
-                if key == "init":
-                    for sub, val in init_overlay["init"].items():
-                        if isinstance(val, dict) and isinstance(kernel["init"].get(sub), dict):
-                            kernel["init"][sub].update(val)
-                        elif isinstance(val, list) and isinstance(kernel["init"].get(sub), list):
-                            kernel["init"][sub].extend(val)
-                        else:
-                            kernel["init"][sub] = val
-                else:
-                    kernel[key] = init_overlay[key]
+        apply_overlay(kernel, init_overlay)
+    return kernel
+
+
+def apply_overlay(kernel, init_overlay):
+    """Merge an --init file (init, expected, unit, policy, scenario, calls, inputs ...) into a converted kernel."""
+    for key in ("init", "expected", "unit_of_work", "numerical_policy", "scenario", "loop", "memory_default", "name", "description",
+                "calls", "max_steps", "inputs", "entry"):
+        if key in init_overlay:
+            if key == "init":
+                for sub, val in init_overlay["init"].items():
+                    if isinstance(val, dict) and isinstance(kernel["init"].get(sub), dict):
+                        kernel["init"][sub].update(val)
+                    elif isinstance(val, list) and isinstance(kernel["init"].get(sub), list):
+                        kernel["init"][sub].extend(val)
+                    else:
+                        kernel["init"][sub] = val
+            elif key == "calls":
+                kernel.setdefault("calls", {}).update(init_overlay["calls"])
+            else:
+                kernel[key] = init_overlay[key]
+    if "provenance" in init_overlay and isinstance(init_overlay["provenance"], dict):
+        kernel.setdefault("provenance", {}).update(init_overlay["provenance"])
     return kernel
 
 

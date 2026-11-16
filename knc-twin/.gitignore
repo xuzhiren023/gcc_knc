@@ -6,3 +6,4 @@ __pycache__/
 !*.c
 !fixtures/**/*.s
 !fixtures/**/*.c
+!fixtures/binary/*.o

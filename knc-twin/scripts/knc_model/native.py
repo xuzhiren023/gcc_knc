@@ -12,17 +12,21 @@ from . import ENGINE_VERSION, NATIVE_MEASUREMENT_SCHEMA, NATIVE_REQUEST_SCHEMA, 
 from .asm import emit_gas
 from .errors import InvalidInput, Unsupported
 from .functional import encode_values, zmm_from_spec
+from .functional import load_input_file
 from .kernel import GPR64
 from .util import dump_json, load_json, parse_int, sha256_of_obj, utc_now_iso
 
 CALLEE_SAVED = ("rbx", "rbp", "r12", "r13", "r14", "r15")
+MAX_IMAGE_BYTES = 32 << 20   # the driver embeds the image as a C initializer (about 5 bytes of source per byte); larger images are not a native request anyone would build
 
 
 def _memory_image(kernel):
     blocks = []
     for i, blk in enumerate(kernel.init.get("memory", [])):
         addr = parse_int(blk["addr"], "init.memory.addr")
-        if "fill" in blk:
+        if "file" in blk:
+            data, _ = load_input_file(blk, kernel.dir, "init.memory[%d]" % i)
+        elif "fill" in blk:
             f = blk["fill"]
             unit = encode_values({k: [f[k]] for k in f if k in ("f32", "f64", "u32", "i32", "u64", "u8")}, "fill")
             data = unit * parse_int(f.get("count", 1), "fill.count")
@@ -32,13 +36,21 @@ def _memory_image(kernel):
     for i, blk in enumerate(kernel.expected.get("memory", [])):
         # expected output ranges belong to the relocated image too (zero-filled unless initialized)
         addr = parse_int(blk["addr"], "expected.memory.addr")
-        n = len(encode_values(blk, "expected.memory[%d]" % i))
+        if "file" in blk:
+            n = len(load_input_file(blk, kernel.dir, "expected.memory[%d]" % i)[0])
+        elif "hex" in blk:
+            n = len(bytes.fromhex(blk["hex"]))
+        else:
+            n = len(encode_values(blk, "expected.memory[%d]" % i))
         blocks.append((addr, bytes(n)))
     if not blocks:
         return None, 0, b""
     base = min(a for a, _ in blocks) & ~0xFFF
     end = max(a + len(d) for a, d in blocks)
     span = (end - base + 63) & ~63
+    if span > MAX_IMAGE_BYTES:
+        raise InvalidInput("the kernel's memory blocks span %d bytes (0x%x to 0x%x); prepare-native relocates one contiguous image of at most %d bytes. "
+                           "Place the kernel's arrays near its data sections (or drop data sections it does not use) before exporting a native request." % (span, base, end, MAX_IMAGE_BYTES))
     img = bytearray(span)
     for a, d in sorted(blocks, key=lambda t: 1 if any(t[1]) else 0):
         img[a - base:a - base + len(d)] = d
@@ -280,7 +292,12 @@ def prepare_native(kernel, profile, out_dir, kernel_hash, prediction_path=None):
         addr = parse_int(blk["addr"], "expected.memory.addr")
         if mem_base is None or not (mem_base <= addr < mem_base + mem_span):
             raise InvalidInput("expected.memory[%d] at 0x%x lies outside the initialized memory image; prepare-native cannot relocate it" % (i, addr))
-        data = encode_values(blk, "expected.memory[%d]" % i)
+        if "file" in blk:
+            data = load_input_file(blk, kernel.dir, "expected.memory[%d]" % i)[0]
+        elif "hex" in blk:
+            data = bytes.fromhex(blk["hex"])
+        else:
+            data = encode_values(blk, "expected.memory[%d]" % i)
         name = "wantm%d" % i
         data_lines.append("static const unsigned char %s[] = { %s };" % (name, ", ".join("0x%02x" % b for b in data)))
         entries.append("{ 0, 0xFFFF, %d, %d, %s }" % (addr - mem_base, len(data), name))

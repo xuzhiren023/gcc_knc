@@ -66,6 +66,13 @@ CALIBRATION_ROWS = {
     "unpack.lat": "model rule: vloadunpack halves do not serialize on the destination merge",
     "c10.branch.fixed": "pairing.v_jmp_pairs", "l1.store_stream": "store.nr_stall_cycles_resident / store.nr_occupancy_core_cycles / NR residency rule",
     "gather_all.rt": "occupancy.gather_cycles_per_line / model rule: completion mask ready after the occupancy",
+    # 0.3.0: rows that exposed a rule or re-derived a value (they were held-out misses in 0.2.x and are no longer counted as held out)
+    "spill_reload.rt": "pairing.load_store_pair, store.load_after_store_interlock_cycles (two- and four-thread values)",
+    "c9.memory.u2": "store.load_after_store_interlock_cycles (one-thread value)",
+    "c9.memory.u4": "store.load_after_store_interlock_cycles (one-thread value)",
+    "gather_scattered.rt": "model rule: one cache line per gather execution, merge dependency on the previous execution (one-thread value)",
+    "c9.vector.u1": "model rule: the taken-branch core bubble applies to forward transfers, not loop back-edges (two-thread value)",
+    "c9.vector.u2": "same rule (two-thread value)", "c9.vector.u4": "same rule (two-thread value)",
 }
 
 RANK_GROUPS = {
@@ -83,9 +90,11 @@ RANK_GROUPS = {
     "latency_rows": ["scalar_add.lat", "vaddps.lat", "vpermd.lat", "vcvtfxpntpd2dq.lat", "x87_add.lat", "masked_load.lat", "x87_div.lat"],
     "gathers": ["gather_all.lat", "gather_scattered.lat", "gather_all.rt", "gather_scattered.rt"],
     "branches": ["c10.branch.fixed", "c10.branch.random"],
-    "s12_31_layout": ["s12-31-microbench/" + v for v in ("gas_0", "mis_44", "inc_0", "adj_0", "mid_0", "mov_adj_0", "mov_split_0")],
-    "s12_30_csr": ["s12-30-small-csr/" + v for v in ("donor-off", "knc-switch-off", "knc-switch-on", "knc-switch-off-two-nests")],
 }
+RANK_THRESHOLD = 0.03          # characterization groups: measured difference above 3%
+BAR = {"median_abs_error_pct": 10.0, "winner_accuracy": 0.90, "min_difference": 0.05, "min_rows": 50, "min_programs": 5}
+# which M4 program (or microbenchmark family) each case's loops come from: the bar wants breadth, not only rows
+CASE_PROGRAM = {"s12-31-microbench": "hpcg (row-loop microbenchmark)", "s12-31-hpcg-toy": "hpcg", "s12-31-hpcg-104": "hpcg", "s12-30-small": "sparse-gate (microbenchmark)"}
 
 
 def xorshift(state):
@@ -219,14 +228,39 @@ def _predict_compiled_function(case_dir, case, variant, profile, max_seconds):
 
 
 def _predict_compiled_kernel(case_dir, case, variant, profile, max_seconds):
-    """A ready kernel (adapter output plus input and expected result); cycles of one unit."""
+    """A ready kernel (adapter output plus input and expected result). Without case["slope"]: cycles of the
+    kernel's one unit. With it: the kernel is run at two unit counts (a register holds the count) and the
+    per-unit cycles are the slope, which removes entry code and reaches the steady cache state."""
     path = os.path.normpath(os.path.join(case_dir, variant["kernel"]))
     raw = load_json(path, "kernel")
-    if raw["unit_of_work"]["count"] != 1:
-        raise TwinError("compiled_kernel variants must define one unit of work")
-    res, chk = _run_kernel(raw, path, profile, max_seconds)
-    return {"status": "ok", "functional": [chk], "completion_cycles": [res["completion_cycles"]],
-            "predicted_cycles_per_unit": float(res["completion_cycles"]), "limiting": timing.limiting_constraints(res)[:2]}
+    slope = case.get("slope")
+    if not slope:
+        if raw["unit_of_work"]["count"] != 1:
+            raise TwinError("compiled_kernel variants without a slope must define one unit of work")
+        res, chk = _run_kernel(raw, path, profile, max_seconds)
+        return {"status": "ok", "functional": [chk], "completion_cycles": [res["completion_cycles"]],
+                "predicted_cycles_per_unit": float(res["completion_cycles"]), "limiting": timing.limiting_constraints(res)[:2],
+                "frontend": res.get("frontend"), "memory_submodels": res["memory"].get("submodels")}
+    points, checks, res = [], [], None
+    for units in slope["units"]:
+        k = json.loads(json.dumps(raw))
+        if slope.get("register"):
+            k["init"].setdefault("registers", {})[slope["register"]] = units
+        for a in slope.get("memory_i32", []):
+            k["init"]["memory"].append({"addr": a, "i32": [units]})
+        k["unit_of_work"] = dict(k["unit_of_work"], count=units)
+        if "expected_f64_per_unit" in slope:
+            k["expected"] = {"memory": [{"addr": slope["expected_addr"], "f64": [slope["expected_f64_per_unit"] * units]}]}
+        elif "expected_by_units" in slope:
+            k["expected"] = slope["expected_by_units"].get(str(units), {})
+        elif not slope.get("expected_same"):
+            k["expected"] = {}
+        res, chk = _run_kernel(k, path, profile, max_seconds)
+        checks.append(chk)
+        points.append(res["completion_cycles"])
+    per_unit = (points[1] - points[0]) / float(slope["units"][1] - slope["units"][0])
+    return {"status": "ok", "functional": checks, "completion_cycles": points, "predicted_cycles_per_unit": round(per_unit, 3),
+            "limiting": timing.limiting_constraints(res)[:2], "frontend": res.get("frontend"), "memory_submodels": res["memory"].get("submodels")}
 
 
 def _twin_cli(args, out):
@@ -276,6 +310,10 @@ def predict_case(case_dir, profile_id="card-7120-measured", tmp=None, max_second
     """The prediction a held-out case records in prediction.json (no timestamps: reproducible)."""
     case_dir = os.path.abspath(str(case_dir))
     case = load_json(os.path.join(case_dir, "case.json"), "case")
+    if case.get("prepare") and not os.path.isdir(os.path.join(case_dir, "input")):
+        import subprocess
+        parts = case["prepare"].split()
+        subprocess.check_call([sys.executable, os.path.join(os.path.dirname(case_dir), parts[0])] + parts[1:])
     if case["scale"] == "card":
         import tempfile
         return _predict_card(case_dir, case, tmp or tempfile.mkdtemp(prefix="knc-heldout-"))
@@ -295,13 +333,17 @@ def predict_case(case_dir, profile_id="card-7120-measured", tmp=None, max_second
     return pred
 
 
-def compiled_rows(cases_dir, profile_id, record=False, max_seconds=120.0):
-    """Held-out rows for every core-scale case directory, compared with measurement.json; card cases listed apart."""
-    rows, card = [], []
+def compiled_rows(cases_dir, profile_id, record=False, max_seconds=120.0, only=None):
+    """Rows for every core-scale case directory, compared with measurement.json; card cases listed apart.
+    A variant marked "calibrates" in case.json set a model rule and is a calibration row; the others are held out."""
+    rows, card, groups = [], [], {}
     for name in sorted(os.listdir(cases_dir)):
         d = os.path.join(cases_dir, name)
         if not os.path.isfile(os.path.join(d, "case.json")):
             continue
+        if only and not re.search(only, name):
+            continue
+        case = load_json(os.path.join(d, "case.json"), "case")
         pred = predict_case(d, profile_id, max_seconds=max_seconds)
         rec_path = os.path.join(d, "prediction.json")
         recorded = load_json(rec_path, "prediction") if os.path.exists(rec_path) else None
@@ -310,28 +352,78 @@ def compiled_rows(cases_dir, profile_id, record=False, max_seconds=120.0):
         elif recorded != pred:
             print("%-28s prediction differs from the recorded prediction.json (engine or profile changed?)" % name, flush=True)
         meas = load_json(os.path.join(d, "measurement.json"), "measurement")
-        if load_json(os.path.join(d, "case.json"), "case")["scale"] == "card":
+        if case["scale"] == "card":
             card.append({"case": name, "prediction": pred, "measurement": meas})
             print("%-28s card        %s" % (name, pred.get("status")), flush=True)
             continue
+        calibrates = {v["name"]: v.get("calibrates") for v in case["variants"]}
+        for g in case.get("rank_groups", []):
+            groups["%s: %s" % (name, g["name"])] = ["%s/%s" % (name, v) for v in g["variants"]]
         for v in pred["variants"]:
             m = meas["per_variant"].get(v["variant"])
-            row = {"name": "%s/%s" % (name, v["variant"]), "suite": "compiled", "kind": "compiled", "unit": pred["unit"],
-                   "measured": {"threads_1": m} if m is not None else {}, "class": "held_out", "calibrates": None,
+            cal = calibrates.get(v["variant"])
+            row = {"name": "%s/%s" % (name, v["variant"]), "suite": "compiled", "case": name, "kind": "compiled", "unit": pred["unit"],
+                   "measured": {"threads_1": m} if m is not None else {}, "class": "calibration" if cal else "held_out", "calibrates": cal,
                    "predicted": {}, "status": v["status"], "message": v.get("message"), "source_log": meas["source_log"]}
             if v["status"] == "ok":
                 row["predicted"]["A"] = {"threads_1": v["predicted_cycles_per_unit"]}
                 row["limiting"] = {"threads_1": v["limiting"]}
             rows.append(row)
-            print("%-28s held_out    meas %s pred %s" % (row["name"], m, v.get("predicted_cycles_per_unit", v["status"])), flush=True)
-    return rows, card
+            print("%-44s %-11s meas %s pred %s" % (row["name"], row["class"], m, v.get("predicted_cycles_per_unit", v["status"] + ": " + str(v.get("message"))[:80])), flush=True)
+    return rows, card, groups
+
+
+def decision_bar(rows, groups):
+    """The bar for relying on the twin to choose between compiled variants (held-out compiled rows only):
+    median absolute error at most 10%, and the right winner in at least 90% of the pairs (within a case's
+    variant groups) whose measured times differ by more than 5%. It also needs enough loops to mean anything."""
+    held = [r for r in rows if r.get("suite") == "compiled" and r["class"] == "held_out" and r["status"] == "ok"
+            and r["measured"].get("threads_1") and r["predicted"].get("A", {}).get("threads_1") is not None]
+    errs = [abs(100.0 * (r["predicted"]["A"]["threads_1"] - r["measured"]["threads_1"]) / r["measured"]["threads_1"]) for r in held]
+    by = {r["name"]: r for r in held}
+    pairs = right = 0
+    wrong = []
+    for g, names in groups.items():
+        present = [n for n in names if n in by]
+        for i in range(len(present)):
+            for j in range(i + 1, len(present)):
+                a, b = by[present[i]], by[present[j]]
+                ma, mb = a["measured"]["threads_1"], b["measured"]["threads_1"]
+                pa, pb = a["predicted"]["A"]["threads_1"], b["predicted"]["A"]["threads_1"]
+                if abs(ma - mb) / max(ma, mb) <= BAR["min_difference"]:
+                    continue
+                pairs += 1
+                if (ma < mb) == (pa < pb) and pa != pb:
+                    right += 1
+                else:
+                    wrong.append({"group": g, "a": present[i], "b": present[j], "measured": [ma, mb], "predicted": [pa, pb]})
+    med = round(statistics.median(errs), 1) if errs else None
+    acc = round(right / float(pairs), 3) if pairs else None
+    cases = sorted(set(r["case"] for r in held))
+    programs = sorted(set(CASE_PROGRAM.get(c, c) for c in cases))
+    m4_programs = sorted(p for p in programs if "microbenchmark" not in p)
+    met_err = med is not None and med <= BAR["median_abs_error_pct"]
+    met_rank = acc is not None and acc >= BAR["winner_accuracy"]
+    met_n = len(held) >= BAR["min_rows"] and len(m4_programs) >= BAR["min_programs"]
+    return {"bar": BAR, "held_out_compiled_rows": len(held), "cases": cases, "source_programs": programs, "m4_programs": m4_programs,
+            "median_abs_error_pct": med, "worst_abs_error_pct": round(max(errs), 1) if errs else None,
+            "within_10pct": sum(1 for e in errs if e <= 10.0),
+            "pairs_over_5pct": pairs, "right_winner": right, "winner_accuracy": acc, "wrong_pairs": wrong,
+            "error_met": met_err, "ranking_met": met_rank, "coverage_met": met_n,
+            "met": bool(met_err and met_rank and met_n),
+            "statement": ("bar met on %d held-out compiled rows from %d M4 programs" % (len(held), len(m4_programs))) if (met_err and met_rank and met_n) else
+                         ("error and ranking criteria met on %d held-out compiled rows, but they come from %d M4 program(s) (%s) and %d microbenchmark families; "
+                          "the bar asks for loops from at least %d M4 programs, so it is not met yet" % (len(held), len(m4_programs), ", ".join(m4_programs) or "none",
+                                                                                                              len(programs) - len(m4_programs), BAR["min_programs"])) if (met_err and met_rank) else
+                         "bar not met: median error %s%% (limit %s), winner accuracy %s (limit %s) on %d rows" % (med, BAR["median_abs_error_pct"], acc, BAR["winner_accuracy"], len(held))}
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--kernels-s", required=True)
-    ap.add_argument("--kernels-h", required=True)
-    ap.add_argument("--measured", required=True)
+    ap.add_argument("--kernels-s", help="characterization catalog assembly (omit to run only --cases)")
+    ap.add_argument("--kernels-h")
+    ap.add_argument("--measured")
+    ap.add_argument("--only-cases", default=None, help="regex on case directory names")
     ap.add_argument("--cases", help="tests/heldout_native: also predict every compiled-code and card case there")
     ap.add_argument("--record", action="store_true", help="with --cases: (re)write each case's prediction.json")
     ap.add_argument("--profile", default="card-7120-measured")
@@ -343,14 +435,15 @@ def main(argv=None):
     args = ap.parse_args(argv)
     os.makedirs(args.out, exist_ok=True)
     profile = load_profile(args.profile)
-    measured = load_json(args.measured, "measured")["rows"]
-    tests = [t for t in parse_header(args.kernels_h) if t["name"] in measured]
+    measured = load_json(args.measured, "measured")["rows"] if args.kernels_s else {}
+    tests = [t for t in parse_header(args.kernels_h) if t["name"] in measured] if args.kernels_s else []
     if args.only:
         tests = [t for t in tests if re.search(args.only, t["name"])]
     threads = [int(x) for x in args.threads.split(",")]
     r1, r2 = [int(x) for x in args.rounds.split(",")]
-    scen_a = {"memory": {"type": "line_tracking", "cold_level": "memory", "tlb": "modeled", "hardware_prefetcher": "off", "memory_service": "modeled"}, "branch": {"type": "all_predicted"}}
-    scen_b = {"memory": {"type": "line_tracking", "cold_level": "memory", "tlb": "modeled", "hardware_prefetcher": "modeled", "memory_service": "modeled"}, "branch": {"type": "all_predicted"}}
+    # A: the engine's default memory domain (TLB, L2 hardware prefetcher and memory service modeled); B: the same without the prefetcher (sensitivity)
+    scen_a = {"memory": {"type": "line_tracking", "cold_level": "memory", "tlb": "modeled", "hardware_prefetcher": "modeled", "memory_service": "modeled"}, "branch": {"type": "all_predicted"}}
+    scen_b = {"memory": {"type": "line_tracking", "cold_level": "memory", "tlb": "modeled", "hardware_prefetcher": "off", "memory_service": "modeled"}, "branch": {"type": "all_predicted"}}
     rows = []
     t_start = time.time()
     for test in tests:
@@ -373,7 +466,7 @@ def main(argv=None):
             if name.startswith("c10."):
                 # fixed direction: predicted; pseudorandom direction bits: every branch charged the measured penalty
                 row_a["branch"] = {"type": "all_predicted" if name.endswith("fixed") else "all_mispredicted"}
-            scenarios = [("A", row_a)] + ([("B_hwp", row_b)] if memory_kind else [])
+            scenarios = [("A", row_a)] + ([("B_nohwp", row_b)] if memory_kind else [])
             for t in threads:
                 if t not in (1, 2, 4):
                     continue
@@ -414,10 +507,12 @@ def main(argv=None):
     for r in rows:
         r.setdefault("suite", "characterization")
     card = []
+    case_groups = {}
     if args.cases:
-        crow, card = compiled_rows(args.cases, args.profile, record=args.record, max_seconds=args.max_seconds)
+        crow, card, case_groups = compiled_rows(args.cases, args.profile, record=args.record, max_seconds=max(args.max_seconds, 900.0), only=args.only_cases)
         rows += crow
-    report = summarize(rows, threads, profile, args)
+    report = summarize(rows, threads, profile, args, case_groups)
+    report["decision_bar"] = decision_bar(rows, case_groups)
     report["card_cases"] = card
     report["python_seconds"] = round(time.time() - t_start, 1)
     dump_json(report, os.path.join(args.out, "validation.json"))
@@ -428,7 +523,7 @@ def main(argv=None):
     return 0
 
 
-def summarize(rows, threads, profile, args):
+def summarize(rows, threads, profile, args, case_groups=None):
     stats = {}
     for t in threads:
         key = "threads_%d" % t
@@ -453,7 +548,9 @@ def summarize(rows, threads, profile, args):
     by_name = {r["name"]: r for r in rows if r["status"] == "ok"}
     ranking = {}
     agree_total = disagree_total = 0
-    for g, names in RANK_GROUPS.items():
+    all_groups = dict(RANK_GROUPS)
+    all_groups.update(case_groups or {})
+    for g, names in all_groups.items():
         for t in threads:
             key = "threads_%d" % t
             pairs = []
@@ -472,8 +569,8 @@ def summarize(rows, threads, profile, args):
             if pairs:
                 ranking["%s@%s" % (g, key)] = {"agree": sum(1 for p in pairs if p["agree"]), "pairs": len(pairs), "detail": [p for p in pairs if not p["agree"]]}
     return {"generated_utc": datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z", "profile": profile.describe(),
-            "invocation": sys.argv, "scenario_A": "line_tracking cold memory, TLB modeled, hardware prefetcher off, memory service modeled",
-            "scenario_B_hwp": "same with the streaming L2 hardware prefetcher sub-model (assumed depth) for memory-kind rows",
+            "invocation": sys.argv, "scenario_A": "line_tracking cold memory with the default sub-models: TLB, L2 hardware prefetcher and memory service modeled",
+            "scenario_B_nohwp": "the same without the hardware prefetcher (sensitivity, memory-kind rows only)",
             "rows": rows, "error_stats": stats,
             "ranking": {"pairs_agree": agree_total, "pairs_total": agree_total + disagree_total,
                         "reliability": round(agree_total / float(agree_total + disagree_total), 3) if agree_total + disagree_total else None, "groups": ranking},
@@ -482,19 +579,34 @@ def summarize(rows, threads, profile, args):
                       "the kernel catalog was regenerated from tests/bench/knc-char/kernels.py; S8-07 additions shift kernel indices but the measured S6-03 bodies are the same templates",
                       "calibration rows set a parameter of the profile and are excluded from the held-out statistics",
                       "every prediction is a model output; the measured column is native",
-                      "compiled rows (tests/heldout_native/<case>/) are held out: S12-31 row loops (core cycles per row, window 5) and S12-30 csr_raw calls (core cycles per call, window 8), seconds converted with card.clock_hz 1.238 GHz; each prediction is also recorded in the case's prediction.json"]}
+                      "compiled rows (tests/heldout_native/<case>/) come from the binaries and objects that ran on the card, with code layout; seconds converted with card.clock_hz 1.238 GHz; variants marked 'calibrates' in a case.json set a model rule and are calibration rows; each prediction is recorded in the case's prediction.json",
+                      "decision bar (compiled held-out rows only): median absolute error at most 10%, right winner in at least 90% of within-group pairs measured more than 5% apart, at least 50 loops"]}
 
 
 def markdown(rep):
     L = ["# Held-out validation against the characterization microbenchmarks", "",
          "Generated %s. Profile %s (hash %s...). %s" % (rep["generated_utc"], rep["profile"]["id"], rep["profile"]["hash"][:12], rep["scenario_A"]), ""]
-    L.append("## Error statistics (scenario A, per thread count)")
+    L.append("## Error statistics (per thread count)")
     L.append("")
     L.append("| rows | n | median abs err % | worst abs err % | within 15% | within 30% | mean signed err % |")
     L.append("|---|---:|---:|---:|---:|---:|---:|")
     for k in sorted(rep["error_stats"]):
         s = rep["error_stats"][k]
         L.append("| %s | %d | %.1f | %.1f | %d | %d | %.1f |" % (k, s["rows"], s["median_abs_error_pct"], s["worst_abs_error_pct"], s["within_15pct"], s["within_30pct"], s["mean_signed_error_pct"]))
+    db = rep.get("decision_bar")
+    if db and db["held_out_compiled_rows"]:
+        L.append("")
+        L.append("## Decision bar (held-out compiled code)")
+        L.append("")
+        L.append("| criterion | limit | result | met |")
+        L.append("|---|---|---|---|")
+        L.append("| median absolute error | at most %.0f%% | %s%% over %d rows (worst %s%%, %d within 10%%) | %s |" % (db["bar"]["median_abs_error_pct"], db["median_abs_error_pct"], db["held_out_compiled_rows"], db["worst_abs_error_pct"], db["within_10pct"], "yes" if db["error_met"] else "no"))
+        L.append("| right winner, pairs measured more than 5%% apart | at least %.0f%% | %s of %s (%s) | %s |" % (100 * db["bar"]["winner_accuracy"], db["right_winner"], db["pairs_over_5pct"], db["winner_accuracy"], "yes" if db["ranking_met"] else "no"))
+        L.append("| held-out compiled loops | at least %d rows from at least %d M4 programs | %d rows in %d cases; sources: %s | %s |" % (db["bar"]["min_rows"], db["bar"]["min_programs"], db["held_out_compiled_rows"], len(db["cases"]), ", ".join(db["source_programs"]), "yes" if db["coverage_met"] else "no"))
+        L.append("")
+        L.append("Verdict: %s." % db["statement"])
+        for w in db["wrong_pairs"]:
+            L.append("- wrong winner: %s vs %s, measured %.1f/%.1f, predicted %.1f/%.1f" % (w["a"], w["b"], w["measured"][0], w["measured"][1], w["predicted"][0], w["predicted"][1]))
     rk = rep["ranking"]
     L.append("")
     L.append("## Ranking reliability")
@@ -510,7 +622,7 @@ def markdown(rep):
     L.append("")
     L.append("## Rows")
     L.append("")
-    L.append("| test | class | status | measured 1/2/4 | predicted A 1/2/4 | err % 1/2/4 | predicted B (HWP) 1/2/4 | limiting (1 thread) |")
+    L.append("| test | class | status | measured 1/2/4 | predicted 1/2/4 | err % 1/2/4 | predicted without HWP 1/2/4 | limiting (1 thread) |")
     L.append("|---|---|---|---|---|---|---|---|")
 
     def fmt(d, keys=("threads_1", "threads_2", "threads_4")):
@@ -518,11 +630,11 @@ def markdown(rep):
     for r in rep["rows"]:
         m = r["measured"]
         pa = r["predicted"].get("A", {})
-        pb = r["predicted"].get("B_hwp", {})
+        pb = r["predicted"].get("B_nohwp", {})
         errs = []
         for k in ("threads_1", "threads_2", "threads_4"):
             if k in m and k in pa and m[k]:
-                errs.append("%+.0f" % (100.0 * (pa[k] - m[k]) / m[k]))
+                errs.append("%+.1f" % (100.0 * (pa[k] - m[k]) / m[k]))
             else:
                 errs.append("-")
         lim = ", ".join(c.get("constraint", "") for c in r.get("limiting", {}).get("threads_1", [])) if r.get("limiting") else ""

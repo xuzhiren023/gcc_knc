@@ -63,7 +63,7 @@ class TestCLI(unittest.TestCase):
             (("functional", helpers.fixture("saxpy_bad_candidate.json")), "functional_mismatch", 6),
             (("simulate", helpers.fixture("budget_long_loop.json"), "--max-cycles", "500"), "budget_exhausted", 5),
             (("simulate", helpers.fixture("budget_long_loop.json"), "--max-steps", "100"), "budget_exhausted", 5),
-            (("bounds", "--scale", "card", "--params", helpers.fixture("card_params_readonly_missing.json")), "needs_parameters", 7),
+            (("bounds", "--scale", "card", "--params", helpers.fixture("card_params_readonly_missing.json"), "--profile", "card-3120-documented"), "needs_parameters", 7),
             (("simulate", helpers.fixture("fence_unknown_param.json"), "--trace-source", "static"), "missing_parameter", 4),
         ]
         for args, status, code in cases:

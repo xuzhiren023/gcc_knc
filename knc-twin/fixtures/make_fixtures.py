@@ -23,7 +23,7 @@ def f32(x):
 
 def write(name, obj):
     path = os.path.join(HERE, name)
-    with open(path, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8", newline=chr(10)) as f:
         json.dump(obj, f, indent=1)
         f.write("\n")
     print("wrote", path)
@@ -196,12 +196,13 @@ write("fp_edge_ftz.json", k2)
 table = list(range(0, 4096))  # u32 table at 0x300000: value == index
 for name, idx, desc in (("gather_one_line", list(range(16)), "all 16 lanes in one cache line"),
                         ("gather_scattered", [i * 16 for i in range(16)], "each lane in a different cache line (stride 64 bytes)")):
-    k = {"schema": SCHEMA, "name": name, "description": "vgatherdps %s; expected lanes are the gathered indices themselves" % desc,
+    k = {"schema": SCHEMA, "name": name, "description": "vgatherdps %s, in the completion loop the hardware needs (one cache line per execution); expected lanes are the gathered indices themselves" % desc,
          "unit_of_work": {"description": "one 16-lane gather", "count": 1},
          "init": {"memory": [{"addr": "0x300000", "u32": table[:256]}],
                   "registers": {"rax": "0x300000", "k1": "0xffff", "zmm1": {"u32": idx}}},
          "streams": [{"context": 0, "instructions": [
-             {"id": "g", "op": "vgatherdps", "ops": ["zmm0", {"base": "rax", "vindex": "zmm1", "scale": 4}], "mask": "k1", "lines": 1 if name == "gather_one_line" else 16},
+             {"id": "g", "label": "again", "op": "vgatherdps", "ops": ["zmm0", {"base": "rax", "vindex": "zmm1", "scale": 4}], "mask": "k1"},
+             {"id": "loop", "op": "jknzd", "ops": ["k1", "again"]},
              {"id": "use", "op": "vpaddd", "ops": ["zmm2", "zmm0", "zmm0"]},
          ]}],
          "expected": {"registers": {"0": {"zmm0": {"u32": idx}, "k1": 0, "zmm2": {"u32": [2 * i for i in idx]}}}}}
@@ -298,10 +299,10 @@ write("saxpy_asm.json", k)
 write("card_params_stream.json", {"schema": "knc-twin.analytic-params/1", "description": "card scenario for a bandwidth-bound stream: 16 M units of 128 bytes read-modify-write, one barrier",
                                   "units": 16777216, "bytes_per_unit": 128, "traffic_type": "read_modify_write",
                                   "per_core_cycles_per_unit": 6.0, "barriers": 1, "barrier_kind": "tree", "imbalance_factor": 1.05})
-write("card_params_readonly_sweep.json", {"schema": "knc-twin.analytic-params/1", "description": "read-only traffic has no measured bandwidth in the 7120 profile; without bandwidth_sweep_gbs the result is needs_parameters",
+write("card_params_readonly_sweep.json", {"schema": "knc-twin.analytic-params/1", "description": "read-only traffic on a profile without a measured sustained bandwidth (card-3120-documented); without bandwidth_sweep_gbs the result is needs_parameters",
                                           "units": 16777216, "bytes_per_unit": 64, "traffic_type": "read_only", "per_core_cycles_per_unit": 3.0,
                                           "bandwidth_sweep_gbs": [160, 200, 264, 299]})
-write("card_params_readonly_missing.json", {"schema": "knc-twin.analytic-params/1", "description": "same as the sweep file but without a sweep: must stop with needs_parameters",
+write("card_params_readonly_missing.json", {"schema": "knc-twin.analytic-params/1", "description": "same as the sweep file but without a sweep: on a profile without a measured bandwidth (--profile card-3120-documented) it must stop with needs_parameters",
                                             "units": 16777216, "bytes_per_unit": 64, "traffic_type": "read_only", "per_core_cycles_per_unit": 3.0})
 write("pair_params.json", {"schema": "knc-twin.analytic-params/1", "description": "producer/consumer pair exchanging 64 lines per unit with one handoff",
                            "core_a_cycles": 2000, "core_b_cycles": 1500, "lines_exchanged": 64, "handoffs": 1})

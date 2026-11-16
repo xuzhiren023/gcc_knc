@@ -1,7 +1,7 @@
 {
   "schema": "knc-twin.profile/1",
   "id": "knc-common",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "kind": "common",
   "synthetic": false,
   "description": "Knights Corner (K1OM, IMCI) architecture rules shared by every card. Holds documented values and literature values only. Card profiles override with measured values and carry card-specific parameters (clock, cores, bandwidth).",
@@ -22,14 +22,14 @@
       "value": 4,
       "unit": "hardware threads per core",
       "status": "documented",
-      "source": "R01 \u00a72.1; R17 slide 10",
+      "source": "R01 §2.1; R17 slide 10",
       "applies_to": "all KNC"
     },
     "core.issue_width": {
       "value": 2,
       "unit": "instructions per core cycle (U then V)",
       "status": "documented",
-      "source": "R01 \u00a72.1; R02 p.34; R17 slide 10",
+      "source": "R01 §2.1; R02 p.34; R17 slide 10",
       "applies_to": "all KNC"
     },
     "core.min_issue_gap_same_context": {
@@ -51,7 +51,7 @@
       "unit": "cycles",
       "status": "unknown",
       "source": "R02 ch.4 mentions a one-clock bubble when picker and prefetch-buffer refill are not synchronized (e.g. after an I-cache miss)",
-      "note": "Not modeled. Instruction fetch is assumed always to hit."
+      "note": "Superseded by frontend.taken_branch_core_bubble_cycles."
     },
     "pairing.v_eligible_classes": {
       "value": [
@@ -115,7 +115,9 @@
       "unit": "cycles added to the plain mov/ALU (register form) or scalar load (memory form) latency of movslq, movs*, movz*, cltq, cltd, cqto",
       "status": "assumed",
       "source": "evidence E (estimate), inferred: plain integer sign- or zero-extension costs what mov does; no KNC source (R02 p.34 Table 3-1 lists no MOVSX/MOVZX; never measured on the card). Lead decision 2026-11-15.",
-      "alternatives": [2],
+      "alternatives": [
+        2
+      ],
       "uncertainty": "every S12-31 and S12-30 row executes one movslq index load per nonzero"
     },
     "pairing.extend_v_pairs": {
@@ -123,7 +125,9 @@
       "unit": "boolean: may movslq, movs*, movz*, cltq, cltd, cqto issue in the V slot",
       "status": "assumed",
       "source": "evidence E (estimate), inferred: treated like the other scalar integer ops of R02 p.34 Table 3-1, which does not list them; no KNC source. Lead decision 2026-11-15.",
-      "alternatives": [false]
+      "alternatives": [
+        false
+      ]
     },
     "latency.scalar_imul": {
       "value": 10,
@@ -188,26 +192,26 @@
       "value": 11,
       "unit": "cycles, raw L2 hit latency",
       "status": "documented",
-      "source": "R17 slide 14 (11 cycles raw); R01 \u00a72.1",
+      "source": "R17 slide 14 (11 cycles raw); R01 §2.1",
       "alternatives": [
         22,
         23,
         25
       ],
-      "uncertainty": "Literature measurements: R06 \u00a75.1.1 22-23 cycles; R08 ~25 idle; owner's card 24-26 (card-7120-measured)."
+      "uncertainty": "Literature measurements: R06 §5.1.1 22-23 cycles; R08 ~25 idle; owner's card 24-26 (card-7120-measured)."
     },
     "latency.memory": {
       "value": null,
       "unit": "cycles, idle demand miss to memory",
       "status": "unknown",
-      "source": "Depends on clock and board. R08: ~275-280 ns (~300 cycles on SE10P); R06 \u00a75.1.1: 318-346 cycles at 1 GHz engineering sample; R17 slide 13: about 275 ns",
+      "source": "Depends on clock and board. R08: ~275-280 ns (~300 cycles on SE10P); R06 §5.1.1: 318-346 cycles at 1 GHz engineering sample; R17 slide 13: about 275 ns",
       "note": "Card profiles set it. Left unknown here so a memory-level simulation needs a card profile."
     },
     "latency.remote_l2_line_ns": {
       "value": null,
       "unit": "ns, read of a line held in another core's L2",
       "status": "unknown",
-      "source": "R08: ~275 ns average, independent of core distance; R06 \u00a75.1.2: ~243 cycles average, sd 32 (engineering sample)",
+      "source": "R08: ~275 ns average, independent of core distance; R06 §5.1.2: ~243 cycles average, sd 32 (engineering sample)",
       "note": "Card profiles set it."
     },
     "latency.agi_cycles": {
@@ -291,13 +295,13 @@
       "value": 32768,
       "unit": "bytes",
       "status": "documented",
-      "source": "R01 \u00a72.1; R08; R17 slide 13"
+      "source": "R01 §2.1; R08; R17 slide 13"
     },
     "l1.ways": {
       "value": 8,
       "unit": "ways",
       "status": "documented",
-      "source": "R01 \u00a72.1; R17 slide 13"
+      "source": "R01 §2.1; R17 slide 13"
     },
     "l1.line_bytes": {
       "value": 64,
@@ -329,7 +333,7 @@
       "alternatives": [
         38
       ],
-      "uncertainty": "R01 p.19 gives about 38 combined requests; R06 \u00a75.2.2 measures MSHRs on an engineering sample."
+      "uncertainty": "R01 p.19 gives about 38 combined requests; R06 §5.2.2 measures MSHRs on an engineering sample."
     },
     "l1.demand_load_miss_stalls_context": {
       "value": true,
@@ -384,7 +388,7 @@
       "value": null,
       "unit": "cache lines",
       "status": "unknown",
-      "source": "R06 \u00a75.2.2 measured on an engineering sample; not imported as a production constant"
+      "source": "R06 §5.2.2 measured on an engineering sample; not imported as a production constant"
     },
     "vpu.lanes_f32": {
       "value": 16,
@@ -435,14 +439,14 @@
       },
       "unit": "MXCSR policy",
       "status": "documented",
-      "source": "R27 \u00a72.4 p.39 (MXCSR FTZ/DAZ bits, architectural default clear); R04 slide 18 (Intel compilers set FTZ at -O1 and above)",
+      "source": "R27 §2.4 p.39 (MXCSR FTZ/DAZ bits, architectural default clear); R04 slide 18 (Intel compilers set FTZ at -O1 and above)",
       "note": "The kernel's numerical_policy decides; this is only the default when the kernel does not say."
     },
     "fp.ftz_rule": {
       "value": "tiny",
       "unit": "semantics",
       "status": "assumed",
-      "source": "SDM vol.1 \u00a710.2.3.3: with FTZ set and underflow masked, a tiny result is replaced by a signed zero; whether an exact tiny result is also flushed is not stated for KNC (R27 \u00a72.4 defines the MXCSR bits only)",
+      "source": "SDM vol.1 §10.2.3.3: with FTZ set and underflow masked, a tiny result is replaced by a signed zero; whether an exact tiny result is also flushed is not stated for KNC (R27 §2.4 defines the MXCSR bits only)",
       "alternatives": [
         "tiny_and_inexact"
       ],
@@ -452,14 +456,14 @@
       "value": "first_nan_operand_quieted",
       "unit": "semantics",
       "status": "assumed",
-      "source": "x86 SSE convention (SDM vol.1 \u00a74.8.3.5); KNC-specific documentation not located",
+      "source": "x86 SSE convention (SDM vol.1 §4.8.3.5); KNC-specific documentation not located",
       "note": "Expected-output comparison treats any NaN as matching any NaN unless numerical_policy.nan_compare is 'bits'."
     },
     "fp.default_nan_f32": {
       "value": "0xFFC00000",
       "unit": "bits",
       "status": "assumed",
-      "source": "x86 'real indefinite' (SDM vol.1 \u00a74.8.3.7)"
+      "source": "x86 'real indefinite' (SDM vol.1 §4.8.3.7)"
     },
     "fp.default_nan_f64": {
       "value": "0xFFF8000000000000",
@@ -537,22 +541,32 @@
       "source": "not documented (fcom/fucom/fcomi)"
     },
     "latency.x87_control": {
-      "value": null,
+      "value": 7,
       "unit": "cycles",
-      "status": "unknown",
-      "source": "not documented (fldcw/fnstcw/fnstsw); these serialize the core in the model"
+      "status": "assumed",
+      "source": "prior from the published Pentium (P5) instruction timings (FLDCW 7 clocks; FNSTCW and FNSTSW are 2). Not measured on KNC; all three are charged the FLDCW value.",
+      "uncertainty": "prior, upper value of the three instructions",
+      "alternatives": [
+        2
+      ]
     },
     "latency.x87_sqrt": {
-      "value": null,
+      "value": 70,
       "unit": "cycles",
-      "status": "unknown",
-      "source": "not documented; not measured by the imported characterization"
+      "status": "assumed",
+      "source": "prior from the published Pentium (P5) instruction timings (FSQRT 70 clocks): the KNC core derives from the P54C design (R01 section 2.1) and the P5 figures that could be checked on the card agree (FDIV 39 vs 39.25 measured in S6-03; IMUL 10 in R02 p.56). Not measured on KNC.",
+      "uncertainty": "prior, not a measurement; calibration-plan stages the microbenchmark that replaces it"
     },
     "latency.scalar_idiv": {
-      "value": null,
+      "value": 46,
       "unit": "cycles",
-      "status": "unknown",
-      "source": "not documented; not measured"
+      "status": "assumed",
+      "source": "prior from the published Pentium (P5) instruction timings (IDIV r32 46 clocks, DIV r32 41). Not measured on KNC; the 64-bit forms have no published figure and are charged the same value.",
+      "uncertainty": "prior; a 64-bit divide is probably slower",
+      "alternatives": [
+        41,
+        78
+      ]
     },
     "occupancy.scatter_cycles_per_line": {
       "value": null,
@@ -564,7 +578,7 @@
       "value": 64,
       "unit": "pages",
       "status": "literature",
-      "source": "R06 \u00a75.1.3 (level-1 TLB miss cost measured beyond 64 4 KiB pages); gcc_knc C4 rerun (S8-12) finds the knee at 64 pages per core",
+      "source": "R06 §5.1.3 (level-1 TLB miss cost measured beyond 64 4 KiB pages); gcc_knc C4 rerun (S8-12) finds the knee at 64 pages per core",
       "applies_to": "first-level data TLB, 4 KiB pages"
     },
     "tlb.l1_entries_2m": {
@@ -667,6 +681,91 @@
       "unit": "policy",
       "status": "assumed",
       "source": "the gather occupies a gather unit for occupancy.gather_cycles_per_line per distinct line; other instructions of the core keep issuing (S6-03 gather_all.rt: kmov+gather+jknzd fit in 7 ticks)"
+    },
+    "frontend.slow_prefix_decode_cycles": {
+      "value": 2,
+      "unit": "decode cycles per prefix",
+      "status": "documented",
+      "source": "R02 p.56 (prefix decode): 62, c4/c5, REX and 0f prefixes decode with no penalty; 66, 67, lock, segment and rep prefixes take two cycles each",
+      "note": "Applied only when records carry encoding.slow_prefixes (code layout from scripts/from_binary.py). The delay runs from the previous issue of the same context, so the two-cycle same-context spacing hides one prefix (S12-31 padding rows: one prefix free, about 2 cycles for each further one)."
+    },
+    "frontend.taken_branch_core_bubble_cycles": {
+      "value": 0,
+      "unit": "core issue cycles lost after a taken branch",
+      "status": "assumed",
+      "source": "R02 ch.4 describes a one-clock bubble when the picker and the prefetch-buffer refill are not synchronized; no rule for when it occurs",
+      "alternatives": [
+        1
+      ]
+    },
+    "l1i.size_bytes": {
+      "value": 32768,
+      "unit": "bytes",
+      "status": "documented",
+      "source": "R01 section 2.1 (32 KiB instruction cache per core); R17 slide 13"
+    },
+    "l1i.ways": {
+      "value": 8,
+      "unit": "ways",
+      "status": "documented",
+      "source": "R01 section 2.1; R17 slide 13"
+    },
+    "pairing.x87_pairs_with_scalar": {
+      "value": true,
+      "unit": "boolean",
+      "status": "assumed",
+      "source": "R01 register-file description lets a scalar instruction take the V pipe next to a U-pipe instruction; nothing documented for x87 on the U pipe",
+      "alternatives": [
+        false
+      ]
+    },
+    "pairing.v_nop_pairs": {
+      "value": true,
+      "unit": "boolean",
+      "status": "assumed",
+      "source": "no documented rule for a NOP as the V-pipe partner",
+      "alternatives": [
+        false
+      ]
+    },
+    "pairing.load_store_pair": {
+      "value": false,
+      "unit": "boolean",
+      "status": "documented",
+      "source": "R17 slide 13 (one L1 access per clock, read or write): a load and a store would not issue in one cycle",
+      "alternatives": [
+        true
+      ]
+    },
+    "store.load_after_store_interlock_cycles": {
+      "value": 0,
+      "unit": "cycles after a store before the same context may issue a load",
+      "status": "assumed",
+      "source": "not documented",
+      "alternatives": [
+        4
+      ]
+    },
+    "latency.x87_load": {
+      "value": null,
+      "unit": "cycles from issue until the loaded value is on the x87 stack",
+      "status": "unknown",
+      "source": "not documented"
+    },
+    "latency.x87_mem_operand_load": {
+      "value": null,
+      "unit": "cycles for the memory operand of an x87 arithmetic instruction before the operation starts",
+      "status": "unknown",
+      "source": "not documented"
+    },
+    "x87.mem_operand_serializes": {
+      "value": false,
+      "unit": "boolean",
+      "status": "assumed",
+      "source": "not documented: whether an x87 instruction with a memory operand holds its context until its result is complete",
+      "alternatives": [
+        true
+      ]
     }
   }
 }

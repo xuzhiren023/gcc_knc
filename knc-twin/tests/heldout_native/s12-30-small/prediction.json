@@ -1,0 +1,585 @@
+{
+  "case": "s12-30-small",
+  "engine_version": "0.3.1",
+  "profile_hash": "2058f0ec2d803051ea99b503bb10920e40ea33e9f84f19ea060727bc6aa3e468",
+  "scenario": "steady state of repeated identical calls (slope between 2 and 3 calls), default memory sub-models, branches predicted from their history",
+  "unit": "one timed call (32 rows)",
+  "variants": [
+    {
+      "completion_cycles": [
+        24776,
+        34289
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 10
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 8809
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 8415
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 9513.0,
+      "status": "ok",
+      "variant": "csr13/donor-off"
+    },
+    {
+      "completion_cycles": [
+        25053,
+        34704
+      ],
+      "frontend": {
+        "decode_delay_cycles": 408,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 99,
+        "taken_branch_bubbles": 106
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 8809
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 8316
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 9651.0,
+      "status": "ok",
+      "variant": "csr13/knc-switch-off"
+    },
+    {
+      "completion_cycles": [
+        25073,
+        34734
+      ],
+      "frontend": {
+        "decode_delay_cycles": 414,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 99,
+        "taken_branch_bubbles": 109
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 8809
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 8328
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 9661.0,
+      "status": "ok",
+      "variant": "csr13/knc-switch-on"
+    },
+    {
+      "completion_cycles": [
+        25196,
+        34752
+      ],
+      "frontend": {
+        "decode_delay_cycles": 24,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 3,
+        "taken_branch_bubbles": 106
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 9211
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 8334
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 9556.0,
+      "status": "ok",
+      "variant": "csr13/knc-switch-off-two-nests"
+    },
+    {
+      "completion_cycles": [
+        54285,
+        80033
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 10
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 27278
+        },
+        {
+          "constraint": "x87_serial",
+          "context_cycles": 15792
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 25748.0,
+      "status": "ok",
+      "variant": "csr27/donor-off"
+    },
+    {
+      "completion_cycles": [
+        54563,
+        80450
+      ],
+      "frontend": {
+        "decode_delay_cycles": 408,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 99,
+        "taken_branch_bubbles": 106
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 27278
+        },
+        {
+          "constraint": "x87_serial",
+          "context_cycles": 15792
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 25887.0,
+      "status": "ok",
+      "variant": "csr27/knc-switch-off"
+    },
+    {
+      "completion_cycles": [
+        54585,
+        80483
+      ],
+      "frontend": {
+        "decode_delay_cycles": 414,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 99,
+        "taken_branch_bubbles": 109
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 27278
+        },
+        {
+          "constraint": "x87_serial",
+          "context_cycles": 15792
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 25898.0,
+      "status": "ok",
+      "variant": "csr27/knc-switch-on"
+    },
+    {
+      "completion_cycles": [
+        54730,
+        80523
+      ],
+      "frontend": {
+        "decode_delay_cycles": 24,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 3,
+        "taken_branch_bubbles": 106
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 27703
+        },
+        {
+          "constraint": "x87_serial",
+          "context_cycles": 15792
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 25793.0,
+      "status": "ok",
+      "variant": "csr27/knc-switch-off-two-nests"
+    },
+    {
+      "completion_cycles": [
+        25037,
+        34755
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 10
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 9683
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 8203
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 9718.0,
+      "status": "ok",
+      "variant": "ptr13/donor-off"
+    },
+    {
+      "completion_cycles": [
+        25245,
+        35068
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 96,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 106
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 9683
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 8206
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 9823.0,
+      "status": "ok",
+      "variant": "ptr13/knc-switch-off"
+    },
+    {
+      "completion_cycles": [
+        25661,
+        35692
+      ],
+      "frontend": {
+        "decode_delay_cycles": 588,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 99,
+        "taken_branch_bubbles": 109
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 9683
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 8221
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 10031.0,
+      "status": "ok",
+      "variant": "ptr13/knc-switch-on"
+    },
+    {
+      "completion_cycles": [
+        26026,
+        36073
+      ],
+      "frontend": {
+        "decode_delay_cycles": 576,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 99,
+        "taken_branch_bubbles": 106
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 10085
+        },
+        {
+          "constraint": "spacing",
+          "context_cycles": 8227
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 10047.0,
+      "status": "ok",
+      "variant": "ptr13/knc-switch-off-two-nests"
+    },
+    {
+      "completion_cycles": [
+        56732,
+        84261
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 10
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 30751
+        },
+        {
+          "constraint": "x87_serial",
+          "context_cycles": 17098
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 27529.0,
+      "status": "ok",
+      "variant": "ptr27/donor-off"
+    },
+    {
+      "completion_cycles": [
+        56938,
+        84570
+      ],
+      "frontend": {
+        "decode_delay_cycles": 0,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 96,
+        "slow_prefix_instructions": 0,
+        "taken_branch_bubbles": 106
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 30751
+        },
+        {
+          "constraint": "x87_serial",
+          "context_cycles": 17098
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 27632.0,
+      "status": "ok",
+      "variant": "ptr27/knc-switch-off"
+    },
+    {
+      "completion_cycles": [
+        57354,
+        85194
+      ],
+      "frontend": {
+        "decode_delay_cycles": 588,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 99,
+        "taken_branch_bubbles": 109
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 30751
+        },
+        {
+          "constraint": "x87_serial",
+          "context_cycles": 17098
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 27840.0,
+      "status": "ok",
+      "variant": "ptr27/knc-switch-on"
+    },
+    {
+      "completion_cycles": [
+        57741,
+        85597
+      ],
+      "frontend": {
+        "decode_delay_cycles": 576,
+        "icache_misses": 0,
+        "layout": true,
+        "padding_nops": 99,
+        "slow_prefix_instructions": 99,
+        "taken_branch_bubbles": 106
+      },
+      "functional": [
+        "ok",
+        "ok"
+      ],
+      "limiting": [
+        {
+          "constraint": "miss_stall",
+          "context_cycles": 31176
+        },
+        {
+          "constraint": "x87_serial",
+          "context_cycles": 17098
+        }
+      ],
+      "memory_submodels": [
+        "tlb",
+        "hardware_prefetcher",
+        "memory_service"
+      ],
+      "predicted_cycles_per_unit": 27856.0,
+      "status": "ok",
+      "variant": "ptr27/knc-switch-off-two-nests"
+    }
+  ]
+}

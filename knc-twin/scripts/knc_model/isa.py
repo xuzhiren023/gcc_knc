@@ -41,6 +41,9 @@ CLASSES = {
     "x87_compare":       {"pipes": "U", "latency": "latency.x87_compare", "kind": "x87"},
     "x87_control":       {"pipes": "UV_both", "latency": "latency.x87_control", "kind": "x87"},
     "fence":             {"pipes": "UV_both", "latency": "latency.fence", "kind": "fence"},
+    "locked_rmw":        {"pipes": "UV_both", "latency": "latency.fence", "kind": "rmw", "occupancy": "latency.fence"},
+    "call":              {"pipes": "U", "latency": None, "kind": "branch"},
+    "ret":               {"pipes": "U", "latency": None, "kind": "branch"},
 }
 
 FLAGS = ("ZF", "SF", "CF", "OF", "PF")
@@ -101,8 +104,11 @@ _add("pop", "scalar_load", ["w:gm"], fn="pop", mem_size=8, note="load; rsp += 8"
 _add("leave", "scalar_load", [], fn="leave", mem_size=8, note="rsp = rbp; pop rbp")
 _add("nop", "scalar_alu", [], fn="nop", note="costs an issue slot only")
 _add("movzx", "scalar_alu", ["w:g", "r:gm"], fn=None, note="use the GAS mnemonics movzbl/movzwl/movzbq/movzwq")
-_add("call", "branch", ["t"], fn=None, note="REGION BOUNDARY: calls are not simulated; cut the region at the call or treat the callee as unsupported")
-_add("ret", "branch", [], fn=None, note="REGION BOUNDARY: a region ends before ret")
+_add("call", "call", ["t"], fn="call", mem_size=8,
+     note="pushes the return address and enters the callee when it is in the region; otherwise the callee must be declared in the kernel's 'calls' (costed stub)")
+_add("ret", "ret", [], fn="ret", mem_size=8, note="pops the return address; returning to the entry sentinel ends the stream")
+_add("xchg", "scalar_alu", ["rw:g", "rw:g"], fn="xchg", note="register-register exchange only (the memory form is implicitly locked: use lock_xchg)")
+_add("sahf", "scalar_alu", [], fn="sahf", flags_w=True, note="SF, ZF, PF, CF from AH (AF not modeled); OF unchanged")
 for _n in ("cmove", "cmovne", "cmovl", "cmovg", "cmovle", "cmovge", "cmova", "cmovb", "cmovae", "cmovbe"):
     _add(_n, "scalar_alu", ["rw:g", "r:gm"], fn=None, note="KNC has no CMOV; -march=knc never emits it (S1-04)")
 
@@ -126,9 +132,21 @@ _add("kortest", "mask_op", ["r:k", "r:k"], fn="kortest", flags_w=True, note="ZF 
 
 # ---- vector FP ------------------------------------------------------------------------
 for _fmt, _suf in (("f32", "ps"), ("f64", "pd")):
-    for _op, _k in (("vadd", "add"), ("vsub", "sub"), ("vsubr", "subr"), ("vmul", "mul"), ("vmax", "max"), ("vmin", "min")):
-        _add(_op + _suf, "vector_arith", ["w:v", "r:v", "r:vm"], fn="vfp2", fmt=_fmt, opk=_k, mem_size=64,
-             note=("max/min follow the x86 rule: a NaN or equal-zero operand returns the second source (assumed for KNC)" if _k in ("max", "min") else ""))
+    for _op, _k in (("vadd", "add"), ("vsub", "sub"), ("vsubr", "subr"), ("vmul", "mul")):
+        _add(_op + _suf, "vector_arith", ["w:v", "r:v", "r:vm"], fn="vfp2", fmt=_fmt, opk=_k, mem_size=64)
+    for _op in ("vmax", "vmin"):
+        _add(_op + _suf, "vector_arith", ["w:v", "r:v", "r:vm"], fn=None, mem_size=64,
+             note="not an IMCI instruction (R27 lists vgmaxps/vgminps/vgmaxpd/vgminpd); GCC-KNC never emits it")
+    _add("vgmax" + _suf, "vector_arith", ["w:v", "r:v", "r:vm"], fn="vgminmax", fmt=_fmt, want_max=True, mem_size=64,
+         note="R27 FpMax: a NaN operand returns the other operand, two NaNs the first (unquieted); max(-0,+0) returns the second source; DAZ applies, no FTZ")
+    _add("vgmin" + _suf, "vector_arith", ["w:v", "r:v", "r:vm"], fn="vgminmax", fmt=_fmt, want_max=False, mem_size=64,
+         note="R27 FpMin: a NaN operand returns the other operand, two NaNs the first; min(-0,+0) returns the first source; DAZ applies, no FTZ")
+    _add("vgetexp" + _suf, "vector_arith", ["w:v", "r:vm"], fn="vgetexp", fmt=_fmt, mem_size=64,
+         note="unbiased exponent as a float; denormals normalized first unless DAZ; 0 -> -inf, inf -> +inf, NaN quieted (R27 pp.313-317)")
+    _add("vgetmant" + _suf, "vector_arith", ["w:v", "r:vm", "r:i"], fn="vgetmant", fmt=_fmt, mem_size=64,
+         note="significand normalized to the interval imm[1:0] ([1,2) [1/2,2) [1/2,1) [3/4,3/2)) with sign control imm[3:2] (keep, zero, NaN if negative); 0 and inf pass through (R27 pp.319-326)")
+    _add("vfixupnan" + _suf, "vector_arith", ["rw:v", "r:v", "r:vm"], fn="vfixupnan", fmt=_fmt, mem_size=64,
+         note="fix-up of special values of src1 by a 21-bit token table in src2 (classes -inf, <0, -0, +0, >0, +inf; tokens no change, -inf, -0, +0, +inf, QNaN, NMAX, -NMAX); NaN passes through quieted (R27 pp.193-198)")
     for _base, _negp, _negc in (("vfmadd", False, False), ("vfmsub", False, True), ("vfnmadd", True, False), ("vfnmsub", True, True)):
         _add("%s132%s" % (_base, _suf), "vector_arith", ["rw:v", "r:v", "r:vm"], fn="vfma", fmt=_fmt, form="132", negp=_negp, negc=_negc, mem_size=64)
         _add("%s213%s" % (_base, _suf), "vector_arith", ["rw:v", "r:v", "r:vm"], fn="vfma", fmt=_fmt, form="213", negp=_negp, negc=_negc, mem_size=64)
@@ -147,11 +165,15 @@ _add("vcvtfxpntpd2udq", "vector_convert_df", ["w:v", "r:vm", "r:i"], fn="vcvt_d2
 _add("vcvtps2pd", "vector_convert_df", ["w:v", "r:vm"], fn="vcvt_s2d", mem_size=64, note="low 8 floats -> 8 doubles (exact); latency assumed equal to pd->dq (7)")
 _add("vcvtpd2ps", "vector_convert_df", ["w:v", "r:vm"], fn="vcvt_d2s", mem_size=64, note="8 doubles -> low 8 floats, upper lanes zero (assumed); rounding per numerical policy")
 _add("vrndfxpntps", "vector_arith", ["w:v", "r:vm", "r:i"], fn="vrnd", mem_size=64, note="round to an integer-valued float with the immediate's rounding mode")
-_add("vrcp23ps", "vector_long", ["w:v", "r:vm"], fn=None, mem_size=64, note="timing only (23-bit approximate reciprocal; exact bit pattern not modeled)")
-_add("vrsqrt23ps", "vector_long", ["w:v", "r:vm"], fn=None, mem_size=64, note="timing only")
+_add("vrcp23ps", "vector_long", ["w:v", "r:vm"], fn="vrcp23", mem_size=64, approximate=True,
+     note="APPROXIMATE value: the correctly rounded reciprocal stands in for the hardware's 0.912-ulp result (R27 p.577), special values and flags per Table 6.26; "
+          "results that depend on the exact bits are marked approximate; the characterization plan captures the 2^23-entry table that makes it exact")
+_add("vrsqrt23ps", "vector_long", ["w:v", "r:vm"], fn="vrsqrt23", mem_size=64, approximate=True,
+     note="APPROXIMATE value: the correctly rounded reciprocal square root stands in for the hardware's 0.775-ulp result (R27 p.588), special values and flags per Table 6.29")
 _add("vlog2ps", "vector_long", ["w:v", "r:vm"], fn=None, mem_size=64, note="timing only")
 _add("vexp223ps", "vector_long", ["w:v", "r:vm"], fn=None, mem_size=64, note="timing only")
-_add("vscaleps", "vector_arith", ["w:v", "r:v", "r:vm"], fn=None, mem_size=64, note="timing only")
+_add("vscaleps", "vector_arith", ["w:v", "r:v", "r:vm"], fn="vscale", mem_size=64,
+     note="src1 * 2^int32(src2) rounded like vmulps (rounding override or MXCSR.RC; FTZ/DAZ); out of range gives inf or 0 (R27 pp.591-592)")
 _add("vpermd", "vector_long", ["w:v", "r:v", "r:vm"], fn="vpermd", mem_size=64, note="dword permute: dst[i] = src2[idx[i] & 15]")
 _add("vpermf32x4", "vector_long", ["w:v", "r:vm", "r:i"], fn="vpermf32x4", mem_size=64, note="128-bit group permute: group i <- group (imm >> 2i) & 3")
 
@@ -160,15 +182,21 @@ for _n, _k in (("vpaddd", "add"), ("vpsubd", "sub"), ("vpsubrd", "subr"), ("vpan
                ("vpmulld", "mullo"), ("vpmulhd", "mulhs"), ("vpmulhud", "mulhu"), ("vpminsd", "mins"), ("vpmaxsd", "maxs"), ("vpminud", "minu"), ("vpmaxud", "maxu"),
                ("vpsllvd", "shlv"), ("vpsrlvd", "shrv"), ("vpsravd", "sarv")):
     _add(_n, "vector_arith", ["w:v", "r:v", "r:vm"], fn="vint2", opk=_k, mem_size=64)
+_add("vpmadd231d", "vector_arith", ["rw:v", "r:v", "r:vm"], fn="vpmadd231d", mem_size=64,
+     note="dst = dst + low32(src1 * src2) per lane; costed like vpmulld (class vector_arith; the integer multiply latency is not measured separately)")
 for _n, _k in (("vpandq", "and"), ("vporq", "or"), ("vpxorq", "xor"), ("vpandnq", "andn")):
     _add(_n, "vector_arith", ["w:v", "r:v", "r:vm"], fn="vint2q", opk=_k, mem_size=64, note="64-bit logic (KNC has no 64-bit integer arithmetic)")
 for _n, _k in (("vpslld", "shl"), ("vpsrld", "shr"), ("vpsrad", "sar")):
     _add(_n, "vector_arith", ["w:v", "r:vm", "r:i"], fn="vshift_imm", opk=_k, mem_size=64)
 _add("vpcmpd", "vector_arith", ["w:k", "r:v", "r:vm", "r:i"], fn="vpcmp", signed=True, mem_size=64, note="predicate: 0 eq, 1 lt, 2 le, 4 ne, 5 nlt, 6 nle")
 _add("vpcmpud", "vector_arith", ["w:k", "r:v", "r:vm", "r:i"], fn="vpcmp", signed=False, mem_size=64)
-_add("vpcmpeqd", "vector_arith", ["w:k", "r:v", "r:vm"], fn="vpcmp", signed=True, fixed_pred=0, mem_size=64)
-_add("vpcmpgtd", "vector_arith", ["w:k", "r:v", "r:vm"], fn="vpcmp", signed=True, fixed_pred=6, mem_size=64)
-_add("vpcmpltd", "vector_arith", ["w:k", "r:v", "r:vm"], fn="vpcmp", signed=True, fixed_pred=1, mem_size=64)
+for _n, _pred in (("vpcmpeqd", 0), ("vpcmpltd", 1), ("vpcmpled", 2), ("vpcmpneqd", 4), ("vpcmpnltd", 5), ("vpcmpnled", 6), ("vpcmpgtd", 6)):
+    _add(_n, "vector_arith", ["w:k", "r:v", "r:vm"], fn="vpcmp", signed=True, fixed_pred=_pred, mem_size=64)
+for _n, _pred in (("vpcmpequd", 0), ("vpcmpltud", 1), ("vpcmpleud", 2), ("vpcmpnequd", 4), ("vpcmpnltud", 5), ("vpcmpnleud", 6)):
+    _add(_n, "vector_arith", ["w:k", "r:v", "r:vm"], fn="vpcmp", signed=False, fixed_pred=_pred, mem_size=64)
+_add("vpblendmd", "vector_arith", ["w:v", "r:v", "r:vm"], fn="vblendm", fmt="i32", mem_size=64, note="dst = mask ? src2 : src1 per dword lane (the mask selects, it does not write-mask)")
+_add("vpblendmq", "vector_arith", ["w:v", "r:v", "r:vm"], fn="vblendm", fmt="i64", mem_size=64)
+_add("stmxcsr", "scalar_store", ["w:m"], fn="stmxcsr", mem_size=4, note="stores MXCSR (RC, FTZ, DAZ, masks, sticky flags); the twin keeps MXCSR from the numerical policy and the flags its vector operations raise")
 _add("vpbroadcastd", "vector_load", ["w:v", "r:m"], fn="vbroadcast", elem=4, mem_size=4, note="dword broadcast from memory")
 _add("vbroadcastss", "vector_load", ["w:v", "r:m"], fn="vbroadcast", elem=4, mem_size=4)
 _add("vbroadcastsd", "vector_load", ["w:v", "r:m"], fn="vbroadcast", elem=8, mem_size=8)
@@ -233,6 +261,10 @@ for _op, _sz in (("fiadd", 4), ("fisub", 4), ("fisubr", 4), ("fimul", 4), ("fidi
     _add(_op + "l", "x87_add" if "mul" not in _op and "div" not in _op else ("x87_mul" if "mul" in _op else "x87_div"), ["r:m"], fn="x87", op=_op[1:], mem=True, mem_int=True, mem_size=_sz)
 for _op in ("fcom", "fcomp", "fucom", "fucomp"):
     _add(_op, "x87_compare", [["r:x"], []], fn="x87", op="fcom", pop=_op.endswith("p"), unordered_ok=_op.startswith("fu"), note="sets C0/C2/C3 in the status word")
+for _op in ("fcom", "fcomp"):
+    for _suf, _sz in (("s", 4), ("l", 8)):
+        _add(_op + _suf, "x87_compare", ["r:m"], fn="x87", op="fcom", pop=_op.endswith("p"), unordered_ok=False, mem=True, mem_size=_sz,
+             note="compares st0 with a binary32/64 memory operand; sets C0/C2/C3")
 _add("fcompp", "x87_compare", [], fn="x87", op="fcom", pop=2, unordered_ok=False)
 _add("fucompp", "x87_compare", [], fn="x87", op="fcom", pop=2, unordered_ok=True)
 for _op in ("fcomi", "fcomip", "fucomi", "fucomip"):
@@ -240,12 +272,27 @@ for _op in ("fcomi", "fcomip", "fucomi", "fucomip"):
 _add("fnstsw", "x87_control", ["w:gm"], fn="x87", op="fnstsw", mem_size=2, note="status word: C0 bit 8, C1 bit 9, C2 bit 10, C3 bit 14, TOP bits 11-13")
 _add("fnstcw", "x87_control", ["w:m"], fn="x87", op="fnstcw", mem_size=2)
 _add("fldcw", "x87_control", ["r:m"], fn="x87", op="fldcw", mem_size=2, note="RC bits 10-11 and PC bits 8-9 take effect for later instructions")
+_add("fxam", "x87_compare", [], fn="x87", op="fxam", note="classifies st0 into C3/C2/C0 and its sign into C1 (empty 101, zero 100, normal 010, infinity 011, NaN 001, denormal 110)")
+_add("ftst", "x87_compare", [], fn="x87", op="ftst", note="compares st0 with +0.0")
+_add("frndint", "x87_add", [], fn="x87", op="frndint", note="rounds st0 to an integer with the control word's RC; costed as an x87 add (assumed)")
 _add("fwait", "x87_move", [], fn="x87", op="nop")
 _add("fnclex", "x87_control", [], fn="x87", op="nop")
 
 # ---- fences ------------------------------------------------------------------------------------
-_add("lock_add", "fence", ["rw:m", "r:gi"], fn=None, note="lock add used as a publication fence; latency.fence must be known")
+for _n in ("add", "sub", "and", "or", "xor"):
+    _add("lock_" + _n, "locked_rmw", ["rw:m", "r:gi"], fn="alu2", flags_w=True, base_op=_n,
+         note="locked read-modify-write (also the publication fence 'lock add $0,(%rsp)'); exact on the sequential functional model; latency.fence must be known")
+for _n in ("inc", "dec"):
+    _add("lock_" + _n, "locked_rmw", ["rw:m"], fn="incdec", flags_w=True, base_op=_n)
+_add("lock_xadd", "locked_rmw", ["rw:m", "rw:g"], fn="xadd", flags_w=True, note="tmp = mem; mem += reg; reg = tmp")
+_add("lock_cmpxchg", "locked_rmw", ["rw:m", "r:g"], fn="cmpxchg", flags_w=True, note="compare rax with mem; equal: mem = reg, ZF=1; else rax = mem, ZF=0")
+_add("lock_xchg", "locked_rmw", ["rw:m", "rw:g"], fn="xchg")
 _add("mfence", "fence", [], fn=None, note="latency.fence must be known")
+
+
+for _a, _b in (("fildll", "fildq"), ("fistpll", "fistpq"), ("fisttpll", "fisttpq"), ("fistll", "fistq")):
+    if _b in INSTRUCTIONS:
+        INSTRUCTIONS[_a] = dict(INSTRUCTIONS[_b], name=_a, alias_of=_b)
 
 
 def lookup(mnemonic):

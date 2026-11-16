@@ -1,0 +1,1718 @@
+{
+  "calls": {
+    "__assert_fail": {
+      "model": "noreturn",
+      "source": "declared automatically (noreturn runtime routine)"
+    }
+  },
+  "description": "HPCG 3.1 ComputeSPMV_ref (donor build) from the linked S12-31 bench binary on the 8x8x8 problem the same run timed; a driver calls it 2 time(s) as the bench does",
+  "entry": "function",
+  "expected": {
+    "memory": [
+      {
+        "addr": "0x33010000",
+        "f64": [
+          17.5,
+          15.375,
+          17.25,
+          19.125,
+          21.875,
+          26.375,
+          31.75,
+          17.625,
+          15.375,
+          10.125,
+          11.25,
+          13.25,
+          17.0,
+          22.5,
+          4.375,
+          16.0,
+          17.25,
+          11.25,
+          13.25,
+          17.0,
+          22.5,
+          4.375,
+          8.125,
+          18.75,
+          19.125,
+          13.25,
+          17.0,
+          22.5,
+          4.375,
+          8.125,
+          10.125,
+          20.625,
+          21.875,
+          17.0,
+          22.5,
+          4.375,
+          8.125,
+          10.125,
+          11.25,
+          22.5,
+          26.375,
+          22.5,
+          4.375,
+          8.125,
+          10.125,
+          11.25,
+          13.25,
+          25.25,
+          31.75,
+          4.375,
+          8.125,
+          10.125,
+          11.25,
+          13.25,
+          17.0,
+          29.75,
+          17.625,
+          16.0,
+          18.75,
+          20.625,
+          22.5,
+          25.25,
+          29.75,
+          16.0,
+          15.375,
+          10.125,
+          11.25,
+          13.25,
+          17.0,
+          22.5,
+          4.375,
+          16.0,
+          10.125,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          11.5,
+          11.25,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          13.5,
+          13.25,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          14.625,
+          17.0,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          16.625,
+          22.5,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          20.375,
+          4.375,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          2.25,
+          16.0,
+          11.5,
+          13.5,
+          14.625,
+          16.625,
+          20.375,
+          2.25,
+          14.875,
+          17.25,
+          11.25,
+          13.25,
+          17.0,
+          22.5,
+          4.375,
+          8.125,
+          18.75,
+          11.25,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          13.5,
+          13.25,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          14.625,
+          17.0,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          16.625,
+          22.5,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          20.375,
+          4.375,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          2.25,
+          8.125,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          7.75,
+          18.75,
+          13.5,
+          14.625,
+          16.625,
+          20.375,
+          2.25,
+          7.75,
+          19.375,
+          19.125,
+          13.25,
+          17.0,
+          22.5,
+          4.375,
+          8.125,
+          10.125,
+          20.625,
+          13.25,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          14.625,
+          17.0,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          16.625,
+          22.5,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          20.375,
+          4.375,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          2.25,
+          8.125,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          7.75,
+          10.125,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          11.5,
+          20.625,
+          14.625,
+          16.625,
+          20.375,
+          2.25,
+          7.75,
+          11.5,
+          22.125,
+          21.875,
+          17.0,
+          22.5,
+          4.375,
+          8.125,
+          10.125,
+          11.25,
+          22.5,
+          17.0,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          16.625,
+          22.5,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          20.375,
+          4.375,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          2.25,
+          8.125,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          7.75,
+          10.125,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          11.5,
+          11.25,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          13.5,
+          22.5,
+          16.625,
+          20.375,
+          2.25,
+          7.75,
+          11.5,
+          13.5,
+          24.0,
+          26.375,
+          22.5,
+          4.375,
+          8.125,
+          10.125,
+          11.25,
+          13.25,
+          25.25,
+          22.5,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          20.375,
+          4.375,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          2.25,
+          8.125,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          7.75,
+          10.125,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          11.5,
+          11.25,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          13.5,
+          13.25,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          14.625,
+          25.25,
+          20.375,
+          2.25,
+          7.75,
+          11.5,
+          13.5,
+          14.625,
+          25.875,
+          31.75,
+          4.375,
+          8.125,
+          10.125,
+          11.25,
+          13.25,
+          17.0,
+          29.75,
+          4.375,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          2.25,
+          8.125,
+          -0.875,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          7.75,
+          10.125,
+          0.0,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          11.5,
+          11.25,
+          0.875,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          13.5,
+          13.25,
+          3.5,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          14.625,
+          17.0,
+          8.75,
+          -8.75,
+          -3.5,
+          -0.875,
+          0.0,
+          0.875,
+          16.625,
+          29.75,
+          2.25,
+          7.75,
+          11.5,
+          13.5,
+          14.625,
+          16.625,
+          28.625,
+          17.625,
+          16.0,
+          18.75,
+          20.625,
+          22.5,
+          25.25,
+          29.75,
+          16.0,
+          16.0,
+          11.5,
+          13.5,
+          14.625,
+          16.625,
+          20.375,
+          2.25,
+          14.875,
+          18.75,
+          13.5,
+          14.625,
+          16.625,
+          20.375,
+          2.25,
+          7.75,
+          19.375,
+          20.625,
+          14.625,
+          16.625,
+          20.375,
+          2.25,
+          7.75,
+          11.5,
+          22.125,
+          22.5,
+          16.625,
+          20.375,
+          2.25,
+          7.75,
+          11.5,
+          13.5,
+          24.0,
+          25.25,
+          20.375,
+          2.25,
+          7.75,
+          11.5,
+          13.5,
+          14.625,
+          25.875,
+          29.75,
+          2.25,
+          7.75,
+          11.5,
+          13.5,
+          14.625,
+          16.625,
+          28.625,
+          16.0,
+          14.875,
+          19.375,
+          22.125,
+          24.0,
+          25.875,
+          28.625,
+          14.375
+        ]
+      }
+    ]
+  },
+  "init": {
+    "memory": [
+      {
+        "addr": "0x30000000",
+        "file": "../input/A.bin"
+      },
+      {
+        "addr": "0x30000100",
+        "file": "../input/vec_x.bin"
+      },
+      {
+        "addr": "0x30000140",
+        "file": "../input/vec_y.bin"
+      },
+      {
+        "addr": "0x30000180",
+        "file": "../input/vec_b.bin"
+      },
+      {
+        "addr": "0x300001c0",
+        "file": "../input/vec_s.bin"
+      },
+      {
+        "addr": "0x30010000",
+        "file": "../input/nnz.bin"
+      },
+      {
+        "addr": "0x30020000",
+        "file": "../input/ind_ptrs.bin"
+      },
+      {
+        "addr": "0x30030000",
+        "file": "../input/val_ptrs.bin"
+      },
+      {
+        "addr": "0x30040000",
+        "file": "../input/diag_ptrs.bin"
+      },
+      {
+        "addr": "0x31000030",
+        "file": "../input/ind_rows.bin"
+      },
+      {
+        "addr": "0x32000030",
+        "file": "../input/val_rows.bin"
+      },
+      {
+        "addr": "0x33000000",
+        "file": "../input/xexact.bin"
+      },
+      {
+        "addr": "0x33020000",
+        "file": "../input/b.bin"
+      },
+      {
+        "addr": "0x33010000",
+        "file": "../input/zeros.bin"
+      },
+      {
+        "addr": "0x33030000",
+        "file": "../input/zeros.bin"
+      }
+    ],
+    "registers": {},
+    "symbols": {}
+  },
+  "max_steps": 4000000,
+  "memory_default": 0,
+  "name": "s12-31-hpcg8-donor_spmv",
+  "provenance": {
+    "adapter": "from_binary.py",
+    "coverage": {
+      "complete": {
+        "functional": true,
+        "isa": true,
+        "parser": true,
+        "timing": null
+      },
+      "functional_exact": 64,
+      "instructions": 64,
+      "isa_known": 64,
+      "memory_records": 17,
+      "mnemonics_unknown": [],
+      "parser_ok": 64,
+      "timing_only_or_missing": [],
+      "timing_params_known": null,
+      "unsupported": []
+    },
+    "function": "donor_spmv",
+    "included_callees": [],
+    "layout": true,
+    "live_in_registers_placeholders": [
+      "r12",
+      "r9",
+      "rbp",
+      "rbx",
+      "rdi",
+      "rdx",
+      "rsi"
+    ],
+    "notes": [],
+    "padding_nops": 2,
+    "shape": "x87_sparse_rows_l2",
+    "slow_prefix_instructions": 1,
+    "source_file": ".work/_shared/S12-31/build/s12-31-bench",
+    "source_sha256": "77713a9be5f4b56bf8be54591c0fb972869f253b7ca83d812a1e2a370429ae66",
+    "undeclared_callees": [],
+    "unresolved_symbols": []
+  },
+  "scenario": {
+    "branch": {
+      "type": "exit_mispredicted"
+    },
+    "memory": {
+      "cold_level": "memory",
+      "type": "line_tracking",
+      "warm": [
+        {
+          "end": "0x30000060",
+          "level": "l2",
+          "start": "0x30000000"
+        },
+        {
+          "end": "0x30000110",
+          "level": "l2",
+          "start": "0x30000100"
+        },
+        {
+          "end": "0x30000150",
+          "level": "l2",
+          "start": "0x30000140"
+        },
+        {
+          "end": "0x30000190",
+          "level": "l2",
+          "start": "0x30000180"
+        },
+        {
+          "end": "0x300001d0",
+          "level": "l2",
+          "start": "0x300001c0"
+        },
+        {
+          "end": "0x30010200",
+          "level": "l2",
+          "start": "0x30010000"
+        },
+        {
+          "end": "0x30021000",
+          "level": "l2",
+          "start": "0x30020000"
+        },
+        {
+          "end": "0x30031000",
+          "level": "l2",
+          "start": "0x30030000"
+        },
+        {
+          "end": "0x30041000",
+          "level": "l2",
+          "start": "0x30040000"
+        },
+        {
+          "end": "0x31010030",
+          "level": "l2",
+          "start": "0x31000000"
+        },
+        {
+          "end": "0x3201c030",
+          "level": "l2",
+          "start": "0x32000000"
+        },
+        {
+          "end": "0x33001000",
+          "level": "l2",
+          "start": "0x33000000"
+        },
+        {
+          "end": "0x33021000",
+          "level": "l2",
+          "start": "0x33020000"
+        },
+        {
+          "end": "0x33011000",
+          "level": "l1",
+          "start": "0x33010000"
+        },
+        {
+          "end": "0x33031000",
+          "level": "l1",
+          "start": "0x33030000"
+        },
+        {
+          "end": "0x7f0000000100",
+          "level": "l1",
+          "start": "0x7efffffff000"
+        }
+      ]
+    }
+  },
+  "schema": "knc-twin.kernel/1",
+  "streams": [
+    {
+      "context": 0,
+      "instructions": [
+        {
+          "id": "drv0_rdi",
+          "op": "mov",
+          "ops": [
+            "rdi",
+            {
+              "imm": 805306368
+            }
+          ],
+          "width": 64
+        },
+        {
+          "id": "drv0_rsi",
+          "op": "mov",
+          "ops": [
+            "rsi",
+            {
+              "imm": 805306624
+            }
+          ],
+          "width": 64
+        },
+        {
+          "id": "drv0_rdx",
+          "op": "mov",
+          "ops": [
+            "rdx",
+            {
+              "imm": 805306688
+            }
+          ],
+          "width": 64
+        },
+        {
+          "id": "drv0_call",
+          "op": "call",
+          "ops": [
+            "donor_spmv"
+          ]
+        },
+        {
+          "id": "drv1_rdi",
+          "op": "mov",
+          "ops": [
+            "rdi",
+            {
+              "imm": 805306368
+            }
+          ],
+          "width": 64
+        },
+        {
+          "id": "drv1_rsi",
+          "op": "mov",
+          "ops": [
+            "rsi",
+            {
+              "imm": 805306624
+            }
+          ],
+          "width": 64
+        },
+        {
+          "id": "drv1_rdx",
+          "op": "mov",
+          "ops": [
+            "rdx",
+            {
+              "imm": 805306688
+            }
+          ],
+          "width": 64
+        },
+        {
+          "id": "drv1_call",
+          "op": "call",
+          "ops": [
+            "donor_spmv"
+          ]
+        },
+        {
+          "id": "drv_ret",
+          "op": "ret",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4256432,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2b0",
+          "label": "donor_spmv",
+          "op": "push",
+          "ops": [
+            "r12"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256434,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2b2",
+          "op": "push",
+          "ops": [
+            "rbp"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256435,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2b3",
+          "op": "push",
+          "ops": [
+            "rbx"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256436,
+            "bytes": 3,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2b4",
+          "op": "mov",
+          "ops": [
+            "eax",
+            {
+              "base": "rdi",
+              "disp": 36
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256439,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2b7",
+          "op": "cmp",
+          "ops": [
+            {
+              "base": "rsi"
+            },
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256441,
+            "bytes": 6,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2b9",
+          "op": "jl",
+          "ops": [
+            ".A_40f347"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256447,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2bf",
+          "op": "mov",
+          "ops": [
+            "r10d",
+            {
+              "base": "rdi",
+              "disp": 32
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256451,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2c3",
+          "op": "cmp",
+          "ops": [
+            {
+              "base": "rdx"
+            },
+            "r10d"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256454,
+            "bytes": 6,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2c6",
+          "op": "jl",
+          "ops": [
+            ".A_40f360"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256460,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2cc",
+          "op": "mov",
+          "ops": [
+            "r8",
+            {
+              "base": "rsi",
+              "disp": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256464,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2d0",
+          "op": "mov",
+          "ops": [
+            "r12",
+            {
+              "base": "rdx",
+              "disp": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256468,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2d4",
+          "op": "test",
+          "ops": [
+            "r10d",
+            "r10d"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256471,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2d7",
+          "op": "jle",
+          "ops": [
+            ".A_40f32c"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256473,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2d9",
+          "op": "fldz",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4256475,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2db",
+          "op": "mov",
+          "ops": [
+            "rbp",
+            {
+              "base": "rdi",
+              "disp": 72
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256479,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2df",
+          "op": "mov",
+          "ops": [
+            "rbx",
+            {
+              "base": "rdi",
+              "disp": 64
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256483,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2e3",
+          "op": "mov",
+          "ops": [
+            "r11",
+            {
+              "base": "rdi",
+              "disp": 48
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256487,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2e7",
+          "op": "fld",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256489,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2e9",
+          "op": "xor",
+          "ops": [
+            "r9d",
+            "r9d"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256492,
+            "bytes": 4,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2ec",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4256496,
+            "bytes": 5,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2f0",
+          "label": ".A_40f2f0",
+          "op": "movsbl",
+          "ops": [
+            "ecx",
+            {
+              "base": "r11",
+              "index": "r9",
+              "scale": 1
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256501,
+            "bytes": 5,
+            "disp": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2f5",
+          "op": "mov",
+          "ops": [
+            "rsi",
+            {
+              "base": "rbp",
+              "index": "r9",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256506,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2fa",
+          "op": "mov",
+          "ops": [
+            "rdi",
+            {
+              "base": "rbx",
+              "index": "r9",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256510,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f2fe",
+          "op": "test",
+          "ops": [
+            "ecx",
+            "ecx"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256512,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f300",
+          "op": "jle",
+          "ops": [
+            ".A_40f333"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256514,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f302",
+          "op": "fld",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256516,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f304",
+          "op": "xor",
+          "ops": [
+            "eax",
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256518,
+            "bytes": 2,
+            "prefixes": [
+              "66"
+            ],
+            "slow_prefixes": 1
+          },
+          "id": "a40f306",
+          "op": "nop",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4256520,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f308",
+          "label": ".A_40f308",
+          "op": "movslq",
+          "ops": [
+            "rdx",
+            {
+              "base": "rdi",
+              "index": "rax",
+              "scale": 4
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256524,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f30c",
+          "op": "fldl",
+          "ops": [
+            {
+              "base": "r8",
+              "index": "rdx",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256528,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f310",
+          "op": "fmull",
+          "ops": [
+            {
+              "base": "rsi",
+              "index": "rax",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256531,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f313",
+          "op": "inc",
+          "ops": [
+            "rax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256534,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f316",
+          "op": "cmp",
+          "ops": [
+            "ecx",
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256536,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f318",
+          "op": "faddp",
+          "ops": [
+            "st(1)",
+            "st"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256538,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f31a",
+          "op": "jg",
+          "ops": [
+            ".A_40f308"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256540,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f31c",
+          "op": "fstpl",
+          "ops": [
+            {
+              "base": "r12",
+              "index": "r9",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256544,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f320",
+          "op": "inc",
+          "ops": [
+            "r9"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256547,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f323",
+          "op": "cmp",
+          "ops": [
+            "r10d",
+            "r9d"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256550,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f326",
+          "op": "jg",
+          "ops": [
+            ".A_40f2f0"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256552,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f328",
+          "op": "fstp",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256554,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f32a",
+          "op": "fstp",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256556,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a40f32c",
+          "label": ".A_40f32c",
+          "op": "pop",
+          "ops": [
+            "rbx"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256557,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f32d",
+          "op": "xor",
+          "ops": [
+            "eax",
+            "eax"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256559,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a40f32f",
+          "op": "pop",
+          "ops": [
+            "rbp"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256560,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f330",
+          "op": "pop",
+          "ops": [
+            "r12"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256562,
+            "bytes": 1,
+            "slow_prefixes": 0
+          },
+          "id": "a40f332",
+          "op": "ret",
+          "ops": []
+        },
+        {
+          "encoding": {
+            "addr": 4256563,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f333",
+          "label": ".A_40f333",
+          "op": "fld",
+          "ops": [
+            "st(1)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256565,
+            "bytes": 4,
+            "slow_prefixes": 0
+          },
+          "id": "a40f335",
+          "op": "fstpl",
+          "ops": [
+            {
+              "base": "r12",
+              "index": "r9",
+              "scale": 8
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256569,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f339",
+          "op": "inc",
+          "ops": [
+            "r9"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256572,
+            "bytes": 3,
+            "slow_prefixes": 0
+          },
+          "id": "a40f33c",
+          "op": "cmp",
+          "ops": [
+            "r10d",
+            "r9d"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256575,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f33f",
+          "op": "jg",
+          "ops": [
+            ".A_40f2f0"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256577,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f341",
+          "op": "fstp",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256579,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f343",
+          "op": "fstp",
+          "ops": [
+            "st(0)"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256581,
+            "bytes": 2,
+            "slow_prefixes": 0
+          },
+          "id": "a40f345",
+          "op": "jmp",
+          "ops": [
+            ".A_40f32c"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256583,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f347",
+          "label": ".A_40f347",
+          "op": "mov",
+          "ops": [
+            "ecx",
+            {
+              "imm": 4806976
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256588,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f34c",
+          "op": "mov",
+          "ops": [
+            "edx",
+            {
+              "imm": 49
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256593,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f351",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "imm": 4806784
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256598,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f356",
+          "op": "mov",
+          "ops": [
+            "edi",
+            {
+              "imm": 4806896
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256603,
+            "bytes": 5,
+            "slow_prefixes": 0
+          },
+          "id": "a40f35b",
+          "op": "call",
+          "ops": [
+            "__assert_fail"
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256608,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f360",
+          "label": ".A_40f360",
+          "op": "mov",
+          "ops": [
+            "ecx",
+            {
+              "imm": 4806976
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256613,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f365",
+          "op": "mov",
+          "ops": [
+            "edx",
+            {
+              "imm": 50
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256618,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f36a",
+          "op": "mov",
+          "ops": [
+            "esi",
+            {
+              "imm": 4806784
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256623,
+            "bytes": 5,
+            "imm": true,
+            "slow_prefixes": 0
+          },
+          "id": "a40f36f",
+          "op": "mov",
+          "ops": [
+            "edi",
+            {
+              "imm": 4806936
+            }
+          ]
+        },
+        {
+          "encoding": {
+            "addr": 4256628,
+            "bytes": 5,
+            "slow_prefixes": 0
+          },
+          "id": "a40f374",
+          "op": "call",
+          "ops": [
+            "__assert_fail"
+          ]
+        }
+      ]
+    }
+  ],
+  "unit_of_work": {
+    "count": 1,
+    "description": "two ComputeSPMV_ref passes"
+  }
+}

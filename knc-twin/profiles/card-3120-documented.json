@@ -1,19 +1,69 @@
 {
   "schema": "knc-twin.profile/1",
   "id": "card-3120-documented",
-  "version": "0.1.0",
+  "version": "0.3.0",
   "kind": "card",
-  "extends": "knc-common",
+  "extends": "core-x100-measured",
   "synthetic": false,
-  "description": "Xeon Phi 3120A/3120P (57 cores, 1.1 GHz, 6 GB GDDR5, 240 GB/s peak). Only Intel's published card constants are filled in. Latencies that the common profile leaves unknown stay unknown here, so simulations that need them stop with missing_parameter until measurements are imported.",
+  "description": "Xeon Phi 3120A/3120P (57 cores, 1.1 GHz, 6 GB GDDR5, 240 GB/s peak). Card constants are Intel's published specification. Core timing in cycles is inherited from core-x100-measured (measured on the project's 7120-class card; same core design, not re-measured on a 3120). Memory latency and the per-core memory service rate are the 7120 figures converted from nanoseconds at this card's clock (assumed: same memory path). No bandwidth is known. The project's '--profile 3100' runs limit threads and memory on the 7120 card; they are not 3120 measurements.",
   "native_measurement_ids": [],
-  "calibration": {"state": "uncalibrated", "statement": "No native measurement imported; no literature latencies assumed.", "held_out_validation_cases": 0},
+  "calibration": {
+    "state": "transferred_core_measurements",
+    "statement": "Core timing is transferred from the 7120-class card; memory latency is converted from its nanoseconds; nothing was measured on a 3120. Every result is an unvalidated scenario estimate for this card.",
+    "held_out_validation_cases": 0
+  },
   "parameters": {
-    "card.model": {"value": "Xeon Phi 3120A/3120P", "unit": "text", "status": "documented", "source": "Intel product specification (ark.intel.com, Xeon Phi Coprocessor 3120A/3120P)"},
-    "card.clock_hz": {"value": 1100000000, "unit": "Hz", "status": "documented", "source": "Intel product specification 3120 (1.1 GHz)"},
-    "card.cores": {"value": 57, "unit": "cores", "status": "documented", "source": "Intel product specification 3120"},
-    "card.usable_cores": {"value": 56, "unit": "cores", "status": "assumed", "source": "one core reserved for the card OS; not measured"},
-    "card.memory_bytes": {"value": 6442450944, "unit": "bytes", "status": "documented", "source": "Intel product specification 3120 (6 GB)"},
-    "card.peak_memory_bandwidth_gbs": {"value": 240, "unit": "GB/s", "status": "documented", "source": "Intel product specification 3120"}
+    "card.model": {
+      "value": "Xeon Phi 3120A/3120P",
+      "unit": "text",
+      "status": "documented",
+      "source": "Intel product specification (ark.intel.com, Xeon Phi Coprocessor 3120A/3120P)"
+    },
+    "card.clock_hz": {
+      "value": 1100000000,
+      "unit": "Hz",
+      "status": "documented",
+      "source": "Intel product specification 3120 (1.1 GHz)"
+    },
+    "card.cores": {
+      "value": 57,
+      "unit": "cores",
+      "status": "documented",
+      "source": "Intel product specification 3120"
+    },
+    "card.usable_cores": {
+      "value": 56,
+      "unit": "cores",
+      "status": "assumed",
+      "source": "one core reserved for the card OS; not measured"
+    },
+    "card.memory_bytes": {
+      "value": 6442450944,
+      "unit": "bytes",
+      "status": "documented",
+      "source": "Intel product specification 3120 (6 GB)"
+    },
+    "card.peak_memory_bandwidth_gbs": {
+      "value": 240,
+      "unit": "GB/s",
+      "status": "documented",
+      "source": "Intel product specification 3120"
+    },
+    "latency.memory": {
+      "value": 317,
+      "unit": "cycles",
+      "status": "assumed",
+      "source": "7120-class card S6-03 memory.load_lat 356.53 cycles at 1.238 GHz = 288 ns, converted at 1.1 GHz; not measured on a 3120",
+      "uncertainty": "assumes the same GDDR5 and ring latency in nanoseconds",
+      "alternatives": [
+        357
+      ]
+    },
+    "memory.core_service_cycles_per_line": {
+      "value": 18,
+      "unit": "cycles per line per core",
+      "status": "assumed",
+      "source": "7120-class card: 20 cycles per line at 1.238 GHz = 16.2 ns, converted at 1.1 GHz; not measured on a 3120"
+    }
   }
 }

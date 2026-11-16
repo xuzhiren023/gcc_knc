@@ -8,13 +8,14 @@ Cycles here are predicted KNC core cycles. Python wall time is reported separate
 """
 import time
 
-from .cache import MemoryModel
+from .cache import MemoryModel, SetAssoc
 from .errors import BudgetExhausted, MissingParameter, Unsupported
 from . import isa
 
 X87_ARITH = ("x87_add", "x87_mul", "x87_div", "x87_sqrt")
 STALL_REASONS = ("spacing", "miss_stall", "dependency", "agi", "flags", "explicit_dep", "x87_serial", "resource",
-                 "outstanding_limit", "l1_port", "core_busy", "not_picked", "branch_penalty", "done")
+                 "outstanding_limit", "l1_port", "core_busy", "not_picked", "branch_penalty", "done",
+                 "decode", "icache_miss", "store_interlock", "stub_call", "nr_store")
 
 
 def _vector_access(insn):
@@ -58,6 +59,11 @@ class CtxState(object):
         self.first_issue = None
         self.last_issue_cycle = None
         self.max_done = 0
+        self.last_store_issue = -10 ** 9
+        self.stall_reason = None
+        self.decode_until = 0
+        self.fetch_checked = -1
+        self.prev_ret_target = {}
 
     @property
     def done(self):
@@ -89,6 +95,23 @@ class CoreSim(object):
         self.l1_per_cycle = profile.get("l1.accesses_per_cycle")
         self.miss_stalls = profile.get("l1.demand_load_miss_stalls_context")
         self.taken_bubble = profile.get("latency.branch_taken_bubble")
+        self.x87_pairs = profile.get("pairing.x87_pairs_with_scalar")
+        self.v_nop_pairs = profile.get("pairing.v_nop_pairs")
+        self.load_store_pair = profile.get("pairing.load_store_pair")
+        self.store_interlock = profile.get("store.load_after_store_interlock_cycles")
+        self.slow_prefix = profile.get("frontend.slow_prefix_decode_cycles")
+        self.core_bubble = profile.get("frontend.taken_branch_core_bubble_cycles")
+        self.has_layout = any(ev.insn.encoding.get("bytes") for c in self.ctx for ev in c.events)
+        fe = kernel.scenario.get("frontend", {})
+        self.icache = None
+        if fe.get("icache", "warm") != "warm":
+            if not self.has_layout:
+                raise Unsupported("scenario.frontend.icache=%r needs instruction addresses (records with encoding.addr; use scripts/from_binary.py)" % fe.get("icache"))
+            self.icache = SetAssoc(profile.get("l1i.size_bytes"), profile.get("l1i.ways"))
+            self.icache_latency = profile.get("latency.l2_hit") if fe["icache"] == "cold_l2" else profile.get("latency.memory")
+            self.assume("instruction cache sub-model: %s code lines, each first touch stalls the context for the data-side %s latency (assumed equal for code)" % (fe["icache"], "L2" if fe["icache"] == "cold_l2" else "memory"))
+        self.frontend_stats = {"layout": self.has_layout, "slow_prefix_instructions": 0, "decode_delay_cycles": 0, "icache_misses": 0,
+                               "taken_branch_bubbles": 0, "padding_nops": 0}
         self.core_busy_until = 0
         self.x87_free_at = 0
         self.l2pf_free_at = 0
@@ -99,14 +122,22 @@ class CoreSim(object):
         self.branch_sc = kernel.scenario["branch"]
         self.mispredict_ids = set(self.branch_sc.get("ids", []))
         self._lat_cache = {}
-        self.assume("instruction fetch and decode always hit; the two-instruction prefetch buffer per context is not modeled (R02 ch.4 one-clock refill bubble ignored)")
+        if self.has_layout:
+            self.assume("front end: instruction bytes come from the listing; each two-cycle prefix (66, 67, lock, segment, rep: R02 p.56) delays that instruction's issue to %d cycles per prefix after the previous issue of its context, which the %d-cycle same-context spacing hides for one prefix (S12-31 padding rows); an instruction with such a prefix does not pair (assumed)" % (self.slow_prefix, self.gap))
+            self.assume("front end: crossing a 16-byte or 64-byte boundary and the loop-head offset cost nothing (S12-31 mis_4..mis_60 within 0.45 ns per row)")
+        else:
+            self.assume("no code layout (records without encoding.bytes): prefix decode delays, alignment padding and encoding pairing limits are not modeled; convert a disassembly with scripts/from_binary.py to include them")
+        if self.icache is None:
+            self.assume("instruction cache: code is assumed resident in the L1 instruction cache (steady-state hot region)")
+        if self.core_bubble:
+            self.assume("a taken forward branch, call or return costs the core %d issue cycle(s) for the prefetch-buffer refill (R02 ch.4; S8-01 C10 fixed-direction row at four threads); loop back-edges pay nothing (S8-01 C9 at two threads); hidden at one thread by the same-context spacing" % self.core_bubble)
         self.assume("register results are available to any context's dependent instruction exactly latency cycles after issue; no bypass penalties beyond the measured latencies")
         if not any(ev.insn.encoding for c in self.ctx for ev in c.events):
             self.assume("no record carries encoding hints, so every V-eligible instruction is assumed to satisfy the R02 p.56 encoding pairing rules")
         if any(ev.insn.kind in ("x87", "x87load", "x87store") and ev.xreads is None for c in self.ctx for ev in c.events):
             self.assume("x87 instructions without a functional trace are serialized within their context (stack registers unknown statically)")
         if any(ev.insn.kind in ("x87", "x87load", "x87store") for c in self.ctx for ev in c.events):
-            self.assume("x87 loads deliver their value at the scalar load latency and x87 stores retire like scalar stores; x87 instructions issue on U only (register-file diagram, R01)")
+            self.assume("x87 instructions issue on U only (register-file diagram, R01) and alone (S12-31); a memory-operand x87 load or arithmetic instruction holds its context until its result is complete; x87 stores retire like scalar stores")
 
     # --------------------------------------------------------------------------------------------
     def assume(self, text):
@@ -161,7 +192,7 @@ class CoreSim(object):
         if cls == "vector_scatter":
             n = max(1, len(ev.lines)) if ev.lines else 1
             return self._param("occupancy.scatter_cycles_per_line") * n
-        if cls == "fence":
+        if cls in ("fence", "locked_rmw"):
             return self._param("latency.fence")
         if cls == "x87_control":
             return self._param("latency.x87_control")
@@ -195,15 +226,27 @@ class CoreSim(object):
             return "resource"
         if insn.cls == "vector_gather" and self.gather_free_at > now:
             return "resource"
+        if ev.stub is not None:
+            name = ev.stub
+            stub = self.kernel.calls[name]
+            if stub.get("cycles") is None:
+                raise MissingParameter("call to %s has no cost: give calls.%s.cycles in the kernel (a stub never gets a default cost)" % (name, name),
+                                       {"parameter": "calls.%s.cycles" % name})
+            return None
         touches_l1 = (insn.is_load or insn.is_store or insn.folded_load) and insn.cls not in ("vector_gather", "vector_scatter")
+        reads_mem = insn.is_load or insn.folded_load
+        if reads_mem and self.store_interlock and cs.last_store_issue + self.store_interlock > now:
+            return "store_interlock"
         if touches_l1:
-            if l1_used >= self.l1_per_cycle:
+            # l1_used: bit 1 = a load issued this cycle, bit 2 = a store did. The port takes one load and one store
+            # per cycle when pairing.load_store_pair (spill_reload.rt at four threads), else one access.
+            if self.load_store_pair:
+                busy = (l1_used & 1 and reads_mem) or (l1_used & 2 and insn.is_store and not insn.is_load)
+            else:
+                busy = l1_used != 0
+            if busy:
                 return "l1_port"
             if ev.lines:
-                if insn.is_load or insn.folded_load:
-                    for la in ev.lines:
-                        if self.mem.line_store_ready.get(la, 0) > now:
-                            return "dependency"
                 ngo = insn.op.startswith("vmovnr")
                 _, _, fills, _ = self.mem.plan_demand(ev.lines, now, _vector_access(insn), insn.is_store and not insn.is_load, ngo)
                 if fills and not self.mem.can_take_fill(now, fills):
@@ -232,7 +275,20 @@ class CoreSim(object):
         done = now
         level = None
         cls = insn.cls
-        if cls in ("prefetch_l1", "prefetch_l2"):
+        if insn.encoding.get("slow_prefixes"):
+            self.frontend_stats["slow_prefix_instructions"] += 1
+        if insn.op == "nop" and insn.encoding.get("bytes"):
+            self.frontend_stats["padding_nops"] += 1
+        if ev.stub is not None:
+            stub = self.kernel.calls[ev.stub]
+            cost = stub["cycles"] + stub.get("cycles_per_byte", 0) * ev.nbytes
+            cost = int(-(-cost // 1))
+            if ev.lines and stub.get("model") in ("memcpy", "memmove", "memset"):
+                self.mem.commit_demand(ev.lines, now, False, stub.get("model") == "memset")
+            done = now + cost
+            self._stall(cs, done, "stub_call")
+            self.assume("calls that leave the region are costed stubs: the calling context stalls for the declared cycles; the callee's own cache and resource use is not modeled (mem* stubs touch their lines)")
+        elif cls in ("prefetch_l1", "prefetch_l2"):
             if ev.lines:
                 self.mem.prefetch(ev.lines[0], insn.spec["level"], now)
             if cls == "prefetch_l2":
@@ -246,10 +302,10 @@ class CoreSim(object):
             if lines:
                 ready, level = self.mem.commit_demand(lines, now, True, False)
                 extra = max(0, ready - now - self.mem.latency("l1", True))
-            self.gather_free_at = now + per * n
+            self.gather_free_at = max(self.gather_free_at, now) + per * n
             done = now + first + per * (n - 1) + extra
             if extra and self.miss_stalls:
-                cs.stall_until = max(cs.stall_until, done)
+                self._stall(cs, done, "miss_stall")
             if insn.mask is not None:
                 # the completion mask is readable long before the data (S6-03 gather_all.rt 7 vs .lat 15)
                 cs.reg_ready[insn.mask.base] = now + self._param("latency.gather_mask_cycles") + (per * (n - 1) if n > 1 else 0)
@@ -266,12 +322,16 @@ class CoreSim(object):
             self.core_busy_until = now + per * n
             done = now + per * n
             self.assume("scatter: occupancy per distinct line like a gather, no result latency, stores visible after the occupancy (assumed)")
-        elif cls in ("fence", "x87_control", "scalar_idiv"):
+        elif cls in ("fence", "x87_control", "scalar_idiv", "locked_rmw"):
             occ = self._occupancy(insn, ev)
             self.core_busy_until = now + occ
             done = now + occ
-            if cls == "x87_control" and ev.lines:
+            if cls in ("x87_control", "locked_rmw") and ev.lines:
                 self.mem.commit_demand(ev.lines, now, False, insn.is_store)
+            if insn.is_store:
+                cs.last_store_issue = now
+                for la in ev.lines:
+                    self.mem.line_store_ready[la] = done
         elif insn.is_load or insn.folded_load or insn.is_store:
             vector = _vector_access(insn)
             ngo = insn.op.startswith("vmovnr")
@@ -280,6 +340,15 @@ class CoreSim(object):
             else:
                 ready, level = now + self.mem.latency("l1", vector), "l1"
                 self.assume("memory accesses without addresses (static trace with no addr) are treated as L1 hits")
+            fwd = 0
+            if insn.is_load or insn.folded_load:
+                # data stored to the same line recently is readable store_to_load_same_line cycles after the store;
+                # the load itself issues (it does not block its context) and its result waits for that data
+                fwd = max([self.mem.line_store_ready.get(la, 0) for la in ev.lines] or [0])
+                if fwd > now and not insn.folded_load:
+                    ready = max(ready, fwd + self.mem.latency("l1", vector))
+            if insn.is_store:
+                cs.last_store_issue = now
             if insn.is_store and not insn.is_load:
                 for la in ev.lines:
                     self.mem.line_store_ready[la] = now + (self._param("latency.store_to_load_same_line") if self.p.has("latency.store_to_load_same_line") else 1)
@@ -287,19 +356,21 @@ class CoreSim(object):
                 if ngo:
                     stall = self._param("store.nr_stall_cycles_resident") if level in ("l1", "l2") else self._param("store.nr_stall_cycles_memory")
                     self.nr_store_free_at = now + self._param("store.nr_occupancy_core_cycles")
-                    cs.stall_until = max(cs.stall_until, now + stall)
+                    self._stall(cs, now + stall, "nr_store")
                     done = now + stall
                     self.assume("no-read stores stall their context for the measured per-line cost and occupy a shared store path (S6-03 store_stream rows)")
                 elif level != "l1" and self._param("l1.store_miss_stalls_context"):
-                    cs.stall_until = max(cs.stall_until, ready)
+                    self._stall(cs, ready, "miss_stall")
                     done = ready
             else:
                 if insn.folded_load:
                     base_lat = self.latency_of(insn, ev)
                     l1lat = self.mem.latency("l1", True)
                     done = (now + base_lat) if level == "l1" else max(now + base_lat, ready - l1lat + base_lat)
+                    if fwd > now:
+                        done = max(done, fwd + base_lat)
                     if level != "l1" and self.miss_stalls:
-                        cs.stall_until = max(cs.stall_until, ready - l1lat)
+                        self._stall(cs, ready - l1lat, "miss_stall")
                 elif cls == "scalar_rmw":
                     alu = self._param("latency.scalar_alu")
                     done = ready + alu
@@ -307,19 +378,30 @@ class CoreSim(object):
                         self.mem.line_store_ready[la] = done
                     if level != "l1" and self.miss_stalls:
                         cs.stall_until = max(cs.stall_until, ready)
-                elif cls in X87_ARITH:
-                    # x87 arithmetic with a memory source: the load, then the op on the x87 unit with the
-                    # register form's latency and occupancy
-                    done = ready + self.latency_of(insn, ev)
-                    occ = isa.CLASSES[cls].get("occupancy")
-                    if occ:
-                        self.x87_free_at = max(self.x87_free_at, ready) + self._param(occ)
-                    if level != "l1" and self.miss_stalls:
-                        cs.stall_until = max(cs.stall_until, ready)
+                elif cls in X87_ARITH or cls == "x87_load":
+                    # x87 instruction with a memory operand: the operand read, then (for arithmetic) the op with the
+                    # register form's latency and occupancy. The context issues nothing else until the result is
+                    # complete (x87.mem_operand_serializes; S12-31 loop-body orders).
+                    l1lat = self.mem.latency("l1", False)
+                    miss_extra = max(0, ready - now - l1lat)
+                    if cls == "x87_load":
+                        done = now + miss_extra + self._param("latency.x87_load")
+                    else:
+                        start = now + miss_extra + self._param("latency.x87_mem_operand_load")
+                        done = start + self.latency_of(insn, ev)
+                        occ = isa.CLASSES[cls].get("occupancy")
+                        if occ:
+                            self.x87_free_at = max(self.x87_free_at, start) + self._param(occ)
+                    if self._param("x87.mem_operand_serializes"):
+                        if level != "l1" and self.miss_stalls:
+                            self._stall(cs, ready, "miss_stall")
+                        self._stall(cs, done, "x87_serial")
+                    elif level != "l1" and self.miss_stalls:
+                        self._stall(cs, ready, "miss_stall")
                 else:
                     done = ready + self._extend_extra(insn)
                     if level != "l1" and self.miss_stalls:
-                        cs.stall_until = max(cs.stall_until, ready)
+                        self._stall(cs, ready, "miss_stall")
                     if insn.is_store:
                         for la in ev.lines:
                             self.mem.line_store_ready[la] = done
@@ -336,6 +418,8 @@ class CoreSim(object):
                 continue
             cs.reg_ready[r] = done
             cs.reg_written_at[r] = now
+        if getattr(insn, "sets_mxcsr", False):
+            cs.reg_ready["mxcsr"] = max(cs.reg_ready.get("mxcsr", 0), done)   # stmxcsr waits for the flags of every earlier FP op
         if insn.flags_w:
             if cls in ("scalar_alu", "scalar_imul", "mask_op", "x87_compare"):
                 cs.flags_ready = now + (self.latency_of(insn, ev) or 1)
@@ -350,15 +434,46 @@ class CoreSim(object):
                 cs.stalls["branch_penalty"] += pen
             elif ev.taken and self.taken_bubble:
                 cs.next_issue = max(cs.next_issue, now + 1 + self.taken_bubble)
+            if ev.taken and self.core_bubble and self._forward_transfer(cs, ev):
+                self.core_busy_until = max(self.core_busy_until, now + 1 + self.core_bubble)
+                self.frontend_stats["taken_branch_bubbles"] += 1
         cs.max_done = max(cs.max_done, done)
         if self.record_issue and len(self.issue_log) < 20000:
             self.issue_log.append({"cycle": now, "ctx": cs.ctx, "id": insn.id, "op": insn.op, "pipe": pipe, "done": done, "level": level})
         return done
 
+    def _forward_transfer(self, cs, ev):
+        """A taken control transfer to code after the branch (or a call/return): the prefetch buffer holds the
+        fall-through, so it refills. A loop back-edge to an earlier target pays nothing (S8-01 C9 register
+        chains at two threads: 4.02/3.01/2.51 per update, no core cycle lost per iteration)."""
+        insn = ev.insn
+        if insn.op in ("call", "ret"):
+            return True
+        if insn.target is None:
+            return True
+        stream = self.kernel.stream_for(cs.ctx)
+        tgt = stream.labels.get(insn.target)
+        return tgt is None or tgt > insn.index
+
+    def _stall(self, cs, until, reason):
+        """Hold the context until `until`; the stall cycles are attributed to `reason` (the latest, longest cause wins)."""
+        if until > cs.stall_until:
+            cs.stall_until = until
+            cs.stall_reason = reason
+        elif until > self.cycle and cs.stall_reason is None:
+            cs.stall_reason = reason
+
     def _mispredicted(self, cs, ev):
         t = self.branch_sc["type"]
-        if t == "all_predicted" or ev.insn.op == "jmp":
-            return False  # an unconditional jump has no direction to mispredict
+        if t == "all_predicted" or ev.insn.op in ("jmp", "call"):
+            return False  # an unconditional jump or direct call has no direction to mispredict
+        if ev.insn.op == "ret":
+            if t == "all_mispredicted":
+                return True
+            prev = cs.prev_ret_target.get(ev.insn.id)
+            cs.prev_ret_target[ev.insn.id] = ev.ret_target
+            self.assume("a ret is predicted when it returns to the same site as its previous execution (branch-target-buffer behaviour, assumed; no return stack is documented)")
+            return prev is not None and prev != ev.ret_target
         if t == "all_mispredicted":
             return True
         if t == "ids_mispredicted":
@@ -374,6 +489,14 @@ class CoreSim(object):
         if u.op == "nop" and not self.p.get("pairing.u_nop_pairs"):
             return False
         if v.op == "jmp" and not self.p.get("pairing.v_jmp_pairs"):
+            return False
+        if v.op == "nop" and not self.v_nop_pairs:
+            return False
+        if u.kind.startswith("x87") and not self.x87_pairs:
+            return False
+        if v.encoding.get("slow_prefixes"):
+            return False
+        if u_ev.stub is not None or v_ev.stub is not None:
             return False
         if v.cls not in self.v_eligible:
             return False
@@ -397,7 +520,27 @@ class CoreSim(object):
             return False
         if self._blockers(cs, v_ev, now, l1_used, paired_with=u_ev) is not None:
             return False
+        if self.icache is not None and not self._fetch_ok(cs, v_ev, now, probe=True):
+            return False
         return True
+
+    def _fetch_ok(self, cs, ev, now, probe=False):
+        """Instruction-cache check for the event's code lines (only with scenario.frontend.icache cold)."""
+        enc = ev.insn.encoding
+        if enc.get("addr") is None:
+            return True
+        a = int(enc["addr"]) if not isinstance(enc["addr"], str) else int(enc["addr"], 0)
+        first, last = a // 64 * 64, (a + max(1, enc.get("bytes", 1)) - 1) // 64 * 64
+        miss = [la for la in range(first, last + 64, 64) if self.icache.lookup(la) is None]
+        if not miss:
+            return True
+        if probe:
+            return False
+        for la in miss:
+            self.icache.insert(la, now + self.icache_latency)
+        self.frontend_stats["icache_misses"] += len(miss)
+        self._stall(cs, now + self.icache_latency, "icache_miss")
+        return False
 
     # --------------------------------------------------------------------------------------------
     def run(self):
@@ -426,12 +569,20 @@ class CoreSim(object):
                 if c.done:
                     continue
                 if c.stall_until > now:
-                    c.stalls["miss_stall"] += 1
+                    c.stalls[c.stall_reason or "miss_stall"] += 1
                     continue
                 if c.next_issue > now:
                     c.stalls["spacing"] += 1
                     continue
                 ev = c.events[c.pos]
+                if c.decode_until > now:
+                    c.stalls["decode"] += 1
+                    continue
+                if self.icache is not None and c.fetch_checked != c.pos:
+                    if not self._fetch_ok(c, ev, now):
+                        c.stalls["icache_miss"] += 1
+                        continue
+                    c.fetch_checked = c.pos
                 why = self._blockers(c, ev, now, 0)
                 if why is not None:
                     c.stalls[why] += 1
@@ -445,7 +596,8 @@ class CoreSim(object):
             for c in eligible[1:]:
                 c.stalls["not_picked"] += 1
             u_ev = cs.events[cs.pos]
-            l1_used = 1 if (u_ev.insn.is_load or u_ev.insn.is_store or u_ev.insn.folded_load) else 0
+            ui = u_ev.insn
+            l1_used = (1 if (ui.is_load or ui.folded_load) else 0) | (2 if ui.is_store else 0)
             cs.pos += 1
             self._retire(cs, u_ev, now, "U")
             if cs.pos < len(cs.events) and cs.stall_until <= now and self.core_busy_until <= now:
@@ -456,6 +608,11 @@ class CoreSim(object):
                     self._retire(cs, v_ev, now, "V")
             cs.last_issue = now
             cs.next_issue = max(cs.next_issue, now + self.gap)
+            if self.has_layout and cs.pos < len(cs.events):
+                k = cs.events[cs.pos].insn.encoding.get("slow_prefixes", 0)
+                if k:
+                    cs.decode_until = now + self.slow_prefix * k
+                    self.frontend_stats["decode_delay_cycles"] += max(0, cs.decode_until - cs.next_issue)
             self.cycle += 1
         end_issue = max((c.last_issue_cycle or 0) for c in active) + 1
         completion = max(end_issue, max(c.max_done for c in active))
@@ -479,6 +636,7 @@ class CoreSim(object):
             "active_contexts": [c.ctx for c in self.ctx],
             "per_context": per_ctx,
             "memory": self.mem.describe(),
+            "frontend": dict(self.frontend_stats),
             "python_seconds": round(self.python_seconds, 4),
         }
 

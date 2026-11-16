@@ -6,7 +6,8 @@ from . import ENGINE_VERSION, RESULT_SCHEMA
 from .util import dump_json, utc_now_iso
 
 RESULT_TYPES = ("functional", "timing_prediction", "analytical_bound", "analytical_scenario_estimate",
-                "imported_native_measurement", "capabilities", "comparison", "native_request", "validation", "selftest", "search")
+                "imported_native_measurement", "capabilities", "comparison", "native_request", "validation", "selftest", "search",
+                "program_rollup", "calibration_plan")
 
 
 def base_result(result_type, status, command, profile=None, kernel=None, input_path=None, input_hash=None, scale=None, out_dir=None):

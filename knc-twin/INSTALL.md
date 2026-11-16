@@ -43,11 +43,14 @@ python knc-twin/scripts/knc_twin.py simulate knc-twin/fixtures/saxpy_loop.json -
 `selftest` runs the bundled synthetic tests and oracle checks. Passing them means the engine works as
 specified here; the comparison with hardware is `references/validation.md`.
 
-To read compiler output: `python knc-twin/scripts/from_gcc_s.py file.s --function NAME --init init.json --out k.json`
-(see `references/input-format.md`). To rank a candidate set off-card: `python knc-twin/scripts/knc_twin.py batch manifest.json --out out/batch`.
+To read the binary that ran (preferred): `python knc-twin/scripts/from_binary.py prog.o --function NAME --disassembly prog.dis --init init.json --out k.json`,
+where `prog.dis` is `k1om-mpss-linux-objdump -dr prog.o`. To read compiler assembly:
+`python knc-twin/scripts/from_gcc_s.py file.s --function NAME --init init.json --out k.json` (see `references/input-format.md`).
+To rank a candidate set off-card: `python knc-twin/scripts/knc_twin.py batch manifest.json --out out/batch`; to roll regions up to a
+program figure: `knc_twin.py rollup manifest.json`; to see what the next card window should measure: `knc_twin.py calibration-plan`.
 
 ## Updating a profile with native data
 
-Follow `references/calibration.md` (prepare-native, measure on the queue, import-native).
+Follow `references/calibration.md` (calibration-plan, prepare-native, measure on the queue, import-native, add the held-out case).
 Installed profiles are read-only during analysis; imported calibrations are applied as
 `--overlay` files until merged with a version bump.

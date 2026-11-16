@@ -357,7 +357,8 @@ def loop_bounds(kernel, profile, assume, body_events=None):
     res_mii = max(res_core, res_ctx_max, max(resource_terms_total.values()) if resource_terms_total else 0)
     rec_int = int(_ceil_frac(rec_max))
     mii = max(res_mii, rec_int)
-    return {"kind": "loop_lower_bound", "mii_cycles_per_iteration": mii, "res_mii": res_mii,
+    return {"kind": "loop_lower_bound", "basis": "static loop body: each instruction once per iteration, both arms of a conditional branch; a dynamic iteration that skips an arm can be shorter",
+            "mii_cycles_per_iteration": mii, "res_mii": res_mii,
             "res_mii_terms": dict(resource_terms_total, core_issue_events=res_core, per_context_spacing=res_ctx_max),
             "rec_mii": str(rec_max), "rec_mii_ceiling": rec_int, "iteration_critical_path_cycles": cp_max,
             "binding": "recurrence" if rec_int > res_mii else "resources",
