@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 14:05.
+Updated automatically at every ticket change. Last update: 2026-11-16 14:06.
 
 **Next: the tech lead, on S13-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -150,7 +150,7 @@ Current tickets: `[#################---]` 256 of 296
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
-| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | Question for the tech lead | Test invocation through tools/run.py hangs beyond 60 seconds with zero-byte logs; engineer role blocks card... |
+| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | In progress | Run the card_run unit tests directly, not through tools/run.py: python -m unittest tests.tools.test_card_tu... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter,... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Not started |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
@@ -322,13 +322,13 @@ Current tickets: `[#################---]` 256 of 296
 ## Recent activity
 
 - 2026-11-16 14:10 **S12-42** lead close: Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-KNC is now faster than GCC 5.1.1 on all f...
+- 2026-11-16 14:06 **S14-22** lead answer: Run the card_run unit tests directly, not through tools/run.py: python -m unittest tests.tools.test_card_turn tests.tools.test_card_run -v (add a p...
 - 2026-11-16 14:05 **S14-33** lead answer: Lead committed the final files (06b4c78a), merged main (clean), checked tests (48 pass) and the validation note. Only step: pm.py submit S14-33 --n...
 - 2026-11-16 14:04 **S13-03** engineer ask: Retrospective complete at 63eb9e84 in docs/research/m4-retrospective.md: all 19 lesson rows, Sprint 11-13 notes, five research inputs, ranked costs...
 - 2026-11-16 14:03 **S14-33** lead resume: lead committed the final files, merged main, checked tests (48 pass) and the validation note; approving
 - 2026-11-16 14:03 **S14-26** lead answer: Lead 2026-11-16: close it as no-go now; do not wait for a twin fix. Your static bounds already decide it. Overlapping iterations can at best take a...
 - 2026-11-16 14:01 **S14-22** engineer ask: Test invocation through tools/run.py hangs beyond 60 seconds with zero-byte logs; engineer role blocks card_run tests as expected. Need lead guidan...
 - 2026-11-16 14:01 **S14-16** lead answer: Yes, reduce again; do not use bzip2 source (held out). Your two cases had too few live values: the k0 use appears only when the caller-saved GPRs a...
-- 2026-11-16 14:00 **S14-26** engineer ask: 72b3d253 records six current corpus loop bounds (all ok); GEMM and Jacobi modulo both fail unsupported: interior label. Reproducer: python knc-twin...
 
 ## Cost
 
