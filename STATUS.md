@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 06:14.
+Updated automatically at every ticket change. Last update: 2026-11-16 06:43.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 249 of 280
+Current tickets: `[#################---]` 249 of 282
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 249 of 280
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 5 of 33 tickets |
+| M5 | Program corpus | In progress | 5 of 35 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -147,9 +147,11 @@ Current tickets: `[#################---]` 249 of 280
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
-| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | In progress |  |
+| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Question for the tech lead | Commit wrapper refused: git add -A cannot create C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S14-19/ind... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
+| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
+| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -305,6 +307,7 @@ Current tickets: `[#################---]` 249 of 280
 
 ## Recent activity
 
+- 2026-11-16 06:43 **S14-19** engineer ask: Commit wrapper refused: git add -A cannot create C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S14-19/index.lock (Permission denied). Test passes...
 - 2026-11-16 06:13 **S14-13** lead approve: knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory slices (simulate --scale unit|ring); every...
 - 2026-11-16 05:59 **S14-13** lead resume: main merged into the branch by the lead with four conflicts resolved (timing.py step/run, cli.py parser, SKILL.md, README); 107 twin tests pass on ...
 - 2026-11-16 05:54 **S14-11** lead approve: knc-twin handles WRF jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp23 imports, and heap calls through a bump-a...
@@ -312,16 +315,15 @@ Current tickets: `[#################---]` 249 of 280
 - 2026-11-16 05:41 **S14-12** lead approve: knc-twin gains sample-loop (iteration sampling with a stated spread, stopping only once the input's period is covered) and phase roll-ups to second...
 - 2026-11-16 05:15 **S14-12** lead resume: S14-18 and S14-14 merged; approving
 - 2026-11-16 05:14 **S14-14** lead approve: knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export and frozen-profile batch ranking; on the...
-- 2026-11-16 05:03 **S14-14** lead resume: S14-18 merged; approving
 
 ## Cost
 
-- From the script, engineer: 766 sessions, 1626.4M input tokens
+- From the script, engineer: 767 sessions, 1632.0M input tokens
 - From the script, lead: 518 sessions, 147.4M input tokens
-- Started by hand, Claude: 14 sessions, 4178.5M input tokens
+- Started by hand, Claude: 14 sessions, 4188.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.6 GiB of 100 GiB. 72 GiB free on the drive.
+The project uses 40.6 GiB of 100 GiB. 68 GiB free on the drive.
