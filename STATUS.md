@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 13:51.
+Updated automatically at every ticket change. Last update: 2026-11-16 13:54.
 
 **Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -125,7 +125,7 @@ Current tickets: `[#################---]` 255 of 296
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
-| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
+| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Not started |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
@@ -144,15 +144,15 @@ Current tickets: `[#################---]` 255 of 296
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Not started |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
-| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
+| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | In progress |  |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter,... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | draft |  |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Not started |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | In progress |  |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Not started |  |
@@ -334,7 +334,7 @@ Current tickets: `[#################---]` 255 of 296
 
 - From the script, engineer: 802 sessions, 1682.7M input tokens
 - From the script, lead: 548 sessions, 154.3M input tokens
-- Started by hand, Claude: 47 sessions, 4377.6M input tokens
+- Started by hand, Claude: 47 sessions, 4379.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
