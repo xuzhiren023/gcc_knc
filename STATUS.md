@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 10:28.
+Updated automatically at every ticket change. Last update: 2026-11-16 10:29.
 
-**Waiting for you:** S14-35. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 253 of 294
 
@@ -161,7 +161,7 @@ Current tickets: `[#################---]` 253 of 294
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
-| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | **Waiting for you** | budget: 7993289 input tokens used; the budget is 6000000 |
+| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | In progress | input_tokens 6M -> 12M (standing rule). Lead review of the uncommitted native.py change: the direction is r... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -319,6 +319,7 @@ Current tickets: `[#################---]` 253 of 294
 
 ## Recent activity
 
+- 2026-11-16 10:29 **S14-35** owner decide: input_tokens 6M -> 12M (standing rule). Lead review of the uncommitted native.py change: the direction is right (use the kernel's rsp/rbp when they...
 - 2026-11-16 10:28 **S14-35** engineer escalate: budget: 7993289 input tokens used; the budget is 6000000
 - 2026-11-16 10:26 **S14-23** owner decide: Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter, measurements, kernels, case, tests); th...
 - 2026-11-16 10:22 **S14-23** lead escalate: budget: 14370671 input tokens used; the budget is 14000000
@@ -326,13 +327,12 @@ Current tickets: `[#################---]` 253 of 294
 - 2026-11-16 10:16 **S14-23** engineer ask: Completed t1/t2/t4 summaries and scatter overlay import. Held-out prediction remains blocked: catalog kernel has a nonterminating outer jnz; valida...
 - 2026-11-16 10:08 **S14-35** lead answer: Originals are in .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/orig/: kernel.json is the kernel embedded in each request.json (the exact...
 - 2026-11-16 10:08 **S14-35** lead resume: lead placed the originals
-- 2026-11-16 10:05 **S14-35** lead defer: Interactive lead: copy the two original sixth_order_diffusion kernel JSONs referenced by .work/_shared/calib-w10/phiweather/sixth_{1,2}ctx_l2_031/k...
 
 ## Cost
 
 - From the script, engineer: 780 sessions, 1659.1M input tokens
 - From the script, lead: 529 sessions, 149.2M input tokens
-- Started by hand, Claude: 15 sessions, 4291.2M input tokens
+- Started by hand, Claude: 15 sessions, 4293.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
