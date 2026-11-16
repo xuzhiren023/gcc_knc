@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 02:58.
+Updated automatically at every ticket change. Last update: 2026-11-16 04:57.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
-Current tickets: `[#################---]` 244 of 279
+Current tickets: `[#################---]` 244 of 280
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 244 of 279
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 32 tickets |
+| M5 | Program corpus | In progress | 0 of 33 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -139,16 +139,17 @@ Current tickets: `[#################---]` 244 of 279
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
-| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is me... |
-| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Question for the tech lead | Submit blocked: 947 changed lines exceeds 800-line budget; no new edits this session. Approve --override fo... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Schema: offline, in memory only: s = json.load(kernel.schema.json); s.pop('$id'); jsonschema.Draft7Vali... |
+| S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | lead | Review done, no findings: A-G match the brief and the 08:25Z pre-review; heap stubs pinned red-then-green i... |
+| S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | lead | Review passed, ready to approve: head 7f734b23 matches the pre-review and meets brief 04's done criteria. M... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | lead | Review passed, but approve's merge was refused: t0 ran past 20 min (pm.py:534); main's t0 is 640 s. Interac... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | lead | Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ord... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Not started |  |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | lead | Interactive lead needed: submit is refused because the branch changes protected .gitignore (the lead's knc-... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
+| S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -304,20 +305,20 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
-- 2026-11-16 02:58 **S14-12** engineer ask: Submit blocked: 947 changed lines exceeds 800-line budget; no new edits this session. Approve --override for existing implementation? Windows Pytho...
-- 2026-11-16 02:56 **S14-11** owner decide: input_tokens 20M -> 30M under the owner's standing auto-extend rule: items A-G are committed and main is merged; the held-out check (python 3.8 or ...
-- 2026-11-16 02:55 **S14-11** engineer escalate: budget: 20910113 input tokens used; the budget is 20000000
-- 2026-11-16 02:54 **S14-14** lead defer: Review passed (approve note: knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export and frozen-...
-- 2026-11-16 02:07 **S14-14** engineer submit: Green 2e975d5b; main merged at 9b699730. Prior checks: 7 acceptance tests, selftest and trial checks passed. Held-out check passed: Windows Python ...
-- 2026-11-16 02:05 **S14-15** lead escalate: budget: 10651104 input tokens used; the budget is 10000000
-- 2026-11-16 02:00 **S14-15** lead answer: Do both on the branch, no review rerun: (1) Merge-main: git merge main into s14/S14-15 (a merge commit, not a rebase of main); resolve any conflict...
-- 2026-11-16 01:57 **S14-15** engineer ask: Submit refused: branch lacks changes from main and no [red] test commit. Lead review required five edits; completed them and committed d450ff6e (se...
+- 2026-11-16 04:57 **S14-18** lead defer: Interactive lead needed: submit is refused because the branch changes protected .gitignore (the lead's knc-twin-runs/ line). Either revert that .gi...
+- 2026-11-16 04:56 **S14-18** engineer ask: Submit is blocked by protected path .gitignore changed on the branch; lead added knc-twin-runs/ ignore after t0 cleanup. Please resolve or authoriz...
+- 2026-11-16 04:55 **S14-18** owner decide: The four refused submits were 'uncommitted changes in the worktree': the untracked knc-twin-runs/ left by the lead's own t0 run. The lead deleted i...
+- 2026-11-16 04:53 **S14-18** engineer escalate: budget: 10 engineer sessions used; the budget is 10
+- 2026-11-16 04:51 **S14-18** owner decide: sessions 8 -> 10 (the budget must exceed the 8 sessions already counted for a new one to start). Only step: pm.py submit S14-18 with the 09:40Z not...
+- 2026-11-16 04:49 **S14-18** engineer escalate: budget: 8 engineer sessions used; the budget is 8
+- 2026-11-16 04:47 **S14-18** owner decide: sessions 6 -> 8, input_tokens 6M -> 8M: the last two sessions were consumed by budget stops before the submit could run. Only step: pm.py submit S1...
+- 2026-11-16 04:46 **S14-18** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 
 ## Cost
 
-- From the script, engineer: 745 sessions, 1613.4M input tokens
-- From the script, lead: 504 sessions, 143.0M input tokens
-- Started by hand, Claude: 14 sessions, 4135.0M input tokens
+- From the script, engineer: 765 sessions, 1626.3M input tokens
+- From the script, lead: 516 sessions, 147.0M input tokens
+- Started by hand, Claude: 14 sessions, 4159.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
