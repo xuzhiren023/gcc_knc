@@ -309,16 +309,21 @@ def launch_until_result(stage, job, build, builds, folder, number, timeout, log)
 
 
 def finished_launches(stage, tag, jobs):
-    """Launches with a final row; they must be exactly the first ones in schedule order."""
+    """Numbers of the launches with a final row.
+
+    They must be exactly the first ones in schedule order, except in a block
+    started by adopt, whose kept launches may leave gaps that resume fills.
+    """
     rows = c.read_partition(stage, tag + '-raw.jsonl')
-    numbers = sorted(int(PureWindowsPath(r['stdout']).name.split('.')[0]) for r in rows)
-    if numbers != list(range(len(rows))):
+    numbers = [int(PureWindowsPath(r['stdout']).name.split('.')[0]) for r in rows]
+    if len(set(numbers)) != len(numbers) or any(n >= len(jobs) for n in numbers):
+        raise ValueError('stored launch records repeat a launch or leave the frozen schedule')
+    if not (stage / (tag + '-adopted.json')).exists() and sorted(numbers) != list(range(len(rows))):
         raise ValueError('stored launch records are not a prefix of the frozen schedule')
-    for row in rows:
-        job = jobs[int(PureWindowsPath(row['stdout']).name.split('.')[0])]
-        if any(row.get(k) != job.get(k) for k in ('program','compiler','run','profile','block','control')):
+    for number, row in zip(numbers, rows):
+        if any(row.get(k) != jobs[number].get(k) for k in ('program','compiler','run','profile','block','control')):
             raise ValueError('stored launch record does not match the frozen schedule')
-    return len(rows)
+    return set(numbers)
 
 
 def resume_command(args):
@@ -415,6 +420,128 @@ def recheck(args):
     return 0 if checked else 1
 
 
+ADOPT_UNTIMED = 'adopted: transport failure, no timing observed'
+ADOPT_SPLIT = 'adopted: pair split by transport failure'
+
+
+def timing_observed(stdout):
+    return any(line.startswith('CORPUS_TIME ') for line in stdout.splitlines())
+
+
+def adopt(args):
+    """Lead only: start a block from a preserved block's timed launches.
+
+    The source block <from>-<block>-<profile> is only read and copied. A launch
+    whose stored capture has a CORPUS_TIME is kept, its row re-derived from the
+    copied capture with the current parser (as recheck does). Every other launch
+    is unfinished, and so are both members of a frozen AB pair with only one
+    timed member, so the pair reruns adjacently; unfinished launches get an entry
+    in the new transport-retry log and their captures are kept as
+    NNN.adopted-1.*. Then run --resume runs exactly the unfinished launches in
+    frozen order. Held-out rows, captures and records stay sealed.
+    """
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9-]*', args.source or ''):
+        raise ValueError('adopt needs --from naming a preserved block prefix')
+    _, spec = load_freeze(args.stage)
+    builds = c.read_partition(args.stage, 'builds.json')
+    tag = paths(args.stage, args.profile, args.block)
+    source = args.source + '-' + tag
+    sealed = c.sealed_dir(args.stage)
+    if source == tag or not (args.stage / (source + '-started.json')).exists():
+        raise ValueError('adopt needs a preserved, started source block')
+    if any(p.name.startswith(tag + '-') for d in (args.stage, sealed) for p in d.iterdir()):
+        raise ValueError('target block already has records; preserve it first')
+    controls, plan = launches(args.profile, args.block, builds, spec)
+    jobs = controls + plan
+    stored = {}
+    for row in c.read_partition(args.stage, source + '-raw.jsonl'):
+        # Stored paths name the block before it was preserved; use the launch name only.
+        name = PureWindowsPath(row['stdout']).name
+        number = int(name.split('.')[0])
+        if name in stored or number >= len(jobs) or any(
+                row.get(k) != jobs[number].get(k) for k in ('program','compiler','run','profile','block','control')):
+            raise ValueError('source launch record does not match the frozen schedule')
+        stored[name] = row
+    partition = lambda job: sealed if job['program'] in c.HELD_OUT else args.stage
+    timed, started = {}, {}
+    for number, job in enumerate(jobs):
+        out = partition(job) / (source + '-capture') / ('%03d.stdout' % number)
+        text = out.read_text(errors='replace') if out.exists() else ''
+        raw = stored.get('%03d.stdout' % number)
+        timed[number] = timing_observed(text)
+        started[number] = bool(text) and transport_failure(text, (raw or {}).get('transport') or stdout_receipt(text)) is None
+        if timed[number] and raw is None:
+            raise ValueError('a timed source launch has no stored row; lead recovery decision required')
+        if not timed[number] and raw is not None and raw.get('time_seconds') is not None:
+            raise ValueError('a stored source row has a time its capture lacks')
+    reason = {n: ADOPT_UNTIMED for n in timed if not timed[n]}
+    pairs = {}
+    for number, job in enumerate(jobs):
+        if not job.get('control'):
+            pairs.setdefault(job['pair_id'], []).append(number)
+    split = 0
+    for members in pairs.values():
+        if len(members) != 2 or members[1] != members[0] + 1:
+            raise ValueError('frozen pair is not adjacent')
+        if timed[members[0]] != timed[members[1]]:
+            split += 1
+            for n in members:
+                reason[n] = ADOPT_SPLIT
+    # Copy, never move: the source block stays exactly as preserved.
+    rows, entries = [], c.read_partition(args.stage, source + '-transport-retries.json')
+    for entry in entries:
+        entry['adopted_from'] = source
+    utc = datetime.now(timezone.utc).isoformat()
+    for directory in (args.stage, sealed):
+        (directory / (tag + '-capture')).mkdir()
+    for number, job in enumerate(jobs):
+        origin, target = (partition(job) / (name + '-capture') for name in (source, tag))
+        for path in sorted(origin.glob('%03d.*' % number)):
+            canonical = path.name in ('%03d.stdout' % number, '%03d.stderr' % number)
+            if canonical and number in reason:
+                shutil.copyfile(path, target / path.name.replace('.', '.adopted-1.', 1))
+            else:
+                shutil.copyfile(path, target / path.name)
+        if number in reason:
+            entries.append(dict(launch='%03d' % number, program=job['program'], compiler=job['compiler'],
+                                run=job['run'], profile=job['profile'], block=job['block'],
+                                control=bool(job.get('control')), utc=utc, event='adopted',
+                                reason=reason[number], timing_observed=timed[number],
+                                program_started=started[number], source=source))
+            continue
+        raw = stored['%03d.stdout' % number]
+        build = prepare_job(job, builds, spec)
+        transport = raw.get('transport', {})
+        row = derive_row(job, build, target / ('%03d.stdout' % number), target / ('%03d.stderr' % number),
+                         transport.get('exit_code', 255), transport)
+        row.update(card_run_exit=raw.get('card_run_exit', transport.get('exit_code')),
+                   lead_environment_policy=raw.get('lead_environment_policy'),
+                   transport_retries=raw.get('transport_retries', 0), adopted_from=source)
+        if job.get('control'):
+            row['negative_control'] = True
+        rows.append(row)
+    c.write_partition(args.stage, tag + '-raw.jsonl', rows)
+    c.write_partition(args.stage, tag + '-transport-retries.json', entries)
+    for directory, held in ((args.stage, False), (sealed, True)):
+        mine = [n for n, job in enumerate(jobs) if (job['program'] in c.HELD_OUT) == held]
+        c.write_json(directory / (tag + '-adopted.json'), dict(
+            source=source, partition='sealed' if held else 'public', utc=utc,
+            kept=sum(n not in reason for n in mine), unfinished=sum(n in reason for n in mine),
+            reasons=dict(Counter(reason[n] for n in mine if n in reason)),
+            split_pairs=sum(reason.get(n) == ADOPT_SPLIT for n in mine) // 2,
+            controls_kept=sum(n not in reason for n in mine if jobs[n].get('control')),
+            controls_rerun=sum(n in reason for n in mine if jobs[n].get('control')),
+            untimed_but_program_started=sum(started[n] and not timed[n] for n in mine),
+            unfinished_launches=['%03d' % n for n in mine if n in reason]))
+    c.write_json(args.stage / (tag + '-started.json'), dict(attempted=True, adopted_from=source))
+    public = [n for n, job in enumerate(jobs) if job['program'] not in c.HELD_OUT]
+    print('Adopted %s from %s: public partition kept %d, unfinished %d; %d launches to run in all; '
+          'held-out counts are in the sealed record. Resume with: %s'
+          % (tag, source, sum(n not in reason for n in public), sum(n in reason for n in public),
+             len(reason), resume_command(args)))
+    return 0
+
+
 def run(args):
     if not args.acl_verified:
         raise ValueError('lead must provision and verify sealed ACLs before run')
@@ -444,7 +571,8 @@ def run(args):
         raise ValueError('block already attempted; preserve it and obtain a lead recovery decision')
     controls, plan = launches(args.profile, args.block, builds, spec)
     jobs = controls + plan
-    finished = finished_launches(args.stage, tag, jobs) if resume else 0
+    finished = finished_launches(args.stage, tag, jobs) if resume else set()
+    pending = [n for n in range(len(jobs)) if n not in finished]
     if not resume:
         c.write_json(args.stage / (tag + '-started.json'), dict(attempted=True))
     c.write_partition(args.stage, 'plan.json', jobs)
@@ -453,28 +581,29 @@ def run(args):
     public_folder.mkdir(exist_ok=True); private_folder.mkdir(exist_ok=True)
     folder_of = lambda job: private_folder if job['program'] in c.HELD_OUT else public_folder
     log = RetryLog(args.stage, tag)
-    if resume and finished < len(jobs):
-        job, folder = jobs[finished], folder_of(jobs[finished])
-        orphan = folder / ('%03d.stdout' % finished)
+    if resume and pending:
+        first = pending[0]
+        job, folder = jobs[first], folder_of(jobs[first])
+        orphan = folder / ('%03d.stdout' % first)
         if orphan.exists():
             # Captures without a row: interrupted. Retry only if no timing was observed.
             text = orphan.read_text(errors='replace')
             receipt = stdout_receipt(text)
             if transport_failure(text, receipt) is None:
                 print('Launch %03d of block %s has program output but no recorded row; not repeated. '
-                      'Lead recovery decision required.' % (finished, tag), file=sys.stderr)
+                      'Lead recovery decision required.' % (first, tag), file=sys.stderr)
                 return 1
-            stdout, stderr = keep_attempt(folder, finished, 'transport')
-            log.add(job, finished, event='launch', attempt=0, result_class=transport_failure(text, receipt),
+            stdout, stderr = keep_attempt(folder, first, 'transport')
+            log.add(job, first, event='launch', attempt=0, result_class=transport_failure(text, receipt),
                     exit_code=receipt.get('exit_code'), detail='interrupted before a row was recorded',
                     stdout=stdout, stderr=stderr)
-        log.add(job, finished, event='resume')
+        log.add(job, first, event='resume')
         (args.stage / (tag + '-paused.json')).unlink(missing_ok=True)
     # Streams are flushed per launch; a resume appends after the finished launches.
     mode = 'a' if resume else 'w'
     with (args.stage / (tag + '-raw.jsonl')).open(mode) as public, (c.sealed_dir(args.stage) / (tag + '-raw.jsonl')).open(mode) as private:
         for number, job in enumerate(jobs):
-            if number < finished:
+            if number in finished:
                 continue
             build = prepare_job(job, builds, spec)
             held = job['program'] in c.HELD_OUT
@@ -590,18 +719,20 @@ def score(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('stage','freeze','run','recheck','score'))
+    parser.add_argument('action', choices=('stage','freeze','run','recheck','adopt','score'))
     parser.add_argument('--stage', type=Path, default=c.SHARED / 'S13-01')
     parser.add_argument('--profile', choices=('full','3100','5100'))
     parser.add_argument('--block', choices=('initial','extension'), default='initial')
     parser.add_argument('--acl-verified', action='store_true')
     parser.add_argument('--resume', action='store_true',
                         help='run: continue a paused block from its next unfinished launch')
+    parser.add_argument('--from', dest='source', metavar='PREFIX',
+                        help='adopt: preserved block prefix, e.g. aborted-2 for aborted-2-initial-full')
     parser.add_argument('--extended', action='store_true')
     parser.add_argument('--timeout', type=int, default=3600)
     args = parser.parse_args()
     args.stage = args.stage.resolve()
-    if args.action in ('run', 'recheck') and not args.profile:
+    if args.action in ('run', 'recheck', 'adopt') and not args.profile:
         parser.error(args.action + ' requires --profile')
     try:
         return globals()[args.action](args) or 0

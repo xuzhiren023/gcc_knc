@@ -903,5 +903,125 @@ class TransportResume(unittest.TestCase):
             self.assertIn('Not deleted: latch recovery is a lead decision', latch.stderr)
 
 
+class AdoptBlock(unittest.TestCase):
+    """S13-01: a new block adopts a preserved block's timed launches; resume runs the rest."""
+    RECEIPT = dict(result_class='program', exit_code=0, program_exit_code=0, card_minutes=0.1,
+                   foreign_processes=[], overlapping_jobs=[])
+    # launch: (program, compiler, run, control, timed in the source block)
+    LAUNCHES = [('PB-gemm', corpus.KNC, 0, True, True), ('STREAM', corpus.KNC, 0, True, False),
+                ('PB-gemm', corpus.DONOR, 0, False, True), ('PB-gemm', corpus.KNC, 0, False, True),
+                ('PB-adi', corpus.DONOR, 0, False, True), ('PB-adi', corpus.KNC, 0, False, False),
+                ('PB-gemm', corpus.KNC, 1, False, False), ('PB-gemm', corpus.DONOR, 1, False, False),
+                ('PB-gemm', corpus.DONOR, 2, False, True), ('PB-gemm', corpus.KNC, 2, False, True),
+                ('PB-adi', corpus.KNC, 1, False, True), ('PB-adi', corpus.DONOR, 1, False, True)]
+
+    def jobs(self):
+        controls, plan = [], []
+        for program, compiler, run, control, _ in self.LAUNCHES:
+            job = dict(program=program, compiler=compiler, run=run, profile='full', block='initial', threads=1,
+                       input=corpus.INPUTS[program], variant='serial', flags=['-O2'],
+                       pair_id='full/%s/0/%d' % (program, run))
+            (controls if control else plan).append(dict(job, control=True) if control else job)
+        return controls, plan
+
+    def setUp(self):
+        import m4_gate as gate
+        self.gate = gate
+        self.temporary = tempfile.TemporaryDirectory()
+        self.stage, self.sealed = Path(self.temporary.name) / 'S13-01', Path(self.temporary.name) / 'sealed'
+        self.stage.mkdir(); self.sealed.mkdir()
+        (self.stage / 'environment-policy.json').write_text(json.dumps(
+            dict(lead_verified=True, clock_power_policy='fixed fixture', exclusive_window='fixture')))
+        source = 'aborted-2-initial-full'
+        (self.stage / (source + '-started.json')).write_text('{"attempted": true}\n')
+        rows = []
+        for number, (job, launch) in enumerate(zip(sum(self.jobs(), []), self.LAUNCHES)):
+            folder = (self.sealed if job['program'] in corpus.HELD_OUT else self.stage) / (source + '-capture')
+            folder.mkdir(exist_ok=True)
+            timed = launch[-1]
+            (folder / ('%03d.stdout' % number)).write_text(
+                TransportResume.CLOCK + json.dumps(self.RECEIPT) + '\n' if timed else '')
+            (folder / ('%03d.stderr' % number)).write_text('' if timed else 'ssh.exe 0xC0000142\n')
+            # Written by the launch-time parser; paths name the block before it was preserved.
+            rows.append(dict(job, check='error', time_seconds=1.0 if timed else None,
+                             stdout=str(self.stage / 'initial-full-capture' / ('%03d.stdout' % number)),
+                             transport=self.RECEIPT if timed else {},
+                             lead_environment_policy=dict(lead_verified=True), negative_control=launch[3]))
+        corpus_sealed = patch.object(corpus, 'sealed_dir', return_value=self.sealed)
+        corpus_sealed.start(); self.addCleanup(corpus_sealed.stop)
+        corpus.write_partition(self.stage, source + '-raw.jsonl', rows)
+        self.source = {p: p.read_bytes() for p in self.source_files()}
+        self.patches = [patch.object(gate, 'load_freeze', return_value=({}, {})),
+                        patch.object(gate, 'launches', side_effect=lambda *a: self.jobs()),
+                        patch.object(gate, 'prepare_job', return_value=dict(files=['runtime-prefix.json']))]
+        for p in self.patches:
+            p.start(); self.addCleanup(p.stop)
+        self.addCleanup(self.temporary.cleanup)
+
+    def source_files(self):
+        return [p for d in (self.stage, self.sealed) for p in d.rglob('*')
+                if p.is_file() and p.relative_to(d).parts[0].startswith('aborted-2-')]
+
+    def adopt(self):
+        args = SimpleNamespace(stage=self.stage, profile='full', block='initial', source='aborted-2', timeout=3600)
+        with redirect_stdout(io.StringIO()):
+            return self.gate.adopt(args)
+
+    def test_adopt_keeps_timed_launches_and_marks_untimed_and_split_pairs_unfinished(self):
+        self.assertEqual(self.adopt(), 0)
+        raw = lambda d: [json.loads(l) for l in (d / 'initial-full-raw.jsonl').read_text().splitlines()]
+        number = lambda r: Path(r['stdout']).name
+        self.assertEqual([number(r) for r in raw(self.stage)],
+                         ['000.stdout', '002.stdout', '003.stdout', '008.stdout', '009.stdout'])
+        self.assertEqual([(number(r), r['program']) for r in raw(self.sealed)],
+                         [('010.stdout', 'PB-adi'), ('011.stdout', 'PB-adi')])
+        for row in raw(self.stage) + raw(self.sealed):  # re-derived from the copied captures
+            self.assertEqual((row['time_seconds'], row['adopted_from']), (1.0, 'aborted-2-initial-full'))
+            self.assertEqual(Path(row['stdout']).parent.name, 'initial-full-capture')
+            self.assertTrue(Path(row['stdout']).exists())
+        self.assertTrue(raw(self.stage)[0]['negative_control'])
+        log = lambda d: [(e['launch'], e['reason']) for e in json.loads((d / 'initial-full-transport-retries.json').read_text())]
+        self.assertEqual(log(self.stage), [('001', self.gate.ADOPT_UNTIMED), ('006', self.gate.ADOPT_UNTIMED),
+                                           ('007', self.gate.ADOPT_UNTIMED)])
+        self.assertEqual(log(self.sealed), [('004', self.gate.ADOPT_SPLIT), ('005', self.gate.ADOPT_SPLIT)])
+        public = json.loads((self.stage / 'initial-full-adopted.json').read_text())
+        sealed = json.loads((self.sealed / 'initial-full-adopted.json').read_text())
+        self.assertEqual((public['kept'], public['unfinished'], public['split_pairs'], public['controls_kept'],
+                          public['controls_rerun'], public['source']), (5, 3, 0, 1, 1, 'aborted-2-initial-full'))
+        self.assertEqual((sealed['kept'], sealed['unfinished'], sealed['split_pairs']), (2, 2, 1))
+        # Unfinished captures are kept aside, so resume does not take them as interrupted launches.
+        capture = self.stage / 'initial-full-capture'
+        self.assertTrue((capture / '006.adopted-1.stdout').exists() and not (capture / '006.stdout').exists())
+        self.assertTrue((self.sealed / 'initial-full-capture' / '004.adopted-1.stdout').exists())
+        self.assertFalse(list(capture.glob('004.*')) + list(capture.glob('010.*')))
+        self.assertEqual({p: p.read_bytes() for p in self.source}, self.source)
+        self.assertEqual(sorted(self.source_files()), sorted(self.source))
+        with self.assertRaises(ValueError):  # never over an existing target block
+            self.adopt()
+
+    def test_resume_after_adopt_runs_exactly_the_unfinished_launches(self):
+        self.adopt()
+        calls = []
+        def card_call(stage_dir, files, mode, density, out, err, profile='full', timeout=3600, record=None):
+            calls.append((out.name, mode))
+            out.write_text(TransportResume.CLOCK + json.dumps(self.RECEIPT) + '\n'); err.write_text('')
+            record.update(self.RECEIPT)
+            return 0
+        args = SimpleNamespace(stage=self.stage, profile='full', block='initial', acl_verified=True,
+                               timeout=3600, resume=True)
+        with patch.object(corpus, 'card_call', side_effect=card_call), \
+                patch.object(self.gate, 'check_block', return_value=True), redirect_stderr(io.StringIO()):
+            self.assertEqual(self.gate.run(args), 0)
+        self.assertEqual(calls, [('001.stdout', 'STREAM-control'), ('004.stdout', 'PB-adi'), ('005.stdout', 'PB-adi'),
+                                 ('006.stdout', 'PB-gemm'), ('007.stdout', 'PB-gemm')])
+        public, sealed = ([Path(json.loads(l)['stdout']).name for l in (d / 'initial-full-raw.jsonl').read_text().splitlines()]
+                          for d in (self.stage, self.sealed))
+        self.assertEqual(sorted(public + sealed), ['%03d.stdout' % n for n in range(12)])
+        self.assertEqual(sealed, ['010.stdout', '011.stdout', '004.stdout', '005.stdout'])
+        events = json.loads((self.stage / 'initial-full-transport-retries.json').read_text())
+        self.assertEqual((events[-1]['event'], events[-1]['launch']), ('resume', '001'))
+        self.assertTrue((self.stage / 'initial-full-done.json').exists())
+
+
 if __name__ == '__main__':
     unittest.main()
