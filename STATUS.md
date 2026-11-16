@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 23:18.
+Updated automatically at every ticket change. Last update: 2026-11-15 23:20.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 244 of 273
 
@@ -138,7 +138,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft |  |
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
-| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | M4 is not done (62 of 65 tickets, not accepted), so the gated runs wait and you should not block on them. N... |
+| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | Question for the tech lead | Committed 9950928b. Selftest 155 passed; syntax passed. Serial regression failed only HPCG-104 (2 tests pas... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | S14-11 red accepted: failing tests now pin knc-twin's WRF switch jump-table resolution (entry order, out-of... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | The red tests for knc-twin loop and phase sampling now pin down the behaviour: a sampled HPCG loop must rea... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | One fix in test_remote_owner_read_uses_td_and_shortest_route before green; everything else stands (contenti... |
@@ -298,6 +298,7 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Recent activity
 
+- 2026-11-15 23:20 **S14-10** engineer ask: Committed 9950928b. Selftest 155 passed; syntax passed. Serial regression failed only HPCG-104 (2 tests passed, 25.2 min); cause unknown, diff trun...
 - 2026-11-15 23:16 **S14-13** lead changes: One fix in test_remote_owner_read_uses_td_and_shortest_route before green; everything else stands (contention, conservation, ring-vs-unit and the s...
 - 2026-11-15 23:14 **S14-13** engineer red: Red extension f9c3c319 adds second test file: shared-channel 1/2/4/8-tile contention; TD remote-owner latency from residual/route parameters and sh...
 - 2026-11-15 23:10 **S14-13** lead changes: Red tests check CLI structure but not the multicore behaviour the brief adds: running each stream on an independent copy of the core model would pa...
@@ -305,7 +306,6 @@ Current tickets: `[#################---]` 244 of 273
 - 2026-11-15 23:07 **S14-12** lead approve-red: The red tests for knc-twin loop and phase sampling now pin down the behaviour: a sampled HPCG loop must reach a steady state and land inside its ow...
 - 2026-11-15 23:06 **S14-14** lead answer: M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for this: the scheduling acceptance tests, k...
 - 2026-11-15 23:05 **S14-12** engineer red: Red 73383e26 closes review gaps: HPCG estimate inside band; width capped by profile shape error plus sample spread; convergence required. Sampled p...
-- 2026-11-15 23:04 **S14-14** engineer ask: Host-idle clearance is missing: the approved red commit is 47ec4e41, and the last engineer note explicitly leaves green implementation and selftest...
 
 ## Cost
 
@@ -317,4 +317,4 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Disk
 
-The project uses 39.8 GiB of 100 GiB. 87 GiB free on the drive.
+The project uses 40.3 GiB of 100 GiB. 86 GiB free on the drive.
