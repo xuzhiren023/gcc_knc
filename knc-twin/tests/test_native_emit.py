@@ -14,6 +14,29 @@ PHIWEATHER = ROOT.parent.parent / "twin-study-20261116" / "sixth" / "held-out"
 
 
 class NativeEmit(unittest.TestCase):
+    def test_prepare_native_places_initialized_stack_in_image(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            kernel = tmp / "stack.json"
+            kernel.write_text(json.dumps({
+                "schema": "knc-twin.kernel/1",
+                "name": "initialized-stack",
+                "init": {"registers": {"rsp": "0x2000", "rbp": "0x2008"},
+                         "memory": [{"addr": "0x2000", "u64": [7, 9]}]},
+                "streams": [{"asm": "movq (%rsp), %rax\nmovq 8(%rbp), %rbx\nret"}],
+            }), encoding="utf-8")
+            output = tmp / "output"
+            result = subprocess.run([
+                sys.executable, str(SCRIPT), "prepare-native", str(kernel),
+                "--out", str(output), "--no-check",
+            ], cwd=tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout[-3000:])
+            asm = (output / "kernel.S").read_text(encoding="utf-8")
+            self.assertIn("leaq knc_twin_mem+0(%rip), %rsp", asm)
+            self.assertIn("leaq knc_twin_mem+8(%rip), %rbp", asm)
+            self.assertIn("knc_twin_stack_top:", asm)
+            self.assertNotIn("NOTE: the region adjusts rsp", asm)
+
     def test_rollup_classification_requires_candidate_held_out_band(self):
         sys.path.insert(0, str(TWIN / "scripts"))
         from knc_model.cli import rollup_result_class
