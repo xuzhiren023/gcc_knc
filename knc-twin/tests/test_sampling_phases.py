@@ -3,6 +3,9 @@
 Each phase has name, share (of program time), and regions whose shares are
 within that phase. prediction.phases reports modeled_share_of_phase_time;
 the existing program-level prediction fields retain their meaning.
+Region sampling options are per side: sampling.baseline / sampling.candidate
+each name a loop and its warmup, window and max_iterations. Region output
+reports sampled=true whenever either side uses sampling.
 """
 import copy
 import json
@@ -68,6 +71,35 @@ class TestPhaseSampling(unittest.TestCase):
         self.assertGreaterEqual(hi, 1.0 / 1.088)
         for text in ("SpMV phase", "MG phase", "65", "seconds per HPCG pilot run"):
             self.assertIn(text, summary)
+
+    def test_sampled_region_downgrades_forecast_and_propagates_band(self):
+        manifest = copy.deepcopy(self.flat)
+        regions = manifest.pop("regions")
+        # Sample the existing calibrated SpMV baseline's outer row loop. The
+        # candidate stays fully simulated; both retain the original inputs.
+        regions[0]["sampling"] = {
+            "baseline": {"loop": ".A_4108be", "warmup": 1, "window": 1,
+                         "max_iterations": 8, "tolerance": 0.01}}
+        manifest["phases"] = [{"name": "pilot", "share": 1.0, "regions": regions}]
+        sampled, _ = self.invoke(manifest, "sampled-phase")
+        flat, _ = self.invoke(self.flat, "unsampled-flat")
+        self.assertEqual(flat["result_class"]["class"], "calibrated_forecast")
+        self.assertEqual(sampled["result_class"]["class"],
+                         "unvalidated_scenario_estimate")
+        row = next(r for r in sampled["regions"] if r["name"] == regions[0]["name"])
+        self.assertTrue(row["sampled"])
+        self.assertEqual(row["baseline"]["result_class"]["class"],
+                         "unvalidated_scenario_estimate")
+        lo, hi = sampled["predicted_time_ratio_band"]
+        flat_lo, flat_hi = flat["predicted_time_ratio_band"]
+        self.assertGreaterEqual(hi - lo + 1e-5, flat_hi - flat_lo)
+        self.assertLessEqual(lo, sampled["predicted_time_ratio"])
+        self.assertGreaterEqual(hi, sampled["predicted_time_ratio"])
+        scale = self.flat["program"]["measured_per_unit"]
+        wall_lo, wall_hi = sampled["predicted_candidate_per_unit_band"]
+        # Ratio output is rounded to five decimals; wall time retains six.
+        self.assertAlmostEqual(wall_lo, scale * lo, delta=scale * 1e-5)
+        self.assertAlmostEqual(wall_hi, scale * hi, delta=scale * 1e-5)
 
     def test_unvalidated_regions_prevent_calibrated_phase_forecast(self):
         # An unchanged ratio is still an unvalidated region; equality alone

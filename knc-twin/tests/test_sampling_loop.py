@@ -32,7 +32,7 @@ class TestLoopSampling(unittest.TestCase):
         args = [sys.executable, str(KT), command, str(kernel)]
         if command == "simulate":
             args.append("--sample-loop")
-        args += ["--loop", label, *options, "--out", str(self.work / "out")]
+        args += ["--loop", label, *options, "--out", str(self.work / "out"), "--force"]
         proc = subprocess.run(args, stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE, universal_newlines=True)
         self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
@@ -114,9 +114,20 @@ class TestLoopSampling(unittest.TestCase):
         pred = self.invoke("sample-loop", path, ".A_40f2f0", "--warmup", "104",
                            "--window", "104", "--max-iterations", "2080")
         self.assertLess(pred["sampling"]["iterations_sampled"], 8000)
+        self.assertEqual(pred["sampling"]["stop_reason"], "converged")
         lo, hi = pred["predicted_cycles_per_unit_band"]
         self.assertGreater(lo, 0)
         self.assertGreaterEqual(hi, lo)
+        cpi = pred["predicted_cycles_per_unit"]
+        self.assertLessEqual(lo, cpi)
+        self.assertGreaterEqual(hi, cpi)
+        # The cap comes from the existing shape model, never from the held-out
+        # targets below. Sampling adds its observed spread to that model band.
+        shape = raw["provenance"]["shape"]
+        evidence = helpers.profile().calibration["validated_shapes"][shape]
+        shape_width = 2 * cpi * evidence["worst_abs_error_pct"] / 100.0
+        sample_lo, sample_hi = pred["sampling"]["cycles_per_iteration_band"]
+        self.assertLessEqual(hi - lo, shape_width + sample_hi - sample_lo + 1e-6)
         recorded = json.loads((case_dir / "prediction.json").read_text())
         donor = next(v for v in recorded["variants"] if v["variant"] == "donor")
         units = json.loads((case_dir / "case.json").read_text())["slope"]["units"]
