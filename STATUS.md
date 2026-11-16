@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 23:21.
+Updated automatically at every ticket change. Last update: 2026-11-15 23:22.
 
-**Next: the tech lead, on S14-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-12.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 244 of 273
 
@@ -138,7 +138,7 @@ Current tickets: `[#################---]` 244 of 273
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft |  |
 | S14-08 | Quantized GEMV kernels on KNC - multi-row activation reuse, FP vs int32 VPMADD231D vs VPERMD lookup table, bandwidth-normalized | draft |  |
 | S14-09 | KNC vs the Z840 host (dual E5-2690 v3) on the same algorithms and numerical contract - where running on the card actually pays | draft |  |
-| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | Question for the tech lead | Committed 9950928b. Selftest 155 passed; syntax passed. Serial regression failed only HPCG-104 (2 tests pas... |
+| S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | S14-11 red accepted: failing tests now pin knc-twin's WRF switch jump-table resolution (entry order, out-of... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Question for the tech lead | Committed 479a2204: loop sampling, period-aware windows/bands, phase rollups, docs/fixture. Focused selftes... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Tests waiting for review | Red correction 73eee70b: remote-owner probe compares elapsed differences with hop-delay differences for dis... |
@@ -298,6 +298,7 @@ Current tickets: `[#################---]` 244 of 273
 
 ## Recent activity
 
+- 2026-11-15 23:22 **S14-10** lead answer: Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG-104 reproducer now, and the 900-second ...
 - 2026-11-15 23:21 **S14-12** engineer ask: Committed 479a2204: loop sampling, period-aware windows/bands, phase rollups, docs/fixture. Focused selftest: 8 passed; log ../_state/logs/S14_12_s...
 - 2026-11-15 23:20 **S14-13** engineer red: Red correction 73eee70b: remote-owner probe compares elapsed differences with hop-delay differences for distances 15/30/31 versus 1; distance 1 bou...
 - 2026-11-15 23:20 **S14-10** engineer ask: Committed 9950928b. Selftest 155 passed; syntax passed. Serial regression failed only HPCG-104 (2 tests passed, 25.2 min); cause unknown, diff trun...
@@ -305,13 +306,12 @@ Current tickets: `[#################---]` 244 of 273
 - 2026-11-15 23:14 **S14-13** engineer red: Red extension f9c3c319 adds second test file: shared-channel 1/2/4/8-tile contention; TD remote-owner latency from residual/route parameters and sh...
 - 2026-11-15 23:10 **S14-13** lead changes: Red tests check CLI structure but not the multicore behaviour the brief adds: running each stream on an independent copy of the core model would pa...
 - 2026-11-15 23:08 **S14-13** engineer red: Red commit 6dfe9298: one new CLI test file covers 1/2/4/8 tiles, per-core contexts, cold-copy outputs, result class, placement and budgets. Cygwin ...
-- 2026-11-15 23:07 **S14-12** lead approve-red: The red tests for knc-twin loop and phase sampling now pin down the behaviour: a sampled HPCG loop must reach a steady state and land inside its ow...
 
 ## Cost
 
 - From the script, engineer: 724 sessions, 1519.3M input tokens
 - From the script, lead: 488 sessions, 139.3M input tokens
-- Started by hand, Claude: 14 sessions, 4018.5M input tokens
+- Started by hand, Claude: 14 sessions, 4020.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
