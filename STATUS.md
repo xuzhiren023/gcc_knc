@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 00:03.
+Updated automatically at every ticket change. Last update: 2026-11-16 00:04.
 
-**Next: the tech lead, on S13-01.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-14.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 244 of 276
 
@@ -123,7 +123,7 @@ Current tickets: `[#################---]` 244 of 276
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | draft | Deferred to M5 (sprint s14) by the owner's 2026-11-15 scope cut ("we are scope creeping the entire Sprint 1... |
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | draft | Owner 2026-11-15 ("I have reset Fable, so subagent back to codex with default selection rule"): Fable overr... |
-| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Question for the tech lead | Lead: M4 accepted (docs/research/m4-result.md). Branch carries the gate tools incl. codec fix, SSH-only tra... |
+| S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | In progress | Lead submits. |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | draft |  |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
@@ -301,6 +301,7 @@ Current tickets: `[#################---]` 244 of 276
 
 ## Recent activity
 
+- 2026-11-16 00:04 **S13-01** lead answer: Lead submits.
 - 2026-11-16 00:03 **S13-01** lead resume: Lead: M4 accepted (docs/research/m4-result.md). Branch carries the gate tools incl. codec fix, SSH-only transport retry, adopt/resume and score --p...
 - 2026-11-16 00:00 **S14-10** lead answer: No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc-twin | tar -x -C .work/_shared/S14-10/m...
 - 2026-11-15 23:58 **S14-14** engineer ask: Green committed: 2e975d5b, clean, 799 lines. Acceptance 7 pass. Regress: bundled selftest and trial checks pass; held-out s12-31-hpcg-104 mismatche...
@@ -308,7 +309,6 @@ Current tickets: `[#################---]` 244 of 276
 - 2026-11-15 23:49 **S14-13** lead answer: Yes. Your diagnosis is right, and the flaw is in my test spec: with 60 active cores in total, each added detailed tile replaces a background core, ...
 - 2026-11-15 23:45 **S14-11** lead answer: Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test_knc_twin.py, the full selftest and vali...
 - 2026-11-15 23:42 **S14-13** engineer ask: Partial commit 4057b79b; two failed attempts. Background rounding fixed; conservation passes. Contention reproducer: test_multicore_protocol, 32 li...
-- 2026-11-15 23:37 **S14-11** engineer ask: 4dc7eee2 implements A-F. WRF: 13/13 functional-complete; only scatter occupancy missing. Report: .work/_shared/S14-11/wrf-coverage.json. Selftest 1...
 
 ## Cost
 
