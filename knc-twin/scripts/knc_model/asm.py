@@ -136,15 +136,20 @@ def _parse_operand(tok, where, branch=False):
                 d["conv"] = conv
             return d, mask, rounding
         return name, mask, rounding
+    if re.match(r"^(0x[0-9a-fA-F]+|\d+)\(%rip\)$", tok):
+        disp = int(tok[:tok.index("(")], 0)
+        return {"disp": disp, "symbol": ".Lknc_absolute_rip"}, mask, rounding
     m = _MEM_RE.match(tok)
     if m:
         d = {}
         if segment:
             d["segment"] = segment
         disp, sym = _eval_disp(m.group("disp"), where)
+        inner = [p.strip() for p in m.group("inner").split(",")]
+        if inner and inner[0].lower() == "%rip" and not sym:
+            sym = ".Lknc_absolute_rip"
         if disp:
             d["disp"] = disp
-        inner = [p.strip() for p in m.group("inner").split(",")]
         if inner and inner[0]:
             base = _parse_reg(inner[0], where)
             if base == "rip":
@@ -330,7 +335,7 @@ def parse_gas(text):
     return records, notes
 
 
-def emit_gas(stream):
+def emit_gas(stream, relocate=None):
     """Records -> AT&T text for the supported subset (used by prepare-native)."""
     lines = []
     for insn in stream.insns:
@@ -361,12 +366,22 @@ def emit_gas(stream):
                 t = opnd.name
             else:
                 t = ""
-                if opnd.disp:
-                    t += str(opnd.disp)
-                inner = "%" + opnd.base.name if opnd.base else ""
-                if opnd.index or opnd.vindex:
-                    inner += ",%" + (opnd.index or opnd.vindex).name + ",%d" % opnd.scale
-                t += "(" + inner + ")"
+                disp = opnd.disp
+                base = opnd.base
+                is_absolute = opnd.absolute or (opnd.symbol is not None and base is None and opnd.index is None and opnd.vindex is None)
+                if is_absolute and relocate is not None:
+                    relocated = relocate(insn, disp)
+                    disp = relocated
+                    t = "knc_twin_mem+%d(%%rip)" % disp
+                elif is_absolute:
+                    t = str(disp)
+                else:
+                    if disp:
+                        t += str(disp)
+                    inner = "%" + base.name if base else ""
+                    if opnd.index or opnd.vindex:
+                        inner += ",%" + (opnd.index or opnd.vindex).name + ",%d" % opnd.scale
+                    t += "(" + inner + ")"
                 if opnd.broadcast:
                     t += "{%s}" % opnd.broadcast
                 if opnd.conv:

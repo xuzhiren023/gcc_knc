@@ -102,7 +102,12 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
                 else:
                     out.append("\tmovabsq $0x%x, %%%s" % (v & 0xFFFFFFFFFFFFFFFF, n))
         out.append("# ---- kernel body (context %d) ----" % stream.context)
-        body = emit_gas(stream)
+        def relocate_memory(insn, addr):
+            if mem_base is None or not (mem_base <= addr < mem_base + mem_span):
+                raise InvalidInput("instruction %s absolute memory address 0x%x lies outside the initialized memory image" % (insn.id, addr))
+            return addr - mem_base
+
+        body = emit_gas(stream, relocate=relocate_memory)
         for line in body.splitlines():
             if line.endswith(":"):
                 out.append("%s_%s" % (fn, line))  # make labels unique per function

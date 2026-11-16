@@ -66,6 +66,17 @@ def _default_out(cmd, name):
     return os.path.join(os.getcwd(), "knc-twin-runs", "%s-%s-%s" % (stamp, cmd, safe))
 
 
+def _rollup_result_class(regions, skipped):
+    candidates = [x for x in regions if "candidate" in x]
+    validated = candidates and all(x.get("band_basis", "").startswith("held-out") for x in candidates) and not skipped
+    return {"class": "calibrated_forecast" if validated else "unvalidated_scenario_estimate",
+            "note": "a ranking aid for compiler or loop changes; the program's final speed is a card measurement"}
+
+
+def rollup_result_class(regions, skipped):
+    return _rollup_result_class(regions, skipped)
+
+
 def _prepare_out(args, cmd, name):
     out = args.out or _default_out(cmd, name)
     if os.path.isdir(out) and os.listdir(out) and not getattr(args, "force", False):
@@ -669,7 +680,7 @@ def cmd_rollup(args):
     try:
         m = rmod.load_rollup(args.manifest)
         base_dir = os.path.dirname(os.path.abspath(args.manifest))
-        prof = load_profile(m.get("profile", args.profile), args.overlay)
+        prof = load_profile(m.get("profile", args.profile), args.overlay, extra_dirs=[base_dir])
         if m.get("frozen_profile_hash") and m["frozen_profile_hash"] != prof.hash:
             raise InvalidInput("the manifest freezes profile hash %s... but %s resolves to %s...; rerun with the frozen profile or re-freeze the manifest" % (
                 m["frozen_profile_hash"][:12], prof.id, prof.hash[:12]))
@@ -717,9 +728,7 @@ def cmd_rollup(args):
             bw = prof.get_sub("card.sustained_bandwidth_gbs", card.get("traffic", "read_modify_write"))
         summary = rmod.combine(usable, m.get("program"), card, bw)
         summary["regions_not_modeled"] = [{"name": x["name"], "share": x["share"], "reason": x["note"]} for x in skipped]
-        summary["result_class"] = {"class": "calibrated_forecast" if usable and all(x.get("band_basis", "").startswith("held-out") or x["ratio"] == 1.0 for x in usable) and not skipped
-                                   else "unvalidated_scenario_estimate",
-                                   "note": "a ranking aid for compiler or loop changes; the program's final speed is a card measurement"}
+        summary["result_class"] = _rollup_result_class(usable, skipped)
         summary["kind"] = "program_rollup"
         r["prediction"] = dict(summary, regions=regions)
         r["parameters_used"] = prof.used_summary()
