@@ -81,7 +81,7 @@ skip or `xfail` a test to make progress.
 A ticket that makes code or a compiler heuristic faster follows `.claude/skills/model-first/SKILL.md`
 (Codex: read that file; Claude loads it as a skill). The tier comes from the ticket's `depth`. KNC values
 come from `docs/research/knc-machine.yaml`, never from memory. For a loop or kernel on one core, get the
-bound and the prediction from knc-twin (`knc-twin/SKILL.md`, `python knc-twin/scripts/knc_twin.py`;
+bound and the prediction from knc-twin (its own repository beside this one since 2026-11-16: `../knc-twin/SKILL.md`, `python ../knc-twin/scripts/knc_twin.py`, or the installed skill;
 `from_gcc_s.py` reads our `.s` output). Report its status, assumptions and unsupported forms as it prints
 them; a twin cycle count is a prediction, never a measurement. On the 105 held-out compiled loops of knc-twin 0.4
 the median error is 3.1% and the worst 17.9%, and it picked the right winner in 39 of 39 pairs more than 5% apart
