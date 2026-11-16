@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 08:40.
+Updated automatically at every ticket change. Last update: 2026-11-16 08:41.
 
-**Next: the tech lead, on S14-20.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 252 of 289
 
@@ -148,7 +148,7 @@ Current tickets: `[#################---]` 252 of 289
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
-| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Question for the tech lead | lead reviewed and committed the coverage fix (test_wrf_coverage, test_v03, test_wrf_imports: 61 pass); sess... |
+| S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | In progress | No open question: the lead reviewed and committed the coverage fix (e0826ac3; test_wrf_coverage, test_v03, ... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Not started |  |
@@ -314,6 +314,7 @@ Current tickets: `[#################---]` 252 of 289
 
 ## Recent activity
 
+- 2026-11-16 08:41 **S14-20** lead answer: No open question: the lead reviewed and committed the coverage fix (e0826ac3; test_wrf_coverage, test_v03, test_wrf_imports 61 pass). Only step: pm...
 - 2026-11-16 08:40 **S14-20** lead resume: lead reviewed and committed the coverage fix (test_wrf_coverage, test_v03, test_wrf_imports: 61 pass); sessions 4 -> 6. Only step: pm.py submit S14...
 - 2026-11-16 08:39 **S14-20** lead defer: Engineer changed knc-twin/scripts/from_gcc_s.py in the S14-20 worktree (uncommitted; sandbox cannot write the git index, S14-24) and reports test_w...
 - 2026-11-16 08:37 **S14-20** engineer ask: Lead instructed worktree-only change; submit refused due to uncommitted change. Changed knc-twin/scripts/from_gcc_s.py and ran test_wrf_coverage (9...
@@ -321,13 +322,12 @@ Current tickets: `[#################---]` 252 of 289
 - 2026-11-16 08:33 **S14-20** lead resume: lead: regression found, sending changes
 - 2026-11-16 08:31 **S14-20** lead defer: Review passed and approve is ready, but pm.py refuses to merge because the main checkout has an uncommitted change to work/tickets/S14-20.md. The i...
 - 2026-11-16 08:29 **S14-20** engineer submit: a region containing an indirect jmp or call that never executes now runs; an executed one fails with the instruction and address
-- 2026-11-16 08:28 **S14-20** owner decide: sessions 2 -> 4: your worktree could not write its git index (S14-24); the lead committed your change as [red] tests then the fix, red verified aga...
 
 ## Cost
 
 - From the script, engineer: 774 sessions, 1636.7M input tokens
 - From the script, lead: 524 sessions, 148.5M input tokens
-- Started by hand, Claude: 14 sessions, 4243.5M input tokens
+- Started by hand, Claude: 14 sessions, 4244.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
