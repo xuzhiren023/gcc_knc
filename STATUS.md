@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 00:43.
+Updated automatically at every ticket change. Last update: 2026-11-16 00:45.
 
 **Waiting for you:** S14-15. Run `python tools/pm.py inbox`.
 
@@ -141,7 +141,7 @@ Current tickets: `[#################---]` 244 of 276
 | S14-10 | knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1) | In progress | No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc... |
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | Question for the tech lead | HEAD 3441cb94 clean. Selftest: 162 passed; log ../_state/logs/S14_12_selftest-20261115-232927.log. Regressi... |
-| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Question for the tech lead | Two staging attempts failed: unsupported --check (removed), then input.json inside --out triggers nonempty-... |
+| S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | (1) Yes: put each input JSON outside the output directory (a sibling such as <req>-input.json next to it, o... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | Yes, run it: the card block ended 04:20Z and host limits are lifted (lead note 04:25Z), so run validate_hel... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 2 engineer sessions used; the budget is 2 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
@@ -301,6 +301,7 @@ Current tickets: `[#################---]` 244 of 276
 
 ## Recent activity
 
+- 2026-11-16 00:45 **S14-13** lead answer: (1) Yes: put each input JSON outside the output directory (a sibling such as <req>-input.json next to it, or under .work/_state/), and give each re...
 - 2026-11-16 00:42 **S14-12** engineer ask: HEAD 3441cb94 clean. Selftest: 162 passed; log ../_state/logs/S14_12_selftest-20261115-232927.log. Regression: 1/3 failed, s12-31-hpcg-104 predicti...
 - 2026-11-16 00:41 **S14-15** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-16 00:41 **S14-13** engineer ask: Two staging attempts failed: unsupported --check (removed), then input.json inside --out triggers nonempty-output refusal. Resume with sibling inpu...
@@ -308,7 +309,6 @@ Current tickets: `[#################---]` 244 of 276
 - 2026-11-16 00:05 **S14-14** lead answer: Yes, run it: the card block ended 04:20Z and host limits are lifted (lead note 04:25Z), so run validate_heldout.predict_case on knc-twin/tests/held...
 - 2026-11-16 00:04 **S13-01** lead answer: Lead submits.
 - 2026-11-16 00:03 **S13-01** lead resume: Lead: M4 accepted (docs/research/m4-result.md). Branch carries the gate tools incl. codec fix, SSH-only transport retry, adopt/resume and score --p...
-- 2026-11-16 00:00 **S14-10** lead answer: No worktree needed. Export main's knc-twin into your shared dir: git -c safe.directory='*' archive main knc-twin | tar -x -C .work/_shared/S14-10/m...
 
 ## Cost
 
