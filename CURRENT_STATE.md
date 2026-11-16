@@ -16,6 +16,9 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Proven, and how
 
+M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.25x LB median, B 7120 scores and
+3100/5100 reported, C Q3/Q5/FFTW held out, D WRF one vote vs plain GCC 5.1.1).
+
 | Claim | Evidence | Rerun with |
 |---|---|---|
 | Small 32-row sparse kernels are no longer slower than GCC 5.1.1 (S12-42 closed): donor/knc 1.08-1.12x on CSR and HPCG-pointers n=13/27, two-nests too | Card window 10, `.work/_shared/calib-w10/out/A-s12-42-small.out` (prefix b2ce6a9eebf with S12-31, 1 thread, GUARDS failures=0) | `.work/_shared/calib-w10/README.md` section A |
@@ -94,8 +97,6 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 ## Not proven yet
 
 - The public repos build on a Linux host (docs say so; not run). Target-library rebuild from a fresh clone not run.
-- M5 definition: ADR-0016 is **proposed** (2026-11-16), four open choices for the owner (threshold, card models,
-  held-out share, WRF). Nothing in Sprint 15 is measured until it is accepted.
 - Lead session 2026-11-16 14:00 EST: S14-22, S14-24 (lane harness), S14-16 (gcc), S13-03 (review) made ready;
   dispatchers started detached for lanes twin-use, harness, review and gcc (logs `.work/_state/logs/dispatch-*-2026111*`,
   `dispatch-twin-use-2.log`). S14-33 is the twin session's ticket and waits on its interactive lead, not on us.

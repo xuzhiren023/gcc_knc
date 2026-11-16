@@ -1,8 +1,7 @@
 # ADR-0016: M5 definition - broad and correct
 
-**Status:** Proposed 2026-11-16 by the lead. Waits for the owner's confirmation of the four open choices at the end.
-Frozen before Sprint 15 measures anything; changing a rule after any M5 result is seen needs a new owner decision,
-recorded here.
+**Status:** Accepted 2026-11-16 (owner, 15:15 EST: "All agree with your recommendation", choices A-D as proposed).
+Frozen from now; changing a rule after any M5 result is seen needs a new owner decision, recorded here.
 **Plan:** `docs/PLAN-M5-M6.md` (M5, Sprints 14-15). **Carries over:** ADR-0015 (measurement), ADR-0010 (kernels).
 
 ## What M5 proves
@@ -35,12 +34,11 @@ rules, 240-thread machine state for OpenMP side tracks, length-only checks on ho
 (`-O3`, `-mphinix`, PGO) are published with labels and never replace a failed primary row. Held-out units are sealed
 at the M5 head as in ADR-0015; development units may be tuned on.
 
-## Open choices for the owner
+## Owner choices (decided 2026-11-16)
 
-- **A. Threshold.** 1.25x LB on the widened corpus (proposed: the new units are where we are weak, so 2.16x will not
-  hold), or another figure.
-- **B. Card models.** 7120 full profile decides (as M4 after the owner's cancellation); 3100 and 5100 reported, not
-  scored (proposed), or all three scored.
-- **C. Held-out share.** Proposed: of the new units, Q3, Q5 and FFTW held out and sealed; the rest development.
-- **D. WRF.** Scored as one unit against plain GCC 5.1.1 (proposed); the gap to PhiWeather's hand-tuned build (S14-30)
-  is reported separately and does not decide M5.
+- **A. Threshold.** 1.25x LB on the widened corpus (the new units are where we are weak, so 2.16x will not hold).
+- **B. Card models.** The 7120 full profile decides (as M4 after the owner's cancellation); 3100 and 5100 are
+  reported, not scored.
+- **C. Held-out share.** Of the new units, Q3, Q5 and FFTW are held out and sealed; the rest are development units.
+- **D. WRF.** Scored as one unit against plain GCC 5.1.1; the gap to PhiWeather's hand-tuned build (S14-30) is
+  reported separately and does not decide M5.

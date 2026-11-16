@@ -56,6 +56,7 @@
  {
   "id": "M5",
   "name": "Program corpus",
+  "definition": "docs/adr/0016-m5-definition.md (accepted 2026-11-16)",
   "sprints": [
    "s14",
    "s15"
