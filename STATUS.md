@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 16:50.
+Updated automatically at every ticket change. Last update: 2026-11-16 16:53.
 
-**Next: the tech lead, on S14-42.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 258 of 297
 
@@ -166,7 +166,7 @@ Current tickets: `[#################---]` 258 of 297
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Not started |  |
-| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Question for the tech lead | 69b1e803 commits the portable skill, source audit, GEMV example and locator fixes. Six artifact checks and ... |
+| S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | In progress | Accept the gap; do not fetch anything. The ticket scope is local sources only. Keep the ICC option-guide GU... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -322,6 +322,7 @@ Current tickets: `[#################---]` 258 of 297
 
 ## Recent activity
 
+- 2026-11-16 16:53 **S14-42** lead answer: Accept the gap; do not fetch anything. The ticket scope is local sources only. Keep the ICC option-guide GUIDs listed as unrechecked in the Source ...
 - 2026-11-16 16:49 **S14-42** engineer ask: 69b1e803 commits the portable skill, source audit, GEMV example and locator fixes. Six artifact checks and installer smoke passed; commands/logs ar...
 - 2026-11-16 16:25 **S14-30** lead note: issue #32 (short WRF tiles), PhiWeather knc-twin study of rk_update_scalar from our module_em.o (twin estimates, unvalidated_scenario_estimate; Phi...
 - 2026-11-16 16:19 **S14-42** lead approve-red: The red test for the knc-optimize skill is accepted: it checks the skill files, trigger words, a source locator and one of the four verdicts on eve...
@@ -329,16 +330,15 @@ Current tickets: `[#################---]` 258 of 297
 - 2026-11-16 16:15 **S14-30** lead note: PhiWeather 25 h figure (their message, 2026-11-16): PGK-02 = patched GCC-KNC WRF (wrf.exe 890f58f8, classic CDF2 inputs, Miami 2024-01-06 12Z, 8x15...
 - 2026-11-16 15:38 **S14-33** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-16 14:59 **S14-33** engineer submit: a69e96f6: all five review fixes. Full held-out recording PASS; selftest 221 tests, zero failures/errors; trial PASS. Scatter t1 +0.7%/+6.8%; scatte...
-- 2026-11-16 14:20 **S14-22** lead defer: Engineer cannot run card_run tests: tools/run.py hangs (>8 min, no log) and the pre-tool hook blocks direct 'python -m unittest tests.tools.test_ca...
 
 ## Cost
 
 - From the script, engineer: 813 sessions, 1713.7M input tokens
 - From the script, lead: 558 sessions, 156.7M input tokens
-- Started by hand, Claude: 82 sessions, 4485.8M input tokens
+- Started by hand, Claude: 83 sessions, 4490.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.1 GiB of 100 GiB. 41 GiB free on the drive.
+The project uses 42.2 GiB of 100 GiB. 41 GiB free on the drive.
