@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 12:33.
+Updated automatically at every ticket change. Last update: 2026-11-16 12:34.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[#################---]` 255 of 295
 
@@ -160,7 +160,7 @@ Current tickets: `[#################---]` 255 of 295
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
-| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | In progress |  |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Question for the tech lead | Required first step blocked: git cherry-pick 8d846ffe (head of s14/S14-23) fails with Unable to create C:/U... |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
@@ -320,6 +320,7 @@ Current tickets: `[#################---]` 255 of 295
 
 ## Recent activity
 
+- 2026-11-16 12:34 **S14-33** engineer ask: Required first step blocked: git cherry-pick 8d846ffe (head of s14/S14-23) fails with Unable to create C:/Users/xuzhi/Documents/gcc_knc/.git/worktr...
 - 2026-11-16 12:31 **S14-35** lead approve: knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-context stack) and restores the driver's s...
 - 2026-11-16 12:12 **S14-35** lead resume: lead cleaned main; approving
 - 2026-11-16 12:11 **S14-35** lead defer: Interactive lead: review passed (per-context saved-rsp slots and private stacks, rsp restored before the epilogue pops, knc_twin_mem 4 KiB aligned,...
@@ -327,13 +328,12 @@ Current tickets: `[#################---]` 255 of 295
 - 2026-11-16 12:08 **S14-35** lead answer: sessions 13 -> 15 for the submit only. Run: pm.py submit S14-35 --note 'prepare-native keeps the kernel's own stack when it lies in the memory imag...
 - 2026-11-16 12:07 **S14-35** lead resume: lead: branch reviewed and merged with main; routing to the engineer for the submit
 - 2026-11-16 12:06 **S14-35** lead defer: Interactive lead: the branch (head 24b650f8) holds the reviewed fix (per-context saved-rsp slots and private stacks, knc_twin_mem 4 KiB aligned, te...
-- 2026-11-16 12:05 **S14-35** lead resume: lead merged main into s14/S14-35 (the branch has eight commits main lacks; the earlier refusal was the merge gate, not a missing diff). Only step: ...
 
 ## Cost
 
 - From the script, engineer: 795 sessions, 1669.5M input tokens
 - From the script, lead: 540 sessions, 152.2M input tokens
-- Started by hand, Claude: 30 sessions, 4350.1M input tokens
+- Started by hand, Claude: 30 sessions, 4352.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
