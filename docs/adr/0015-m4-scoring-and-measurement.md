@@ -299,3 +299,7 @@ triggers the one retry, label it **exposed-set confirmation**, never fresh held-
 validation. The lead publishes final program/family diagnostics with the unchanged
 17-vote median after choices freeze; this bounded corpus does not establish MPI,
 LLM decode or broad production performance. (Owner; finding 8.)
+
+## Amendment 1 (2026-11-15, lead, S13-01 recoveries)
+
+Transport: gate launches use SSH transfers only (no SCIF DMA in the timed path). A launch is retried only if the transport failed before the program started, so no timing or check result was observed; the retry decision depends only on transport, never on a measurement, so it cannot favour either compiler or any time. The same launch reruns in its frozen order with the same inputs and its pair keeps its order, up to 5 attempts with backoff; then the block pauses and resumes with `--resume`, keeping finished launches. Every attempt is kept in `<block>-transport-retries.json` (held-out entries sealed) with its captures; `done.json` and each row carry the retry counts and the report states the total. A launch whose program started and then lost transport stays final. Owner 2026-11-15: M4 is decided on the 7120 full profile only (3100 and 5100 not run).
