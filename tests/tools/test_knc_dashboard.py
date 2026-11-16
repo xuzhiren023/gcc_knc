@@ -1,8 +1,11 @@
 import datetime as dt
 import json
+import os
 from pathlib import Path
 import sys
+import tempfile
 import threading
+from types import SimpleNamespace
 import unittest
 from urllib.request import urlopen
 
@@ -82,6 +85,33 @@ mic1 (temp):
             server.shutdown()
             server.server_close()
             worker.join()
+
+    def test_twin_ticket_sessions(self):
+        now = dt.datetime(2026, 11, 16, 12).astimezone(dt.timezone.utc)
+        with tempfile.TemporaryDirectory() as root:
+            logs = Path(root) / '.work/_state/logs'
+            logs.mkdir(parents=True)
+            ticket = SimpleNamespace(id='S14-01', state='doing',
+                                     fields={'lane': 'twin-model', 'title': 'Twin work'})
+            board = SimpleNamespace(root=root, policy={'session_timeout_minutes': 30},
+                                    tickets=lambda: [ticket])
+            def check(start, remaining, status):
+                row = d.twin_tickets(board, now)[0]
+                self.assertEqual(row['session_start'], start)
+                self.assertEqual(row['remaining_seconds'], remaining)
+                self.assertEqual(row['session_status'], status)
+            check(None, None, 'no live session')
+            old = logs / 'S14-01-engineer-2026-11-16T110000.jsonl'
+            latest = logs / 'S14-01-lead-2026-11-16T115000.jsonl'
+            for path in (old, latest):
+                path.write_text('fixture', encoding='utf-8')
+                os.utime(str(path), (now.timestamp(), now.timestamp()))
+            start = dt.datetime(2026, 11, 16, 11, 50).astimezone(dt.timezone.utc).isoformat()
+            check(start, 1200, 'live')
+            # A newer session name wins even if an older log was modified later.
+            stale = now.timestamp() - 31 * 60
+            os.utime(str(latest), (stale, stale))
+            check(None, None, 'no live session')
 
 
 if __name__ == '__main__':
