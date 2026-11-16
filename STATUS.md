@@ -147,7 +147,7 @@ Current tickets: `[#################---]` 249 of 282
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
-| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Question for the tech lead | lead committed the worktree: 105-style red commit (tests only, verified failing on main's code: 'mismatch' ... |
+| S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | In progress | Your changes are committed on s14/S14-19 by the lead (two commits: [red] tests, then the fix with engine 0.... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft |  |
@@ -307,6 +307,7 @@ Current tickets: `[#################---]` 249 of 282
 
 ## Recent activity
 
+- 2026-11-16 06:47 **S14-19** lead answer: Your changes are committed on s14/S14-19 by the lead (two commits: [red] tests, then the fix with engine 0.4.0 and the re-recorded predictions). On...
 - 2026-11-16 06:47 **S14-19** lead resume: lead committed the worktree: 105-style red commit (tests only, verified failing on main's code: 'mismatch' != 'ok') then the fix; run outputs valid...
 - 2026-11-16 06:44 **S14-19** lead defer: Interactive lead: the engineer's worktree could not write .git/worktrees/S14-19/index.lock (Permission denied), so its changes are uncommitted. Ple...
 - 2026-11-16 06:43 **S14-19** engineer ask: Commit wrapper refused: git add -A cannot create C:/Users/xuzhi/Documents/gcc_knc/.git/worktrees/S14-19/index.lock (Permission denied). Test passes...
@@ -314,16 +315,15 @@ Current tickets: `[#################---]` 249 of 282
 - 2026-11-16 05:59 **S14-13** lead resume: main merged into the branch by the lead with four conflicts resolved (timing.py step/run, cli.py parser, SKILL.md, README); 107 twin tests pass on ...
 - 2026-11-16 05:54 **S14-11** lead approve: knc-twin handles WRF jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp23 imports, and heap calls through a bump-a...
 - 2026-11-16 05:43 **S14-11** lead resume: S14-18, S14-14 and S14-12 merged; main merged into the branch by the lead (8c0a2a97, cli.py conflict resolved); approving
-- 2026-11-16 05:41 **S14-12** lead approve: knc-twin gains sample-loop (iteration sampling with a stated spread, stopping only once the input's period is covered) and phase roll-ups to second...
 
 ## Cost
 
 - From the script, engineer: 767 sessions, 1632.0M input tokens
 - From the script, lead: 519 sessions, 147.5M input tokens
-- Started by hand, Claude: 14 sessions, 4190.5M input tokens
+- Started by hand, Claude: 14 sessions, 4191.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 40.6 GiB of 100 GiB. 69 GiB free on the drive.
+The project uses 40.6 GiB of 100 GiB. 70 GiB free on the drive.
