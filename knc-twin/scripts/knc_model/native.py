@@ -80,6 +80,7 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
         out.append("%s:" % fn)
         for r in CALLEE_SAVED:
             out.append("\tpushq %%%s" % r)
+        out.append("\tmovq %rsp, knc_twin_saved_rsp(%rip)")
         # mask registers first (uses r11 as scratch), then zmm, then gprs
         for name, val in regs.items():
             n = name.lower()
@@ -96,12 +97,21 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
             n = name.lower()
             if n in GPR64:
                 v = parse_int(val, name)
+                if n == "rsp":
+                    continue
                 if mem_base is not None and mem_base <= v < mem_base + mem_span:
                     out.append("\tleaq knc_twin_mem+%d(%%rip), %%%s" % (v - mem_base, n))
-                elif n in ("rsp", "rbp"):
+                elif n == "rbp":
                     out.append("\tleaq knc_twin_stack_top(%%rip), %%%s" % n)
                 else:
                     out.append("\tmovabsq $0x%x, %%%s" % (v & 0xFFFFFFFFFFFFFFFF, n))
+        if "rsp" in {name.lower() for name in regs}:
+            val = next(val for name, val in regs.items() if name.lower() == "rsp")
+            v = parse_int(val, "rsp")
+            if mem_base is not None and mem_base <= v < mem_base + mem_span:
+                out.append("\tleaq knc_twin_mem+%d(%%rip), %%rsp" % (v - mem_base))
+            else:
+                out.append("\tleaq knc_twin_stack_top(%rip), %rsp")
         out.append("# ---- kernel body (context %d) ----" % stream.context)
         def relocate_memory(insn, addr):
             if mem_base is None or not (mem_base <= addr < mem_base + mem_span):
@@ -127,6 +137,7 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
         gbase = 128 * stream.context
         for i, r in enumerate(GPR64):
             out.append("\tmovq %%%s, knc_twin_gpr_out+%d(%%rip)" % (r, gbase + 8 * i))
+        out.append("\tmovq knc_twin_saved_rsp(%rip), %rsp")
         kbase = 32 * stream.context
         for i in range(8):
             out.append("\tkmov %%k%d, %%eax" % i)
@@ -149,6 +160,8 @@ def gen_kernel_asm(kernel, mem_base, mem_span):
     out.append("\t.zero 65536")
     out.append("\t.globl knc_twin_stack_top")
     out.append("knc_twin_stack_top:")
+    out.append("\t.globl knc_twin_saved_rsp")
+    out.append("knc_twin_saved_rsp:\n\t.zero 8")
     out.append("\t.globl knc_twin_mem")
     out.append("knc_twin_mem:")
     out.append("\t.zero %d" % max(64, mem_span))

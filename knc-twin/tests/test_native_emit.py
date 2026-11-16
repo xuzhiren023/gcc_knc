@@ -35,7 +35,30 @@ class NativeEmit(unittest.TestCase):
             self.assertIn("leaq knc_twin_mem+0(%rip), %rsp", asm)
             self.assertIn("leaq knc_twin_mem+8(%rip), %rbp", asm)
             self.assertIn("knc_twin_stack_top:", asm)
+            self.assertLess(asm.index("movq %rsp, knc_twin_saved_rsp(%rip)"), asm.index("leaq knc_twin_mem+0(%rip), %rsp"))
+            self.assertLess(asm.index("movq knc_twin_saved_rsp(%rip), %rsp"), asm.index("popq %r15"))
             self.assertNotIn("NOTE: the region adjusts rsp", asm)
+
+    def test_prepare_native_uses_private_stack_for_external_rsp(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp = Path(tmp)
+            kernel = tmp / "stack.json"
+            kernel.write_text(json.dumps({
+                "schema": "knc-twin.kernel/1",
+                "name": "external-stack",
+                "init": {"registers": {"rsp": "0x9000"}},
+                "streams": [{"asm": "pushq %rax\npopq %rbx\nret"}],
+            }), encoding="utf-8")
+            output = tmp / "output"
+            result = subprocess.run([
+                sys.executable, str(SCRIPT), "prepare-native", str(kernel),
+                "--out", str(output), "--no-check",
+            ], cwd=tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout[-3000:])
+            asm = (output / "kernel.S").read_text(encoding="utf-8")
+            self.assertIn("leaq knc_twin_stack_top(%rip), %rsp", asm)
+            self.assertLess(asm.index(".zero 65536"), asm.index("knc_twin_stack_top:"))
+            self.assertLess(asm.index("movq knc_twin_saved_rsp(%rip), %rsp"), asm.index("popq %r15"))
 
     def test_rollup_classification_requires_candidate_held_out_band(self):
         sys.path.insert(0, str(TWIN / "scripts"))
