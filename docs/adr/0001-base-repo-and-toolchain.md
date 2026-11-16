@@ -41,3 +41,7 @@ benefits from a recent base. The bridge option stays open until Milestone M0 has
   `git status` cannot be trusted.
 - A GCC source tree on Windows also has case-sensitivity concerns. S0-06 checks this.
 - This project is independent of PhiWeather. Its `.tools` folder is read-only bootstrap input until Sprint 0 ends.
+
+## Amendment 1 (2026-11-15)
+
+Owner, 2026-11-15: the fork becomes public ("Make it public"), so anyone can clone and build GCC-KNC and produce IMCI assembly. The project repository is published with it. `contrib/knc-vecmath` (from PhiWeather, Arm and musl licences kept) may be published (owner: "Yes"). The fork stays GPL-3.0-or-later as upstream GCC. Pushing to the remotes is allowed for this release; the lead reviews before every push.
