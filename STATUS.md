@@ -146,7 +146,7 @@ Current tickets: `[#################---]` 244 of 279
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | **Waiting for you** | budget: 10651104 input tokens used; the budget is 10000000 |
 | S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
-| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | In progress | sessions 2 -> 4 under the owner's standing auto-extend rule: the change is complete in the worktree, only t... |
+| S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Question for the tech lead | The current worktree has a duplicate test_compiled_rows_record_disables_deadline definition in knc-twin/tes... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Not started |  |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -304,6 +304,7 @@ Current tickets: `[#################---]` 244 of 279
 
 ## Recent activity
 
+- 2026-11-16 03:25 **S14-18** engineer ask: The current worktree has a duplicate test_compiled_rows_record_disables_deadline definition in knc-twin/tests/test_v03.py (one in TestRollupAndBar ...
 - 2026-11-16 03:24 **S14-13** lead answer: No main repeat. The branch run equals the recorded s12-31-hpcg-104 prediction.json exactly, so this branch did not change that prediction, and a ma...
 - 2026-11-16 03:24 **S14-11** engineer escalate: Submit refused: 1925 changed lines exceed budget 800. Per owner instruction, next stall goes to owner. Please approve size override for completed A...
 - 2026-11-16 03:23 **S14-18** owner decide: sessions 2 -> 4 under the owner's standing auto-extend rule: the change is complete in the worktree, only the two commits, one timed t0 and the sub...
@@ -311,13 +312,12 @@ Current tickets: `[#################---]` 244 of 279
 - 2026-11-16 03:22 **S14-18** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-16 03:22 **S14-18** owner decide: Nothing is hung: the t0 you timed still ran the 45-minute held-out replay because your change is uncommitted and the three Cygwin test processes ou...
 - 2026-11-16 03:20 **S14-18** engineer escalate: Targeted twin tests pass. Required tools/check t0 remains running beyond 10 minutes with an empty log, so its required under-10-minute wall-time re...
-- 2026-11-16 03:17 **S14-12** lead defer: Review passed, ready to approve: head 7f734b23 matches the pre-review and meets brief 04's done criteria. Missing: pm.py approve S14-12 ran past th...
 
 ## Cost
 
 - From the script, engineer: 752 sessions, 1623.3M input tokens
 - From the script, lead: 508 sessions, 143.9M input tokens
-- Started by hand, Claude: 14 sessions, 4139.3M input tokens
+- Started by hand, Claude: 14 sessions, 4139.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
