@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-15 23:56.
+Updated automatically at every ticket change. Last update: 2026-11-15 23:58.
 
 **Next: the tech lead, on S14-10.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 244 of 274
+Current tickets: `[#################---]` 244 of 276
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 244 of 274
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | In progress | 62 of 65 tickets |
-| M5 | Program corpus | In progress | 0 of 27 tickets |
+| M5 | Program corpus | In progress | 0 of 29 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -142,8 +142,10 @@ Current tickets: `[#################---]` 244 of 274
 | S14-11 | knc-twin: close PhiWeather WRF coverage gaps (jump tables, vcvtps2pd ymm, loop-region and complete-listing modes, scatter and rcp-table import) | In progress | Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test... |
 | S14-12 | knc-twin: iteration and phase sampling for loop and whole-program wall-time estimates (roadmap item 2) | In progress | Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded ... |
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | In progress | Yes. Your diagnosis is right, and the flaw is in my test spec: with 60 active cores in total, each added de... |
-| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | In progress | M4 is not finished (62 of 65) and the card may be in a timed block, but you do not need idle clearance for ... |
+| S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Question for the tech lead | Green committed: 2e975d5b, clean, 799 lines. Acceptance 7 pass. Regress: bundled selftest and trial checks ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | In progress |  |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | draft |  |
+| S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -299,6 +301,7 @@ Current tickets: `[#################---]` 244 of 274
 
 ## Recent activity
 
+- 2026-11-15 23:58 **S14-14** engineer ask: Green committed: 2e975d5b, clean, 799 lines. Acceptance 7 pass. Regress: bundled selftest and trial checks pass; held-out s12-31-hpcg-104 mismatche...
 - 2026-11-15 23:54 **S14-10** engineer ask: 7a41d127 documents diagnostic: all 8 HPCG-104 variants budget_exhausted at 120s; non-variant fields including scenario match record. JSON: .work/_s...
 - 2026-11-15 23:49 **S14-13** lead answer: Yes. Your diagnosis is right, and the flaw is in my test spec: with 60 active cores in total, each added detailed tile replaces a background core, ...
 - 2026-11-15 23:45 **S14-11** lead answer: Yes, run them now: the M4 card block finished 04:20Z and the host limits are lifted. Run tests/regress/test_knc_twin.py, the full selftest and vali...
@@ -306,13 +309,12 @@ Current tickets: `[#################---]` 244 of 274
 - 2026-11-15 23:37 **S14-11** engineer ask: 4dc7eee2 implements A-F. WRF: 13/13 functional-complete; only scatter occupancy missing. Report: .work/_shared/S14-11/wrf-coverage.json. Selftest 1...
 - 2026-11-15 23:23 **S14-13** lead approve-red: S14-13 red tests approved: they now require the shared 8-tile multicore model (channel contention across 1-8 tiles, remote L2 reads through the tag...
 - 2026-11-15 23:23 **S14-12** lead answer: Yes, run the full knc-twin selftest and tests/regress/test_knc_twin.py now, one at a time, single-threaded (no -j/--jobs, no builds): that is insid...
-- 2026-11-15 23:22 **S14-10** lead answer: Yes, go ahead. One single-threaded process at a time is always allowed, so you can run the single-case HPCG-104 reproducer now, and the 900-second ...
 
 ## Cost
 
 - From the script, engineer: 728 sessions, 1544.5M input tokens
 - From the script, lead: 493 sessions, 140.2M input tokens
-- Started by hand, Claude: 14 sessions, 4056.9M input tokens
+- Started by hand, Claude: 14 sessions, 4057.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
