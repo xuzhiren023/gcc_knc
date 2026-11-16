@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 14:21.
+Updated automatically at every ticket change. Last update: 2026-11-16 14:59.
 
-**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 256 of 296
+Current tickets: `[#################---]` 257 of 296
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 256 of 296
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 11 of 49 tickets |
+| M5 | Program corpus | In progress | 12 of 49 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -151,7 +151,7 @@ Current tickets: `[#################---]` 256 of 296
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | lead | Engineer cannot run card_run tests: tools/run.py hangs (>8 min, no log) and the pre-tool hook blocks direct... |
-| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | In progress | Owner closed the budget after the final session. The worktree is committed on s14/S14-23 as wip (converter,... |
+| S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Not started |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | lead | Reviewed b9056c7f: matches the 14:03 answer (static caps, no-go verdict, modulo unsupported evidence kept);... |
@@ -160,7 +160,7 @@ Current tickets: `[#################---]` 256 of 296
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
-| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | In progress | 1. knc-twin/references/validation.md:303 (and :304): the scatter parameter does not reproduce the rows it w... |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Waiting for review | a69e96f6: all five review fixes. Full held-out recording PASS; selftest 221 tests, zero failures/errors; tr... |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
@@ -321,6 +321,7 @@ Current tickets: `[#################---]` 256 of 296
 
 ## Recent activity
 
+- 2026-11-16 14:59 **S14-33** engineer submit: a69e96f6: all five review fixes. Full held-out recording PASS; selftest 221 tests, zero failures/errors; trial PASS. Scatter t1 +0.7%/+6.8%; scatte...
 - 2026-11-16 14:20 **S14-22** lead defer: Engineer cannot run card_run tests: tools/run.py hangs (>8 min, no log) and the pre-tool hook blocks direct 'python -m unittest tests.tools.test_ca...
 - 2026-11-16 14:18 **S14-22** engineer ask: The authorized test invocation through tools/run.py has hung for over 8 minutes without output or log; direct unittest invocation is blocked by the...
 - 2026-11-16 14:14 **S14-16** lead approve-red: S14-16 has a red test: a synthetic byte decoder written from scratch fails because existing GCC parks scalar integers in mask registers inside its ...
@@ -328,16 +329,15 @@ Current tickets: `[#################---]` 256 of 296
 - 2026-11-16 14:12 **S14-26** lead defer: Reviewed b9056c7f: matches the 14:03 answer (static caps, no-go verdict, modulo unsupported evidence kept); ready to approve. Needs interactive lea...
 - 2026-11-16 14:10 **S14-26** engineer ask: Committed the requested static-cap table and no-go verdict as b9056c7f, retaining unsupported modulo evidence; no further model runs. Submit with y...
 - 2026-11-16 14:10 **S14-16** engineer red: 76490eea: synthetic byte decoder T1 fails on loop %k register scan, as expected. Log .work/_state/logs/S14_16_red-20261116-140840.log. Zlib scan fo...
-- 2026-11-16 14:10 **S12-42** lead close: Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-KNC is now faster than GCC 5.1.1 on all f...
 
 ## Cost
 
 - From the script, engineer: 810 sessions, 1693.1M input tokens
 - From the script, lead: 556 sessions, 156.3M input tokens
-- Started by hand, Claude: 52 sessions, 4394.9M input tokens
+- Started by hand, Claude: 60 sessions, 4406.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 41.3 GiB of 100 GiB. 50 GiB free on the drive.
+The project uses 41.3 GiB of 100 GiB. 48 GiB free on the drive.
