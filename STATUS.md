@@ -2,9 +2,9 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-16 12:35.
 
-**Next: the tech lead, on S14-33.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[#################---]` 255 of 295
+Current tickets: `[#################---]` 255 of 296
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[#################---]` 255 of 295
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 10 of 48 tickets |
+| M5 | Program corpus | In progress | 10 of 49 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -160,11 +160,12 @@ Current tickets: `[#################---]` 255 of 295
 | S14-29 | knc-twin: schedule --block ADDR..ADDR for a straight-line block inside a function, and batch must not write a native request per candidate by default | Not started |  |
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
-| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Question for the tech lead | Required first step blocked: git cherry-pick 8d846ffe (head of s14/S14-23) fails with Unable to create C:/U... |
+| S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | In progress | Lead cherry-picked 8d846ffe (the S14-23 wip: converter, w10 scatter measurements t1/t2/t4, kernels, case, t... |
 | S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Done | knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-co... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
+| S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -320,6 +321,7 @@ Current tickets: `[#################---]` 255 of 295
 
 ## Recent activity
 
+- 2026-11-16 12:35 **S14-33** lead answer: Lead cherry-picked 8d846ffe (the S14-23 wip: converter, w10 scatter measurements t1/t2/t4, kernels, case, tests) onto s14/S14-33 in your worktree. ...
 - 2026-11-16 12:34 **S14-33** engineer ask: Required first step blocked: git cherry-pick 8d846ffe (head of s14/S14-23) fails with Unable to create C:/Users/xuzhi/Documents/gcc_knc/.git/worktr...
 - 2026-11-16 12:31 **S14-35** lead approve: knc-twin prepare-native runs each kernel on its own stack (the kernel's in-image stack, or a private per-context stack) and restores the driver's s...
 - 2026-11-16 12:12 **S14-35** lead resume: lead cleaned main; approving
@@ -327,13 +329,12 @@ Current tickets: `[#################---]` 255 of 295
 - 2026-11-16 12:09 **S14-35** engineer submit: prepare-native keeps the kernel's own stack when it lies in the memory image and otherwise gives each context a private stack, with the memory imag...
 - 2026-11-16 12:08 **S14-35** lead answer: sessions 13 -> 15 for the submit only. Run: pm.py submit S14-35 --note 'prepare-native keeps the kernel's own stack when it lies in the memory imag...
 - 2026-11-16 12:07 **S14-35** lead resume: lead: branch reviewed and merged with main; routing to the engineer for the submit
-- 2026-11-16 12:06 **S14-35** lead defer: Interactive lead: the branch (head 24b650f8) holds the reviewed fix (per-context saved-rsp slots and private stacks, knc_twin_mem 4 KiB aligned, te...
 
 ## Cost
 
 - From the script, engineer: 796 sessions, 1669.7M input tokens
 - From the script, lead: 540 sessions, 152.2M input tokens
-- Started by hand, Claude: 30 sessions, 4352.8M input tokens
+- Started by hand, Claude: 30 sessions, 4355.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
