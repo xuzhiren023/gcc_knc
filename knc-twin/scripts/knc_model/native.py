@@ -188,6 +188,7 @@ static const int n_expects = %(n_expects)d;
 
 typedef void (*kfn)(void);
 static kfn kernels[] = { %(kernels)s };
+static const int context_ids[] = { %(context_ids)s };
 static const int n_ctx = %(n_ctx)d;
 static const int unit_count = %(unit_count)d;
 static uint64_t shared_start, finish_ticks[%(n_ctx)d];
@@ -278,7 +279,7 @@ int main(int argc, char **argv) {
         for (int c = 0; c < n_ctx; c++) { ta[c].ctx = c; ta[c].cpu = cpu[c]; ta[c].reps = reps; ta[c].bar = &bar; if (pthread_create(&th[c], NULL, worker, &ta[c])) { fprintf(stderr, "pthread_create failed\n"); exit(2); } }
         double worst = 0;
         for (int c = 0; c < n_ctx; c++) { pthread_join(th[c], NULL); if (ta[c].median_ticks > worst) worst = ta[c].median_ticks;
-            printf("{\"group\":%%d,\"ctx\":%%d,\"cpu\":%%d,\"ticks_per_call\":%%.3f,\"ticks_per_unit\":%%.3f}\n", g, c, ta[c].cpu, ta[c].median_ticks, ta[c].median_ticks / unit_count); }
+            printf("{\"group\":%%d,\"ctx\":%%d,\"cpu\":%%d,\"ticks_per_call\":%%.3f,\"ticks_per_unit\":%%.3f}\n", g, context_ids[c], ta[c].cpu, ta[c].median_ticks, ta[c].median_ticks / unit_count); }
         qsort(envelope_samples, 21, sizeof envelope_samples[0], cmpu64);
         group_medians[g] = (double)envelope_samples[10] / reps;
         printf("{\"group\":%%d,\"completion_envelope_ticks_per_call\":%%.3f,\"worst_thread_median\":%%.3f}\n", g, group_medians[g], worst);
@@ -350,6 +351,7 @@ def prepare_native(kernel, profile, out_dir, kernel_hash, prediction_path=None):
         "expect_entries": ", ".join(entries) if entries else "{0,0,0,0,0}",
         "n_expects": len(entries),
         "kernels": ", ".join("knc_twin_kernel_ctx%d" % s.context for s in kernel.streams),
+        "context_ids": ", ".join(str(s.context) for s in kernel.streams),
         "n_ctx": len(kernel.streams),
         "unit_count": kernel.unit_count,
     }
@@ -380,6 +382,21 @@ def prepare_native(kernel, profile, out_dir, kernel_hash, prediction_path=None):
             "Import the measurement with: knc_twin.py import-native measurement.json --request request.json --out <dir>",
         ],
     }
+    if kernel.multicore:
+        request["requested_measurements"] = [{
+            "threads": len(kernel.streams), "metric": "completion_envelope_ticks_per_call",
+            "groups": 5, "batches_per_group": 21, "warmup_batches": 3,
+            "accept_if_spread_pct_below": 2.0,
+            "placement": "explicit --cpus list in stream order, or exactly the granted sched_getaffinity set",
+            "streams": [{"worker": i, "core": s.core, "context": s.local_context,
+                         "state_slot": s.context} for i, s in enumerate(kernel.streams)],
+        }]
+        request["notes"].extend([
+            "Multicore envelope includes the shared-start barrier and ends after all worker completion fences; report start skew separately when comparing a different driver.",
+            "One worker per supplied CPU; no implicit replication of a four-context kernel. Generate matching streams for 1/2/4/8/16/30/60 cores and each sibling count.",
+            "Repeated calls retain data in cache. Cold-memory and remote-owner experiments require explicit cache/ownership preconditioning by the queue operator; this skeleton does not implement handoffs.",
+            "Multicore envelope rows are not core latency measurements; do not import them as core profile parameters.",
+        ])
     request["request_hash_sha256"] = sha256_of_obj({k: v for k, v in request.items() if k != "created_utc"})
     dump_json(request, os.path.join(out_dir, "request.json"))
     readme = """# knc-twin native request: %s
@@ -391,8 +408,12 @@ with register/memory setup and state save), driver.c (timing and correctness dri
 
 Procedure for the queue operator:
 1. Review kernel.S and driver.c. Build natively: `k1om-mpss-linux-gcc -O2 -pthread -o knc_twin_native driver.c kernel.S`.
-2. Run in an exclusive window with pinned siblings, e.g. `./knc_twin_native --reps 1000 --cpus 1` (1 thread),
-   `--cpus 1,2` (2 threads), `--cpus 1,2,3,4` (4 threads) for a kernel with that many contexts.
+2. Run in an exclusive window with exactly one CPU per generated stream, in stream order:
+   `./knc_twin_native --reps 1000 --cpus CPU0,CPU1,...`. Without `--cpus`, every granted
+   CPU from `sched_getaffinity` is used and the count must equal the generated stream count.
+   Single-core requests use pinned siblings; multicore requests state their placement separately.
+   The envelope includes the release barrier and all completion fences. Repeated calls retain
+   cache state; a cold-memory or remote-owner measurement needs operator preconditioning.
 3. Fill measurement.json (schema %s) with the summary lines, job id, date, clock policy;
    list parameters only if the kernel is a calibration microbenchmark whose result isolates them.
 4. `python knc_twin.py import-native measurement.json --request request.json --out <dir>`.

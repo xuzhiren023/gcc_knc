@@ -269,6 +269,17 @@ class Fabric(object):
         state["pending"].append(tx)
         if not state["busy"]:
             self._serve_line(state)
+        elif (i["operation"] == "read" and not state["pending"][0].done
+              and all(p.info["operation"] == "read" for p in state["pending"])):
+            # Compatible reads join the outstanding fill. Conflicting writes
+            # keep FIFO order; no sharer or cache copy is installed early.
+            primary = state["pending"][0]
+            state["active"].add(tx)
+            i.update(source="merged_read", source_core=primary.info["core"],
+                     response_path_hops=self.distance(self.placement[primary.info["core"]],
+                                                     self.placement[i["core"]]))
+            primary.then(lambda _: self.route(self.placement[primary.info["core"]],
+                         self.placement[i["core"]], "data", lambda: self._finish_line(tx, state)))
 
     def _serve_line(self, state):
         if not state["pending"]:
@@ -276,6 +287,7 @@ class Fabric(object):
             return
         state["busy"] = True
         tx = state["pending"][0]
+        state["active"] = {tx}
         i = tx.info
         core, td, op = i["core"], i["directory"], i["operation"]
         reqpos, tdpos = self.placement[core], self.td_positions[td]
@@ -370,11 +382,13 @@ class Fabric(object):
         tx.finish(self.now)
         # Data is usable now; directory serialization/credits release after ack.
         def acknowledged():
-            state["pending"].popleft()
+            state["pending"].remove(tx)
+            state["active"].discard(tx)
             self.outstanding[core] -= 1
             self._inject(core)
-            self._serve_line(state)
-            if i["background"] and not state["pending"]:
+            if not state["active"]:
+                self._serve_line(state)
+            if not state["pending"] and (i["background"] or not state["sharers"]):
                 self.lines[i["directory"]].pop(i["address"], None)
         self.route(self.placement[core], self.td_positions[i["directory"]], "ack", acknowledged)
 
@@ -386,6 +400,8 @@ class Fabric(object):
             self.request(core, address, "writeback")
         else:
             state["sharers"].discard(core)
+            if not state["sharers"] and not state["pending"]:
+                self.lines[self.directory(address)].pop(address, None)
 
     def flush(self):
         for table in self.lines:
@@ -760,7 +776,7 @@ def simulate(kernel, profile, traces, scale, max_cycles, deadline, record_issue=
         pred["symmetry_full_card_bytes_per_cycle"] = useful / max(1, envelope) * active / len(tiles)
     assumptions = ["61 contracted ring positions and assumed TD/channel maps; virtual addresses are physical surrogates",
                    "separate pipelined address/data/ack link queues (or explicit shared-fabric overlay); R01 pp.13,19,22 verified early guide, production stepping unspecified",
-                   "private inclusive LRU caches; reduced owner/sharer protocol; compatible reads serialize at TD",
+                   "private inclusive LRU caches; reduced owner/sharer protocol; compatible pending reads share a fill and forward its data",
                    "memory delay decomposed once; channel interval derived from sustained read calibration; banks/refresh/turnaround not simulated",
                    "background is synthetic prior-epoch traffic with excluded cold warmup, not additional executed work; symmetry stability and epoch sensitivity unvalidated"]
     for tile in tiles:

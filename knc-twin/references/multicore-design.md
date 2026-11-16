@@ -5,51 +5,89 @@ implementation contract and validation plan, not a simulation result. No native
 measurement, new parameter fit, or multi-core prediction was made in this phase.
 The scope is brief `codex-briefs/03-multicore-unit.md`; brief 02 owns `--jobs`.
 
-### Implementation checkpoint (2026-11-15)
+### Implementation and contention contract (2026-11-16)
 
-The first implementation adds a causal fabric, transaction handles, private tile
-memory backends and a shared cycle loop. The existing core loop's issue decision
-is extracted as `step`; pair/card formulas and existing profiles are unchanged.
-`multicore-assumed.json` is a separate automatic unit/ring overlay. Native driver
-changes for explicit placement, larger thread counts and a common completion
-envelope are provisional and have not been tested or staged.
+The shared implementation uses causal transaction handles, private tile memory
+backends and a global cycle loop. The existing core issue decision is extracted
+as `step`; pair/card formulas and core profiles are unchanged.
+`multicore-assumed.json` is an automatic unit/ring overlay. Pending compatible
+reads share one fill; writes serialize after the read group and its acknowledgements.
 
-Two unit-test attempts preceded this checkpoint. The first ran all ten approved
-CLI/protocol tests: CLI structure, functional cold copies, core register schedules,
-remote-owner routes, budgets, and ring-vs-unit/analytical behavior passed. Two
-conservation subcases had zero background traffic because rounding separately
-for every destination starved short streams. The contention relation also failed.
-The correction carries total per-background-core packet credits, distributing
-packets by cumulative destination debt; it does not change an offered traffic rate.
+The lead approved a test correction on 2026-11-15: a growth experiment must keep
+52 background cores while adding detailed tiles; fixed total active cores instead
+tests symmetry. The profile still defaults to 60 total active cores. The synthetic
+single-channel experiment uses 32 cold lines per tile, a 256-cycle channel interval
+and a 64-cycle background epoch. Results are **model predictions**, not native data:
 
-The second run reran only conservation and contention. Conservation passed for
-2/4/8 tiles. With the unchanged synthetic single-channel test (32 lines per tile,
-256-cycle channel interval, 60 total active cores, 64-cycle background epoch),
-mean detailed per-core completion cycles were:
+| Detailed tiles | Fixed 52 background: mean cycles | Fixed 60 total: mean cycles |
+|---|---:|---:|
+| 1 | 434200.2660092213 | 491544.2660092213 |
+| 2 | 442265.7660092213 | 491417.7660092213 |
+| 4 | 458395.2660092213 | 491163.2660092213 |
+| 8 | 490653.5160092213 | 490653.5160092213 |
 
-| Detailed tiles | Mean completion cycles (model prediction) |
-|---|---:|
-| 1 | 491544.2660092213 |
-| 2 | 491417.7660092213 |
-| 4 | 491163.2660092213 |
-| 8 | 490653.5160092213 |
+Growth is nondecreasing and strictly positive from one to eight detailed tiles.
+For fixed total load, abs(mean(N)-mean(1)) <= N times the channel interval,
+read from `parameters_used`. The small decrease is consistent with averaging the
+last channel batch over additional detailed completions. This replaces the earlier
+checkpoint hypothesis; it does not fit a hardware parameter. All detailed request
+counts, nonzero background service, and positive queue-wait assertions are retained.
 
-These fail the required nondecreasing/strict-growth assertion. Hypothesis, not
-hardware evidence: with fixed 60 total active cores, symmetry holds aggregate
-offered work approximately constant; averaging completion times of more detailed
-requests in the final channel batch lowers the mean by approximately half a
-service interval per added tile. Increasing total offered work by holding the
-background core count fixed would test contention growth without this averaging
-effect. The tests and approved 60-core policy have not been changed. Lead guidance
-is requested before another implementation/test attempt, per AGENTS.md.
+Test-correction commit: `6054f5ca`. Test log:
+`.work/_state/logs/S14_13_contention_contract-20261115-235831.log`.
 
-Logs: `.work/_state/logs/S14_13_multicore_green-20261115-233326.log` and
-`.work/_state/logs/S14_13_background_correction-20261115-233728.log`.
-No native runs, GCC builds, long comparisons, selftest or repository regression
-run at this checkpoint. Parameters documentation was regenerated. Native requests,
-held-out fixtures/predictions and the rest of Phase 2 remain incomplete. Compatible
-TD reads currently serialize rather than merge, and protocol tests beyond the
-approved red set still need implementation. This checkpoint is not acceptance.
+### Phase 2 continuation checkpoint
+
+Additional synthetic tests now cover compatible pending-read merging, a conflicting
+store waiting for the read group, delayed cache visibility, invalidation, dirty
+writeback, no-read traffic, link contention, independent channel service and all
+64 TD indices. The tests passed; the eviction fixture initially used an empty
+instruction list, was corrected to a NOP, and its affected test passed.
+The existing approved remote-route/conservation/CLI tests are unchanged.
+
+Native generation now carries explicit stream identities, more than four workers,
+CPU-affinity validation and a shared completion envelope. The added native and
+unsupported-sharing/event-budget tests passed. The `stage_multicore.py` generator
+and six calibration-plan entries are provisional. **No native request is staged
+successfully yet.** Two attempts stopped before native export:
+
+1. `S14_13_prepare_native`: unsupported `--check` (functional checking is already
+   the default). Removed that flag.
+2. `S14_13_prepare_native_fixed`: the output directory contains the generated
+   `input.json`, so the CLI's empty-output check rejects it. No third attempt.
+
+Reduced reproducer: write `native/multicore-ring-distance/input.json`, then run
+`knc_twin.py prepare-native <that input> --out native/multicore-ring-distance`.
+Proposed continuation: move the input alongside the output directory and use the
+CLI's documented overwrite option for the stable request directory; never create
+per-attempt directories. Check overwrite semantics before doing this.
+
+The generated read kernels are controls/skeletons, not yet cold-memory or
+remote-owner experiments: the minimal driver repeats warm calls and has no owner
+priming/handoff phases. Every request specification states this prerequisite;
+remote-write and ring-mixed are explicitly `needs-driver`. Clarify with the lead
+whether ring-distance can be submitted as this operator-preconditioned skeleton.
+Do not report the tiny warm working sets as memory or remote-L2 measurements.
+
+Logs under `.work/_state/logs/`:
+- `S14_13_remaining_protocol-20261116-000427.log` (two pass, fixture error)
+- `S14_13_eviction_fixture-20261116-000458.log` (affected test pass)
+- `S14_13_native_and_rejections-20261116-001022.log` (two pass)
+- `S14_13_prepare_native-20261116-001042.log` (argument rejection)
+- `S14_13_prepare_native_fixed-20261116-001121.log` (nonempty output rejection)
+
+Still required: native staging, schema/input documentation for core placement,
+recorded multicore predictions and open misses in validation.md, selftest and
+`tests/regress/test_knc_twin.py` (the latter invokes selftest too; avoid duplicate
+runs), and any applicable held-out comparison. The existing card fixtures are
+analytical stand-ins; do not use them as faithful multicore GEMV kernels. The
+measured GEMV winner has four row streams, unroll four, 8/64 prefetch, 11008 columns,
+1024-column windows, vector loads and scalar partial reductions, 120 threads and
+small pages, with completion fences/start skew included (knc-memory-bandwidth.md,
+S11-09). A faithful full-function prediction needs these details preserved.
+No profile parameters were edited in this continuation; the prior generated
+parameters.md remains current. No GCC build or card execution occurred.
+This checkpoint is not acceptance.
 
 ## Evidence and geometry
 
@@ -328,8 +366,10 @@ These are planned destinations, **not staged or executed requests**.
 The present `prepare-native` driver supports at most four contexts and checks
 them serially before timing (`scripts/knc_model/native.py`). It cannot yet express
 60-core saturation or concurrent handoff correctness. Extend it in Phase 2 to
-carry explicit placement, cooperative phases, a shared completion envelope and
-all CPUs from `sched_getaffinity` for long checks. Do not stage a four-context
+carry explicit placement, a shared completion envelope and
+all CPUs from `sched_getaffinity` for long checks. Per the lead answer on
+2026-11-15, cooperative handoff phases are outside this ticket; remote-write and
+ring-mixed remain specifications marked `needs-driver`. Do not stage a four-context
 request and claim it measures 60-core saturation. Unsupported lock/fence costs
 remain explicit. Requests retain calibration versus validation roles; the lead
 builds/runs them in coordinated card time. No card launch is authorized here.

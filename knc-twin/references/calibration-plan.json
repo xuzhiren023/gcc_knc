@@ -229,6 +229,96 @@
       ],
       "variants": "9, 10 and 12 lines of one L1 set read round-robin and in a random order",
       "why": "the S12-30 small cases are predicted 14 to 18% slow, most of it L1 conflict misses of the random column accesses"
+    },
+    {
+      "id": "multicore-ring-distance",
+      "status": "request-skeleton",
+      "role": "calibration; reserve separate prospective validation rows",
+      "parameters": [
+        "ring.hop_cycles",
+        "td.lookup_cycles",
+        "multicore.remote_endpoint_residual_cycles"
+      ],
+      "settles": "Owner/requester candidate distances 1/15/30, both directions; repeat allocations and pairs.",
+      "variants": "Owner/requester candidate distances 1/15/30, both directions; repeat allocations and pairs.",
+      "prerequisites": "Two shared read streams are the generated control. Before the measured first read, the operator must pin and prime a remote owner, evict requester copies, and record actual placement uncertainty. Warm repeated calls are NOT remote-L2 latency. No handoff framework is implemented.",
+      "why": "S14-13 assumed geometry/service/background parameters need independent native evidence; no card result has been produced.",
+      "request_path": ".work/_shared/S14-13/native/multicore-ring-distance",
+      "body": []
+    },
+    {
+      "id": "multicore-channel-saturation",
+      "status": "request-skeleton",
+      "role": "calibration; reserve separate prospective validation rows",
+      "parameters": [
+        "memory.channel_service_cycles_per_line",
+        "memory.channel_interleave"
+      ],
+      "settles": "1/2/4/8/16/30/60 cores; candidate one-channel addresses versus balanced addresses, fixed siblings and page mode.",
+      "variants": "1/2/4/8/16/30/60 cores; candidate one-channel addresses versus balanced addresses, fixed siblings and page mode.",
+      "prerequisites": "Generated 60-core candidate stride is single-channel only under the assumed line-modulo map. Discover or bound physical mapping, use a footprint exceeding caches or explicit cold preconditioning, regenerate streams for each count, and retain completed line counts. Repeated tiny warm calls do not measure DRAM saturation.",
+      "why": "S14-13 assumed geometry/service/background parameters need independent native evidence; no card result has been produced.",
+      "request_path": ".work/_shared/S14-13/native/multicore-channel-saturation",
+      "body": []
+    },
+    {
+      "id": "multicore-td-contention",
+      "status": "request-skeleton",
+      "role": "calibration; reserve separate prospective validation rows",
+      "parameters": [
+        "td.initiation_cycles",
+        "td.interleave"
+      ],
+      "settles": "Common candidate TD versus dispersed TD, matching channel distribution and offered load.",
+      "variants": "Common candidate TD versus dispersed TD, matching channel distribution and offered load.",
+      "prerequisites": "Generated 60-core addresses select one slice under the assumed XOR map, not a verified hardware hash. Operator must establish candidate address sets and cold preconditioning; compare channel-matched controls.",
+      "why": "S14-13 assumed geometry/service/background parameters need independent native evidence; no card result has been produced.",
+      "request_path": ".work/_shared/S14-13/native/multicore-td-contention",
+      "body": []
+    },
+    {
+      "id": "multicore-symmetry",
+      "status": "request-skeleton",
+      "role": "calibration; reserve separate prospective validation rows",
+      "parameters": [
+        "multicore.background_epoch_cycles",
+        "memory.channel_service_cycles_per_line"
+      ],
+      "settles": "Matched 1/2/4/8-core and 60-core STREAM; fixed background levels; reserve prospective STREAM/GEMV validation.",
+      "variants": "Matched 1/2/4/8-core and 60-core STREAM; fixed background levels; reserve prospective STREAM/GEMV validation.",
+      "prerequisites": "Generated balanced read skeleton has 60 workers. Regenerate per requested count and sibling placement; use matched long cold footprints, 4 KiB pages and synchronized completed work. No 1/2/4/8 native rows currently exist; do not interpolate.",
+      "why": "S14-13 assumed geometry/service/background parameters need independent native evidence; no card result has been produced.",
+      "request_path": ".work/_shared/S14-13/native/multicore-symmetry",
+      "body": []
+    },
+    {
+      "id": "multicore-remote-write",
+      "status": "needs-driver",
+      "role": "calibration; reserve separate prospective validation rows",
+      "parameters": [
+        "memory.write_read_service_ratio"
+      ],
+      "settles": "Exclusive/clean-shared/dirty-owner handoffs; partial/full ordinary and no-read stores.",
+      "variants": "Exclusive/clean-shared/dirty-owner handoffs; partial/full ordinary and no-read stores.",
+      "prerequisites": "Needs cooperative ownership handoff/publication driver, outside S14-13 per lead 2026-11-15.",
+      "why": "S14-13 assumed geometry/service/background parameters need independent native evidence; no card result has been produced.",
+      "request_path": null,
+      "body": []
+    },
+    {
+      "id": "multicore-ring-mixed",
+      "status": "needs-driver",
+      "role": "calibration; reserve separate prospective validation rows",
+      "parameters": [
+        "ring.shared_fabrics",
+        "memory.write_read_service_ratio"
+      ],
+      "settles": "Read/write and remote-only mixtures with matched destinations.",
+      "variants": "Read/write and remote-only mixtures with matched destinations.",
+      "prerequisites": "Needs phase and traffic-mixture driver, outside S14-13 per lead 2026-11-15.",
+      "why": "S14-13 assumed geometry/service/background parameters need independent native evidence; no card result has been produced.",
+      "request_path": null,
+      "body": []
     }
   ],
   "open_misses": [

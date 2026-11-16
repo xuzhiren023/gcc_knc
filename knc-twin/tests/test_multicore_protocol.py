@@ -198,6 +198,69 @@ class TestMulticoreProtocol(unittest.TestCase):
                 self.assertEqual(sum(c["detailed_served"] for c in controllers), count * 32)
                 self.assertGreater(sum(c["background_served"] for c in controllers), 0)
 
+    def test_pending_reads_merge_and_conflicting_store_waits(self):
+        from knc_model.multicore import Fabric
+        fabric = Fabric(helpers.profile(), {0: 0, 1: 1, 2: 2})
+        first = fabric.request(0, 0, "read")
+        second = fabric.request(1, 0, "read")
+        store = fabric.request(2, 0, "write")
+        fabric.advance(20)
+        self.assertFalse(first.done)
+        self.assertFalse(second.done)
+        self.assertEqual(fabric.lines[0][0]["sharers"], set())
+        fabric.drain()
+        self.assertEqual(second.result()["source"], "merged_read")
+        self.assertEqual(sum(c["read_transactions"] for c in fabric.controllers), 1)
+        self.assertGreater(store.result()["completed_cycle"], second.result()["completed_cycle"])
+        self.assertEqual(fabric.lines[0][0]["owner"], 2)
+        self.assertEqual(fabric.lines[0][0]["sharers"], {2})
+
+    def test_rfo_no_read_and_dirty_eviction_accounting(self):
+        from knc_model.multicore import Fabric, TileMemory
+        fabric = Fabric(helpers.profile(), {0: 0, 1: 15})
+        kernel = helpers.kernel([{"op": "nop"}], scenario={"memory": {"type": "line_tracking", "cold_level": "memory"}})
+        caches = [TileMemory(kernel.scenario, fabric.p, lambda _: None, fabric, c) for c in (0, 1)]
+        first = caches[0]._fetch(0, "read")
+        self.assertIsNone(caches[0].l2.lookup(0))
+        fabric.drain()
+        self.assertIsNotNone(caches[0].l2.lookup(0))
+        caches[1]._fetch(0, "write")
+        fabric.drain()
+        self.assertIsNone(caches[0].l1.lookup(0))
+        self.assertIsNone(caches[0].l2.lookup(0))
+        fabric.evict(1, 0)
+        fabric.drain()
+        self.assertEqual(sum(c["read_transactions"] for c in fabric.controllers), 1)
+        self.assertEqual(sum(c["write_transactions"] for c in fabric.controllers), 1)
+        self.assertNotIn(0, fabric.lines[0])
+        nr = fabric.request(0, 64, "no_read")
+        fabric.drain()
+        self.assertEqual(nr.result()["memory_transactions"], 1)
+        self.assertEqual(sum(c["read_transactions"] for c in fabric.controllers), 1)
+        self.assertEqual(sum(c["write_transactions"] for c in fabric.controllers), 2)
+        self.assertTrue(first.done)
+
+    def test_links_contend_and_channels_overlap(self):
+        from knc_model.multicore import Fabric
+        fabric = Fabric(helpers.profile(), {0: 0, 1: 30})
+        arrivals = []
+        fabric.route(0, 15, "data", lambda: arrivals.append(fabric.now))
+        fabric.route(0, 15, "data", lambda: arrivals.append(fabric.now))
+        fabric.drain()
+        self.assertEqual(arrivals[1] - arrivals[0], fabric.data)
+        self.assertTrue(any(s["wait_cycles"] > 0 for s in fabric.link_stats.values()))
+        # Remove route asymmetry, retaining real channel queues and service.
+        fabric = Fabric(helpers.profile(), {0: 0}, scenario={"td_positions": [0] * 64,
+                        "controller_positions": [0] * 8})
+        fabric.interval = 256
+        a = fabric.request(0, 0, "read")
+        b = fabric.request(0, 64, "read")
+        c = fabric.request(0, 1024, "read")
+        fabric.drain()
+        self.assertEqual(c.result()["completed_cycle"] - a.result()["completed_cycle"], 256)
+        self.assertLess(b.result()["completed_cycle"], c.result()["completed_cycle"])
+        self.assertEqual({fabric.directory(i * 64) for i in range(64)}, set(range(64)))
+
     def test_background_changes_ring_but_not_analytical_scales(self):
         raw = read_kernel(2, False)
         unit = self.prediction(raw, "unit")

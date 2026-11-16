@@ -176,6 +176,42 @@ class TestMulticoreCLI(unittest.TestCase):
                 self.assertIsNone(result.get("prediction"))
                 self.assertIn("partial", result)
 
+    def test_multicore_native_request_has_explicit_workers_and_envelope(self):
+        from knc_model.kernel import Kernel
+        from knc_model.native import prepare_native
+        raw = register_kernel(8, 2)
+        # Sparse state slots differ from dense worker IDs.
+        with tempfile.TemporaryDirectory() as work:
+            req = prepare_native(Kernel(raw, None), helpers.profile(), work, "synthetic-test")
+            row = req["requested_measurements"][0]
+            self.assertEqual(row["threads"], 16)
+            self.assertEqual(row["metric"], "completion_envelope_ticks_per_call")
+            self.assertEqual([s["state_slot"] for s in row["streams"]],
+                             [c * 4 + t for c in range(8) for t in (0, 1)])
+            with open(os.path.join(work, "driver.c")) as f:
+                driver = f.read()
+            self.assertIn("finish_ticks[16]", driver)
+            self.assertIn("sched_getaffinity", driver)
+            self.assertIn("context_ids[c]", driver)
+            with open(os.path.join(work, "kernel.S")) as f:
+                asm = f.read()
+            self.assertIn("knc_twin_kernel_ctx29:", asm)
+            self.assertIn(".zero 61440", asm)
+
+    def test_shared_writes_and_event_budget_return_no_prediction(self):
+        raw = copy_kernel(2)
+        # Core 1 now reads core 0's output: sequential traces cannot model this.
+        raw["streams"][1]["init"]["registers"]["rax"] = 0x108000
+        code, result, diagnostic = self.invoke("simulate", raw, "--scale", "unit")
+        self.assertEqual(result["status"], "unsupported", diagnostic)
+        self.assertIsNone(result.get("prediction"))
+        raw = copy_kernel(2)
+        raw["scenario"]["multicore"] = {"max_events": 1}
+        code, result, diagnostic = self.invoke("simulate", raw, "--scale", "unit")
+        self.assertEqual(code, 5, diagnostic)
+        self.assertEqual(result["status"], "budget_exhausted")
+        self.assertIsNone(result.get("prediction"))
+
 
 if __name__ == "__main__":
     unittest.main()
