@@ -50,70 +50,26 @@ miss-dominated loop.
 
 ## Scheduling explorer (`schedule`)
 
-`schedule <kernel> --method beam --max-states 4096 --beam-width 8 --seed 17`
-explores one straight-line block or a selected loop body of at most 60 static
-instructions. The final back branch remains last; labels, physical-register
-RAW/WAR/WAW, flags, MXCSR observations, explicit dependencies, x87 stack order
-and possibly aliasing stores constrain the order. Interior labels and control
-transfers are rejected. All candidate cycles come from functional tracing and
-the unchanged timing engine, including the surrounding function when present.
-
-The pruning bound is an **invariant resource subset of the trace lower bound**:
-issue events, same-context spacing and L1 ports. UV-both instructions prevent
-pairing but do not add an extra issue event. Dependency and memory-concurrency
-terms of the original execution are excluded: a reordered prefetch can change
-memory timing. Prefix simulation ranks the beam; it is not used as a lower
-bound. A global bound hit can stop a long search, but does not set
-`space_exhausted`. The bound is conditional on the model, not a card guarantee.
-
-`max_states` counts expanded beam prefixes; each considers at most the body
-length in ready successors. Width limits the retained frontier at each depth.
-The baseline and a lookahead list seed are evaluated before beam expansion;
-`list_steps` reports that fixed preparation cost, and `orders_evaluated` counts
-distinct full orders including the baseline. Work is deterministic for fixed
-input, profile, seed, width, lookahead and state budget. No wall-clock cutoff
-decides which candidate wins. Beam truncation and budget exhaustion are recorded.
-`space_exhausted` is true only if all legal orders were explored without either
-truncation. Otherwise this is best found, not a proven optimum; a bound match
-is reported separately. Status `ok` means the returned complete candidate was
-evaluated successfully, even if the beam's search budget ended.
-
-`--method list --lookahead 8` chooses among a bounded number of ready operations
-using prefix timing, dependency heights and a preference to leave an eligible
-compare adjacent to the final jump. It supports bodies beyond 60 instructions.
-Beam reports `list_cycles` and `best_minus_list_cycles` for comparison. Neither
-list scheduling nor beam ordering is a claim about real out-of-order hardware.
-
-`--method modulo --max-states 4096` starts at the existing loop MII and tries
-each increasing integer II. It greedily places the selected executable order
-in cyclic slots, allowing stages. Each attempted cycle placement consumes one
-state. It enforces zero/distance-one hazards, declared memory-carried edges,
-profile latency/AGI, U/V pairing, cyclic context spacing, L1 ports, x87 occupancy
-and memory-operand context holds. Failed greedy placements do not prove that
-an II is infeasible; the achieved II is never claimed minimal. A state limit
-before a complete feasible placement returns `budget_exhausted`, not a partial
-schedule presented as a result.
-
-Modulo estimates assume steady-state L1, without decode or branch-refill
-stalls; unusual resources (gather/scatter, fences, prefetches, no-read stores,
-division/control serialization) are explicitly unsupported in placement.
-X87 occupancy reservations are conservative, including the operand-load lead-in.
-Register live counts count distinct physical names from the representative
-functional iteration, not register allocation or renamed value versions.
-There is no prologue, epilogue or rotating-register generation. Actual simulation
-executes the reordered kernel under its original scenario; the reported
-`simulation_minus_estimate_cycles_per_iteration` makes that distinction explicit.
-Per-iteration simulation is whole-trace completion divided by actual selected
-back-branch executions, so includes entry, exit and any surrounding loops.
-
-Both baseline and candidate discard obsolete binary-layout metadata. A declared
-validated shape is removed when that metadata was present; such candidates are
-`unvalidated_scenario_estimate` until the new assembly is built and reimported.
-For inputs without layout, the usual shape/profile classification applies.
-Exports include `candidate.s` (via `asm.emit_gas`), `candidate.json`, the
-normalized baseline and a frozen-profile batch manifest; the existing `batch`
-command evaluates those kernels without any new ranking or timing rules.
-
+Beam covers up to 60 instructions. Its pruning bound uses only invariant trace
+issue, same-context spacing and L1-port terms; UV-both prevents pairing without
+adding an issue event. Order-sensitive dependency/memory terms are excluded.
+Prefix timing ranks candidates, never bounds them. This is a conditional model bound.
+`max_states` counts expanded prefixes, each with at most body-length successors;
+`beam_width` limits retained prefixes. The baseline/list seed is separate fixed
+preparation (`list_steps`); `orders_evaluated` includes baseline. Fixed input,
+profile, seed and budgets give deterministic work, without wall-clock selection.
+`space_exhausted` requires every legal order explored without width/budget truncation.
+A long-search bound hit is reported separately. Otherwise the result is best found,
+not proven optimal; `ok` means a complete evaluated candidate, even after a budget hit.
+List supports longer bodies with bounded `lookahead`; beam reports `list_cycles` and its delta.
+Modulo tries integer IIs from existing MII upward, greedily placing a fixed order.
+Each attempted cycle consumes a state; failure at a smaller II proves no infeasibility.
+Checks cover carried hazards, declared memory recurrences, latency/AGI, U/V pairing,
+cyclic spacing, L1 ports and x87 occupancy/holds from the timing engine. X87 resource
+reservations conservatively include operand-load lead-in. Estimates assume L1 with
+no decode/refill stalls. Gather/scatter, prefetch, fences, no-read stores and serial
+division/control resources are unsupported. No II is claimed minimal; placement
+budget exhaustion yields `budget_exhausted`. Methods/output: `scheduling-explorer.md`.
 ## Reading a result
 
 `binding_term` names the constraint that sets the bound. Compare it with the simulated
