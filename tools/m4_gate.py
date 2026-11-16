@@ -26,6 +26,8 @@ import m4_score as scoring
 PREFIX_REVISION = 'b2ce6a9eebf'
 DISCLOSURE = ('Serial -O2 GCC-KNC versus GCC 5.1.1, with the SQLite donor assembly exception. '
               '3100/5100 model cores and memory on a 7120, not clock or per-core bandwidth.')
+FULL_ONLY_DISCLOSURE = ('Serial -O2 GCC-KNC versus GCC 5.1.1, with the SQLite donor assembly exception. '
+                        '7120 full profile only (owner decision, ADR-0015 amendment 1); 3100/5100 not run.')
 CONTROLS = ('PB-gemm', 'STREAM', 'NPB-CG', 'HPCG', 'zlib', 'SQLite')
 # Transport-failure resume (ADR-0015 protocol note): a launch that observed no
 # workload result is attempted again, at most this many attempts in all.
@@ -653,7 +655,11 @@ def score(args):
     _, spec = load_freeze(args.stage)
     models, failures = {}, []
     policies = []
-    for profile, model in (('full','7120'), ('3100','3100'), ('5100','5100')):
+    # --profiles full: the frozen rules on the 7120 full profile only, on the
+    # owner decision in ADR-0015 amendment 1; 3100/5100 are not read at all.
+    full_only = getattr(args, 'profiles', 'all') == 'full'
+    scored = (('full','7120'),) if full_only else (('full','7120'), ('3100','3100'), ('5100','5100'))
+    for profile, model in scored:
         blocks = ['initial', 'extension'] if args.extended else ['initial']
         rows = []
         expected = []
@@ -701,13 +707,17 @@ def score(args):
         models[model] = programs
     if policies and any(p != policies[0] for p in policies):
         failures.append(dict(reason='clock/power policy changed across the gate'))
+    disclosure = FULL_ONLY_DISCLOSURE if full_only else DISCLOSURE
     if failures:
-        report = dict(held_out=True, ready=False, passed=False, failures=failures, disclosure=DISCLOSURE)
+        report = dict(held_out=True, ready=False, passed=False, failures=failures, disclosure=disclosure)
+        if full_only:
+            report.update(profiles=['full'], owner_decision=scoring.FULL_ONLY_DECISION)
     else:
         review_file = c.sealed_dir(args.stage) / 'reviewed-causes.json'
         reviews = json.loads(review_file.read_text()) if review_file.exists() else {}
-        report = scoring.score_models(models, primary_spec=spec, known_causes=reviews)
-        report.update(ready=True, disclosure=DISCLOSURE)
+        report = scoring.score_models(models, primary_spec=spec, known_causes=reviews,
+                                      full_only=full_only)
+        report.update(ready=True, disclosure=disclosure)
         report['owner_target_misses'] = [dict(model=model, program=p,
             status='found; held out, never tuned' if p in c.HELD_OUT else 'development defect')
             for model, result in report['models'].items() for p, value in result['programs'].items() if value['speedup'] <= 1.]
@@ -729,6 +739,9 @@ def main():
     parser.add_argument('--from', dest='source', metavar='PREFIX',
                         help='adopt: preserved block prefix, e.g. aborted-2 for aborted-2-initial-full')
     parser.add_argument('--extended', action='store_true')
+    parser.add_argument('--profiles', choices=('all','full'), default='all',
+                        help='score: "full" scores the 7120 full profile only '
+                             '(owner decision, ADR-0015 amendment 1); default all three')
     parser.add_argument('--timeout', type=int, default=3600)
     args = parser.parse_args()
     args.stage = args.stage.resolve()

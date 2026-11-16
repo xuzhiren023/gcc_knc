@@ -70,6 +70,57 @@ class GateReadiness(unittest.TestCase):
                 self.assertTrue(not report['ready'] and not report['passed'])
             self.assertNotIn('speedup',output.getvalue())
 
+    def test_gate_scores_full_profile_only_on_explicit_owner_flag(self):
+        import m4_gate as gate
+        import m4_score as scorer
+        from dataclasses import asdict
+        spec = scorer.freeze_primary_spec({level: dict(assembled=True,diagnostic='')
+                                           for level in scorer.SQLITE_LEVELS})
+        with tempfile.TemporaryDirectory() as temporary:
+            stage = Path(temporary)
+            rows = gate.schedule('full')
+            for row in rows:
+                speedup = 1.0 if row['program'] == 'PB-gemm' else 1.5
+                row.update(check='pass',time_seconds=3. if row['compiler']==corpus.DONOR else 3./speedup,
+                           primary=json.loads(json.dumps(asdict(spec[row['program']]))),
+                           flags=list(spec[row['program']].donor_flags if row['compiler']==corpus.DONOR
+                                      else spec[row['program']].new_flags),
+                           timing=dict(utc_start_ns=row['launch_order']+1),
+                           lead_environment_policy=dict(lead_verified=True,exclusive_window='fixture',
+                                                        clock_power_policy='fixed fixture'),
+                           environment=dict(start={}))
+            records = {'initial-full-checked.jsonl': rows}  # 3100/5100 were never run
+            asked = []
+            def read(stage, name):
+                asked.append(name)
+                return records.get(name, [])
+            def run(profiles):
+                gate.score(SimpleNamespace(stage=stage,extended=False,profiles=profiles))
+                return json.loads((stage/'score.json').read_text())
+            with patch.object(gate,'load_freeze',return_value=({},spec)), \
+                    patch.object(gate,'check_block',return_value=True), \
+                    patch.object(corpus,'read_partition',side_effect=read), \
+                    patch.object(corpus,'sealed_dir',return_value=stage), \
+                    patch.object(scorer,'SEALED_ROOT',stage), redirect_stdout(io.StringIO()):
+                report = run('full')
+                self.assertTrue(report['ready'] and report['pass'])
+                self.assertEqual((report['profiles'], list(report['models'])), (['full'], ['7120']))
+                self.assertIn('amendment 1', report['owner_decision'])
+                self.assertEqual(report['models']['7120']['draws'], 10000)
+                self.assertEqual(report['models']['7120']['seed'], 1514)
+                self.assertEqual(asked, ['initial-full-checked.jsonl'])
+                self.assertEqual([(r['model'], r['program']) for r in report['owner_target_misses']],
+                                 [('7120', 'PB-gemm')])
+                last = rows.pop()  # a missing full launch still fails the full-only score
+                report = run('full')
+                self.assertTrue(not report['ready'] and not report['passed'])
+                self.assertEqual(report['profiles'], ['full'])
+                rows.append(last)
+                report = run('all')  # default still requires 3100 and 5100
+                self.assertFalse(report['ready'])
+                self.assertNotIn('profiles', report)
+                self.assertEqual({f['profile'] for f in report['failures']}, {'3100', '5100'})
+
     def test_initial_and_extension_have_exact_pairs_and_separate_profiles(self):
         import m4_gate as gate
         for profile in ('full', '3100', '5100'):
