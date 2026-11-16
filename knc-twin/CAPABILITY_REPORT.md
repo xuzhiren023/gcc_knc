@@ -56,6 +56,11 @@ Captures live under `fixtures/tables/`, load lazily, and are selected explicitly
 kernel numerical policy; no measured table or new timing value is bundled. Synthetic table
 tests establish importer and lookup behavior, not hardware agreement. The WRF call template
 is `fixtures/wrf-calls.json`, with assumed illustrative costs and explicit functional models.
+Heap calls now use a declared `init.heap` bump allocator: aligned distinct addresses,
+calloc zero filling, realloc copying, and no-op free. Allocation sizes and summed charged
+stub cycles are reported. Costs remain assumed and results using stubs remain unvalidated
+scenario estimates. The `libc-calls` plan and `fixtures/libc-calls.json` stage a post-M4
+native smoke request; separate measurements are still needed for each call and byte cost.
 See `references/input-format.md` for report fields, loop selection, indirect-branch assumptions
 and capture format.
 

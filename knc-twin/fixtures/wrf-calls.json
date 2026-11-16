@@ -50,16 +50,36 @@
   },
   "malloc": {
     "cycles": 100,
-    "model": "none",
+    "model": "malloc",
     "status": "assumed",
     "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
-    "note": "No allocation is modeled; include an implementation or supply a region with allocated live-in data."
+    "note": "Declared init.heap bump allocator; 64-byte alignment, no address reuse, free is a no-op."
   },
   "free": {
     "cycles": 100,
-    "model": "none",
+    "model": "free",
     "status": "assumed",
     "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
-    "note": "No allocator state or memory effect is modeled."
+    "note": "Declared init.heap bump allocator; 64-byte alignment, no address reuse, free is a no-op."
+  },
+  "calloc": {
+    "cycles": 100,
+    "model": "calloc",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Declared init.heap bump allocator; 64-byte alignment, no address reuse, free is a no-op."
+  },
+  "realloc": {
+    "cycles": 100,
+    "model": "realloc",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost.",
+    "note": "Declared init.heap bump allocator; 64-byte alignment, no address reuse, free is a no-op."
+  },
+  "powf": {
+    "cycles": 100,
+    "model": "libm.f32.pow",
+    "status": "assumed",
+    "source": "Illustrative template cost only; replace with a measured or explicitly justified scenario cost."
   }
 }

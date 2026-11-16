@@ -387,6 +387,8 @@ class Interpreter(object):
         self.contexts = {}
         self.steps = {}
         self.stub_calls = {}
+        self.heap = None
+        self.heap_allocations = []
         self.approximate_stubs = set()
         self.approximate_instructions = set()
         from .reciprocal_tables import Tables

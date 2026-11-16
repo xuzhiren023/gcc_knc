@@ -238,6 +238,8 @@ def cmd_functional(args):
         r["assumptions"].extend(interp.assumptions)
         r["prediction"] = {"dynamic_instructions": steps, "contexts": len(kernel.streams), "functional_check_status": check["status"],
                            "checked_items": check["checked"], "mismatches": len(check["mismatches"])}
+        if interp.heap_allocations:
+            r["prediction"]["heap_allocations"] = interp.heap_allocations
         final = {str(c): interp.contexts[c].snapshot() for c in interp.contexts}
         dump_json(final, os.path.join(out, "final-state.json"))
         dump_json({"memory": interp.memory.snapshot()}, os.path.join(out, "final-memory.json"))
@@ -307,22 +309,28 @@ def _simulate_core(kernel, prof, args, r):
             "active_contexts": res["active_contexts"], "per_context": res["per_context"], "memory": res["memory"],
             "kind": "timing_prediction_core_cycles"}
     pred["frontend"] = res.get("frontend")
+    if res["stub_costs"]:
+        pred["stub_cycles_total"] = res["stub_cycles_total"]
+        pred["stub_calls"] = {n: dict(cost, cycles_each=kernel.calls[n].get("cycles"),
+                                    cycles_per_byte=kernel.calls[n].get("cycles_per_byte", 0),
+                                    model=kernel.calls[n].get("model", "none"),
+                                    status=kernel.calls[n].get("status", "assumed"),
+                                    source=kernel.calls[n].get("source"))
+                              for n, cost in sorted(res["stub_costs"].items())}
     interp = getattr(args, "_interp", None)
     args._interp = None
     if interp is not None:
         if interp.input_files:
             pred["input_files"] = interp.input_files
-        if interp.stub_calls:
-            pred["stub_calls"] = {n: {"calls": c, "cycles_each": kernel.calls[n].get("cycles"), "model": kernel.calls[n].get("model", "none"),
-                                      "status": kernel.calls[n].get("status", "assumed"), "source": kernel.calls[n].get("source")}
-                                  for n, c in sorted(interp.stub_calls.items())}
+        if interp.heap_allocations:
+            pred["heap_allocations"] = [a for a in interp.heap_allocations if a["context"] in traces]
         approx = sorted(interp.approximate_stubs) + sorted(interp.approximate_instructions)
         pred["functional_exactness"] = "exact" if not approx else "approximate: %s are not bit-exact (stub or approximate instruction)" % ", ".join(approx)
         if interp.approximate_instructions:
             pred["approximate_instructions"] = sorted(interp.approximate_instructions)
     pred["result_class"] = memory_result_class("simulate", kernel, prof, res["memory"].get("stats"), kernel.scenario)
-    if interp is not None and interp.stub_calls and pred["result_class"]["class"] == "calibrated_forecast":
-        pred["result_class"] = {"class": "unvalidated_scenario_estimate", "reasons": ["the region calls costed stubs (%s): their cycles are inputs, not validated model output" % ", ".join(sorted(interp.stub_calls))]}
+    if res["stub_costs"] and pred["result_class"]["class"] == "calibrated_forecast":
+        pred["result_class"] = {"class": "unvalidated_scenario_estimate", "reasons": ["the region calls costed stubs (%s): their cycles are inputs, not validated model output" % ", ".join(sorted(res["stub_costs"]))]}
     return sim, res, pred
 
 

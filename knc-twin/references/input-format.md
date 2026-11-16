@@ -67,16 +67,51 @@ not a production measurement); the YMM spelling is the supplied WRF object's dis
 
 ### WRF call template
 
-`fixtures/wrf-calls.json` declares all nine callees named in the WRF brief, including the three
+`fixtures/wrf-calls.json` declares the callees named in the WRF brief, including the three
 Fortran helpers, vector exp, scalar `expf`, and memory/allocator calls. Every cost is an
 illustrative 100 cycles with `status: assumed`; replace it with a measured or justified scenario
 cost before interpreting timing. `expf` uses `libm.f32.exp`; `memcpy` and `memset` use byte models.
-Vector exp, Fortran helpers and allocator calls use `none`, so results after those calls are
-approximate and no allocation is performed. Include real helper bodies for functional effects.
+Vector exp and Fortran helpers use `none`, so results after those calls are approximate.
+Include real helper bodies for their functional effects. `powf` uses `libm.f32.pow`.
+`malloc`, `calloc`, `realloc` and `free` use the functional heap models described below.
 
 ```
 python scripts/from_binary.py module_bl_mynnedmf.o --function __module_bl_mynnedmf_MOD_mynn_tendencies --objdump k1om-mpss-linux-objdump --calls fixtures/wrf-calls.json --report coverage.json --out mynn.json
 ```
+
+Add a disjoint heap region to the converted kernel, for example
+`"init": {"heap": {"addr": "0x10000000", "size": 16777216}}` (alongside its existing init
+fields). This is an explicit scenario, not a reproduction of the card's allocator. The four
+call models share one bump cursor across contexts. Returned addresses are rounded up to 64
+bytes; every allocation, including a zero-size allocation, reserves at least one aligned
+slot. `malloc` leaves bytes uninitialized; `calloc` initializes the product of its two sizes
+to zero. `realloc` allocates a distinct block and copies the smaller of the old and new sizes;
+`realloc(NULL,n)` allocates, and `realloc(p,0)` returns null without reclaiming storage.
+`free` is a no-op, including for null. The model never reuses addresses. Missing/invalid heap
+declarations, exhausted regions, size overflow, and unknown realloc pointers stop with
+`invalid_input`; it does not simulate allocation failure recovery. A calloc/copy effect over
+64 MiB per call is rejected to bound host work. The caller must keep the heap disjoint from
+initialized globals, stacks and other live-in memory. Normal uninitialized-read checks apply.
+
+Functional and simulation output record `heap_allocations` (address, requested size, context,
+model and bytes copied). Simulation output and its summary print `stub_cycles_total`, the
+sum of the actual charged call costs, including per-byte prices and integer rounding, over
+the selected contexts; `stub_calls` also gives each callee's total, cost status and source.
+This sum is not elapsed core time when contexts overlap. Use it to expose the assumed heap
+cost in a comparison against `-fstack-arrays`; simulate both complete variants because their
+memory behavior can also differ. Allocator internals are not simulated, and a result using
+stubs is an unvalidated scenario estimate. No assumed cost becomes a measurement.
+
+The `libc-calls` calibration-plan item includes malloc, free, memset/memcpy per byte, vector
+exp, expf and powf. Stage its aggregate ABI/link smoke skeleton with:
+
+```
+python scripts/knc_twin.py prepare-native fixtures/libc-calls.json --out <shared>/S14-11/libc-calls
+```
+
+The queue operator must split the named variants and baselines into isolated measurements,
+review the vector helper ABI, and link the project helper and libm. The aggregate request
+checks memory side effects; it cannot identify individual call costs. Card runs are lead-only.
 
 ### Importing scatter occupancy and reciprocal captures
 
