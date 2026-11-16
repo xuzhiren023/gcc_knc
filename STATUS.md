@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 12:02.
+Updated automatically at every ticket change. Last update: 2026-11-16 12:03.
 
-**Next: the tech lead, on S14-35.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-10 (knc-twin: --jobs N for independent simulations and PyPy support (roadmap item 1)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[#################---]` 254 of 295
 
@@ -161,7 +161,7 @@ Current tickets: `[#################---]` 254 of 295
 | S14-30 | WRF built with GCC-KNC runs 1.21x slower per step than PhiWeather's production build - attribute the gap per cause before fixing (M5, owner rule) | draft |  |
 | S14-31 | knc-twin multi-core usability: compare across scales, stubs and repeated calls at unit/ring scale, multi-context sampling, separated ring/memory stall shares | Not started |  |
 | S14-33 | knc-twin: import the window-11 calibration rows (imci-math latency and throughput, div10, x87 fcoms, rcp23/rsqrt23 tables) and retire the assumed parameters they settle | Not started |  |
-| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | Question for the tech lead | Submit refused because the branch lacks real changes from main: ask the lead to merge main into the ticket ... |
+| S14-35 | knc-twin prepare-native: the generated native program for PhiWeather's sixth_order_diffusion kernels segfaults on the card (exit 139 under claude-pin); find the cause, fix the generator, restage | lead | Interactive lead: submit is refused because s14/S14-35 has no changes against main (the fix at 34b662ae app... |
 | S14-37 | knc-twin x87 double rounding: _x87_binop rounds to the 64-bit significand and then to PC=53/24; real x87 rounds once (knc-boinc repro, 1 to 8 ULP errors) | Not started |  |
 | S14-38 | Card and twin dashboard - running card job, card queue and running twin work with remaining time, card temperature and utilization, host CPU, refreshed every 5 minutes | Done | A local dashboard (python tools/knc_dashboard.py serve) now shows the running card job, the card queue and ... |
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
@@ -320,6 +320,7 @@ Current tickets: `[#################---]` 254 of 295
 
 ## Recent activity
 
+- 2026-11-16 12:03 **S14-35** lead defer: Interactive lead: submit is refused because s14/S14-35 has no changes against main (the fix at 34b662ae appears already on main). Check git log mai...
 - 2026-11-16 12:02 **S14-35** engineer ask: Submit refused because the branch lacks real changes from main: ask the lead to merge main into the ticket branch. Please merge main into s14/S14-3...
 - 2026-11-16 12:01 **S14-35** owner decide: sessions 11 -> 13 for the submit only. The lead checked the branch head 34b662ae: per-context slots and stacks are in, test_native_emit and test_v0...
 - 2026-11-16 11:58 **S14-35** engineer escalate: budget: 11 engineer sessions used; the budget is 11
@@ -327,7 +328,6 @@ Current tickets: `[#################---]` 254 of 295
 - 2026-11-16 11:36 **S14-38** lead resume: Worktree reset to 2a2328a5; approve was not hung, T0 takes ~10 min and was killed early. Rerunning approve.
 - 2026-11-16 11:34 **S14-38** lead defer: Review passed (overdue clamp, log-based twin session liveness, command-line only, live card check recorded), but pm.py approve hung in the machine ...
 - 2026-11-16 11:18 **S14-38** engineer submit: Dashboard ready via python tools/knc_dashboard.py serve at 2a2328a5; all four fixture/HTTP tests passed (red first), log .work/_state/logs/S14_38_s...
-- 2026-11-16 11:16 **S14-38** owner decide: Owner 2026-11-16 (in chat: 'Yes raise it'): budget raised to 4 sessions. Resubmit 2a2328a5 as is with the one-sentence note; no rebase needed.
 
 ## Cost
 
