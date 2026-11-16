@@ -128,7 +128,7 @@ def cmd_capabilities(args):
             "pair": "analytical scenario only (two cores exchanging lines over the ring); needs core-scale cycles and transfer counts as parameters",
             "card": "analytical scenario only (compute vs bandwidth roofline with barriers and imbalance); never one-core throughput x cores",
         },
-        "commands": ["capabilities", "selftest", "validate", "functional", "simulate", "bounds", "compare", "batch", "prepare-native", "import-native"],
+        "commands": ["capabilities", "selftest", "validate", "functional", "simulate", "bounds", "schedule", "compare", "batch", "prepare-native", "import-native"],
         "adapters": ["scripts/from_gcc_s.py: GCC-KNC / GCC 5.1.1 k1om assembly -> records (function or loop regions, data symbols, coverage audit)",
                      "scripts/validate_heldout.py: held-out validation against the gcc_knc characterization catalog"],
         "input_representations": ["normalized-records (JSON, knc-twin.kernel/1)", "gas-att-subset (GAS AT&T assembly, see references/input-format.md)"],
@@ -437,6 +437,62 @@ def cmd_bounds(args):
     except TwinError as e:
         if prof is not None:
             r["parameters_used"] = prof.used_summary()
+        return _fail(r, out, args, e)
+
+
+def cmd_schedule(args):
+    """Export ordinary kernels so batch uses its existing frozen-profile path."""
+    import copy
+    from . import scheduling
+    args._t0 = time.time()
+    out = _prepare_out(args, "schedule", os.path.basename(args.kernel))
+    r = base_result("search", "ok", "schedule", out_dir=out, scale="core")
+    try:
+        kernel = load_kernel(args.kernel)
+        prof = load_profile(args.profile, args.overlay)
+        r["profile"] = prof.describe()
+        r["calibration_status"] = _calib(prof)
+        result = scheduling.explore(kernel, prof, method=args.method, seed=args.seed,
+                                    max_states=args.max_states, beam_width=args.beam_width,
+                                    lookahead=args.lookahead)
+        r.update(result)
+        r["prediction"] = {k: v for k, v in result["candidate"].items() if k not in ("kernel", "gas")}
+        # Input files retain their meaning after export to a different directory.
+        def export(raw, name):
+            raw = copy.deepcopy(raw)
+            def resolve(value):
+                if isinstance(value, dict):
+                    if isinstance(value.get("file"), str) and not os.path.isabs(value["file"]):
+                        value["file"] = os.path.abspath(os.path.join(kernel.dir, value["file"]))
+                    for child in value.values():
+                        resolve(child)
+                elif isinstance(value, list):
+                    for child in value:
+                        resolve(child)
+            resolve(raw)
+            path = os.path.join(out, name)
+            dump_json(raw, path)
+            return path
+        r["artifacts"]["candidate_kernel"] = export(result["candidate"]["kernel"], "candidate.json")
+        r["artifacts"]["baseline_kernel"] = export(scheduling._normalized(kernel), "baseline.json")
+        gas_path = os.path.join(out, "candidate.s")
+        with open(gas_path, "w", encoding="utf-8") as f:
+            f.write(result["candidate"]["gas"])
+        r["artifacts"]["candidate_gas"] = gas_path
+        profile_arg = os.path.abspath(args.profile) if os.path.isfile(args.profile) else args.profile
+        manifest = {"schema": BATCH_SCHEMA, "name": kernel.name + " schedules", "profile": profile_arg,
+                    "overlays": [os.path.abspath(p) for p in args.overlay], "frozen_profile_hash": prof.hash,
+                    "baseline": "baseline", "queue_uncertain": False,
+                    "candidates": [{"name": "baseline", "kernel": "baseline.json"},
+                                   {"name": args.method, "kernel": "candidate.json"}]}
+        manifest_path = os.path.join(out, "batch.json")
+        dump_json(manifest, manifest_path)
+        r["artifacts"]["batch_manifest"] = manifest_path
+        r["message"] = "%s: %d cycles (baseline %d, bound %d); %s" % (
+            args.method, result["candidate"]["cycles"], result["baseline_cycles"],
+            result["lower_bound_cycles"], result["result_class"])
+        return _finish(r, out, args)
+    except TwinError as e:
         return _fail(r, out, args, e)
 
 
@@ -825,6 +881,15 @@ def build_parser():
     s.add_argument("--trip-count", type=int, default=None)
     s.add_argument("--contexts", default=None)
     s.set_defaults(fn=cmd_bounds)
+
+    s = sub.add_parser("schedule", help="bounded beam, lookahead list or modulo scheduling; export GAS and a frozen-profile batch")
+    common(s, budgets=False)
+    s.add_argument("--method", choices=("beam", "list", "modulo"), default="beam")
+    s.add_argument("--seed", type=int, default=0)
+    s.add_argument("--max-states", type=int, default=512)
+    s.add_argument("--beam-width", type=int, default=8)
+    s.add_argument("--lookahead", type=int, default=8)
+    s.set_defaults(fn=cmd_schedule)
 
     s = sub.add_parser("compare", help="compare two result.json files (same engine, profile hash, scenario)")
     common(s, profile=False, kernel=False, budgets=False)
