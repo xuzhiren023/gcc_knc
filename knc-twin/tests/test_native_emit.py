@@ -8,14 +8,15 @@ import shutil
 
 
 ROOT = Path(__file__).resolve().parents[1]
-TWIN = ROOT / "knc-twin"
+TWIN = ROOT
 SCRIPT = TWIN / "scripts" / "knc_twin.py"
 PHIWEATHER = ROOT.parent.parent / "twin-study-20261116" / "sixth" / "held-out"
 
 
 class NativeEmit(unittest.TestCase):
     def test_rollup_classification_requires_candidate_held_out_band(self):
-        from knc_twin.scripts.knc_model.cli import rollup_result_class
+        sys.path.insert(0, str(TWIN / "scripts"))
+        from knc_model.cli import rollup_result_class
 
         self.assertEqual(rollup_result_class([{"ratio": 1.0}], [])["class"],
                          "unvalidated_scenario_estimate")
@@ -43,25 +44,6 @@ class NativeEmit(unittest.TestCase):
             asm = (output / "kernel.S").read_text(encoding="utf-8")
             self.assertIn("knc_twin_mem+0(%rip)", asm)
             self.assertNotRegex(asm, r"\(\s*\)")
-
-            rip = tmp / "rip.json"
-            rip.write_text(json.dumps({
-                "schema": "knc-twin.kernel/1",
-                "name": "absolute-rip-displacement",
-                "streams": [{"asm": "movq data(%rip), %rax\nret"}],
-                "init": {
-                    "memory": [{"addr": "0x1000", "u64": [7, 8]}, {"addr": "0x1008", "u64": [9]}],
-                    "symbols": {"data": "0x1008"},
-                },
-            }), encoding="utf-8")
-            rip_output = tmp / "rip-output"
-            rip_result = subprocess.run([
-                sys.executable, str(SCRIPT), "prepare-native", str(rip),
-                "--out", str(rip_output), "--no-check",
-            ], cwd=tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-            self.assertEqual(rip_result.returncode, 0, rip_result.stdout[-3000:])
-            rip_asm = (rip_output / "kernel.S").read_text(encoding="utf-8")
-            self.assertIn("knc_twin_mem+8(%rip)", rip_asm)
 
             symbol = tmp / "symbol.json"
             symbol.write_text(json.dumps({

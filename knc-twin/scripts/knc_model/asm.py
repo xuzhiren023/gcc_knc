@@ -136,9 +136,6 @@ def _parse_operand(tok, where, branch=False):
                 d["conv"] = conv
             return d, mask, rounding
         return name, mask, rounding
-    if re.match(r"^(0x[0-9a-fA-F]+|\d+)\(%rip\)$", tok):
-        disp = int(tok[:tok.index("(")], 0)
-        return {"disp": disp, "symbol": ".Lknc_absolute_rip"}, mask, rounding
     m = _MEM_RE.match(tok)
     if m:
         d = {}
@@ -146,8 +143,6 @@ def _parse_operand(tok, where, branch=False):
             d["segment"] = segment
         disp, sym = _eval_disp(m.group("disp"), where)
         inner = [p.strip() for p in m.group("inner").split(",")]
-        if inner and inner[0].lower() == "%rip" and not sym:
-            sym = ".Lknc_absolute_rip"
         if disp:
             d["disp"] = disp
         if inner and inner[0]:

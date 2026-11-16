@@ -516,9 +516,7 @@ class Stream(object):
         # resolve rip-relative symbols to absolute displacements
         for i in self.insns:
             for o in i.operands:
-                if isinstance(o, Mem) and o.symbol == ".Lknc_absolute_rip":
-                    o.symbol = None
-                elif isinstance(o, Mem) and o.symbol is not None:
+                if isinstance(o, Mem) and o.symbol is not None:
                     if not symbols or o.symbol not in symbols:
                         raise InvalidInput("streams[%d]: instruction %s refers to symbol %r; give its address in init.symbols" % (idx, i.id, o.symbol))
                     o.disp += parse_int(symbols[o.symbol], "init.symbols." + o.symbol)
