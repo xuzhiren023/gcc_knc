@@ -9,6 +9,7 @@ Anyone:    board | status | show ID | inbox | usage | escalate ID TEXT
 import argparse
 import contextlib
 import datetime
+import functools
 import json
 import os
 import re
@@ -117,13 +118,43 @@ def gcc_slot(ticket):
     return "2" if lane_of(ticket) == "gcc2" else "1"
 
 
-def run_git(*args, cwd=None, check=True):
+def run_git(*args, cwd=None, check=True, ticket=None):
+    if ticket is not None:
+        path = require_ticket_worktree(ticket.board, ticket)
+        if canonical_path(cwd) != canonical_path(path):
+            raise Refused("git cwd is not the ticket worktree")
     # Git emits UTF-8 (notes and diffs may hold non-ASCII text); Windows would decode with its ANSI code page.
     result = subprocess.run(("git",) + args, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             universal_newlines=True, encoding="utf-8", errors="replace")
     if check and result.returncode != 0:
         raise Refused("git %s failed:\n%s" % (" ".join(args), result.stdout.strip()[:800]))
     return result.stdout.strip()
+
+
+def canonical_path(path):
+    return os.path.normcase(os.path.realpath(path))
+
+
+def require_ticket_worktree(board, ticket):
+    """Never let Git discover a parent repository through a missing ticket checkout."""
+    path = board.worktree(ticket)
+    if board.load(ticket.id).state == "done":
+        raise Refused(ticket.id + " is done; its worktree cannot be used again")
+    error = "ticket folder must be a registered worktree of this repository on " + ticket.fields["branch"]
+    if not os.path.isdir(path):
+        raise Refused(error + ": " + path)
+    top = run_git("rev-parse", "--show-toplevel", cwd=path, check=False)
+    records = run_git("worktree", "list", "--porcelain", "-z", cwd=board.root).split("\0\0")
+    registered = False
+    for record in records:
+        fields = dict(field.split(" ", 1) for field in record.split("\0") if " " in field)
+        if fields.get("worktree") and canonical_path(fields["worktree"]) == canonical_path(path):
+            registered = fields.get("branch") == "refs/heads/" + ticket.fields["branch"]
+            break
+    if canonical_path(top) != canonical_path(path) or not registered or \
+            run_git("branch", "--show-current", cwd=path) != ticket.fields["branch"]:
+        raise Refused(error + ": " + path)
+    return path
 
 
 def main_checkout():
@@ -308,16 +339,17 @@ def free_knc(gcc):
             run_git("checkout", "-q", "--detach", cwd=tree)
 
 
-def merge_clean(cwd, ref, *options, integration="main"):
+def merge_clean(cwd, ref, *options, integration="main", git=None):
     """Abort our failed merge and report conflicts before any board update can stage them."""
+    git = git or run_git
     try:
-        run_git("merge", *options, ref, cwd=cwd)
+        git("merge", *options, ref, cwd=cwd)
     except Refused as error:
-        paths = run_git("diff", "--name-only", "--diff-filter=U", cwd=cwd)
-        merge_head = run_git("rev-parse", "--git-path", "MERGE_HEAD", cwd=cwd)
+        paths = git("diff", "--name-only", "--diff-filter=U", cwd=cwd)
+        merge_head = git("rev-parse", "--git-path", "MERGE_HEAD", cwd=cwd)
         if os.path.exists(os.path.join(cwd, merge_head)):
-            run_git("merge", "--abort", cwd=cwd)
-        if run_git("status", "--porcelain", cwd=cwd):
+            git("merge", "--abort", cwd=cwd)
+        if git("status", "--porcelain", cwd=cwd):
             raise Refused("merge failed; checkout is not clean after abort: " + cwd) from error
         raise Refused("merge refused (%s): %s; ask the lead to merge %s into the ticket branch.\n%s"
                       % (cwd, paths or "no conflicting paths", integration, error)) from error
@@ -325,19 +357,20 @@ def merge_clean(cwd, ref, *options, integration="main"):
 
 def submit_problems(board, ticket, cwd):
     """Return (hard problems, budget problems) for this branch against main."""
+    git = functools.partial(run_git, ticket=ticket)
     policy = board.policy
     budget = board.budget(ticket)
     hard, soft = [], []
-    if run_git("status", "--porcelain", cwd=cwd):
+    if git("status", "--porcelain", cwd=cwd):
         hard.append("uncommitted changes in the worktree")
-    base = run_git("merge-base", "main", "HEAD", cwd=cwd)
+    base = git("merge-base", "main", "HEAD", cwd=cwd)
     # Inspect every missing commit, including edits later reverted and rename sources.
-    missing_paths = run_git("log", "--format=", "--name-only", "--no-renames", "-m",
+    missing_paths = git("log", "--format=", "--name-only", "--no-renames", "-m",
                             "HEAD..main", cwd=cwd).splitlines()
     if any(p and not (p.startswith("work/") or p in ("STATUS.md", "CURRENT_STATE.md"))
            for p in missing_paths):
         hard.append("the branch lacks real changes from main: ask the lead to merge main into the ticket branch")
-    subjects = run_git("log", "--format=%s", base + "..HEAD", cwd=cwd).splitlines()
+    subjects = git("log", "--format=%s", base + "..HEAD", cwd=cwd).splitlines()
     gcc = gcc_checkout(board, ticket)
     gcc_diff = "knc..." + ticket.fields["branch"] if gcc else None
     if gcc:
@@ -351,7 +384,7 @@ def submit_problems(board, ticket, cwd):
     if ticket.fields.get("type", "code") == "code" and not any("[red]" in s for s in subjects):
         hard.append("no [red] test commit: this is test-driven work")
 
-    names = run_git("diff", "--name-status", base + "...HEAD", cwd=cwd).splitlines()
+    names = git("diff", "--name-status", base + "...HEAD", cwd=cwd).splitlines()
     new_tests = 0
     for line in names:
         parts = line.split("\t")
@@ -372,7 +405,7 @@ def submit_problems(board, ticket, cwd):
     for line in names:
         parts = line.split("\t")
         if parts[0].startswith(("A", "M", "R", "C")):
-            size = int(run_git("cat-file", "-s", "HEAD:" + parts[-1], cwd=cwd))
+            size = int(git("cat-file", "-s", "HEAD:" + parts[-1], cwd=cwd))
             total_bytes += size
             if size > limits["max_file_mb"] * storage.MIB:
                 hard.append("%s is %.1f MiB; the limit is %d MiB. Large data stays out of git."
@@ -386,7 +419,7 @@ def submit_problems(board, ticket, cwd):
                     % (worktree_gib, budget["disk_gib"]))
 
     test_added = code_added = 0
-    for line in run_git("diff", "--numstat", base + "...HEAD", cwd=cwd).splitlines():
+    for line in git("diff", "--numstat", base + "...HEAD", cwd=cwd).splitlines():
         added, removed, path = line.split("\t", 2)
         if added == "-":
             continue
@@ -411,7 +444,7 @@ def submit_problems(board, ticket, cwd):
     hash_rx = re.compile(policy["hash_in_diff"], re.I)
     # A ticket whose deliverable hashes payloads names those paths in hash_ok, set by the lead (S11-01).
     hash_ok = re.compile(ticket.fields["hash_ok"]) if ticket.fields.get("hash_ok") else None
-    for path, text in added_lines(run_git("diff", "-U0", base + "...HEAD", cwd=cwd)):
+    for path, text in added_lines(git("diff", "-U0", base + "...HEAD", cwd=cwd)):
         if hash_rx.search(text) and not (hash_ok and hash_ok.search(path)):
             hard.append("hashing added in %s: %s" % (path, text.strip()[:80]))
             break
@@ -429,6 +462,8 @@ def cmd_start(board, args):
     path = board.worktree(ticket)
     os.makedirs(storage.shared_area(board.root), exist_ok=True)
     branch = ticket.fields.setdefault("branch", "%s/%s" % (ticket.fields.get("sprint", "s0"), ticket.id))
+    if os.path.isdir(path):
+        require_ticket_worktree(board, ticket)
     # Resuming keeps this ticket's own uncommitted GCC work; any other checkout must be clean.
     gcc = gcc_checkout(board, ticket, allow_dirty=gcc_current_branch(board, ticket) == branch)
     if gcc:
@@ -440,6 +475,7 @@ def cmd_start(board, args):
         exists = run_git("branch", "--list", branch, cwd=board.root)
         target = (path, branch) if exists else ("-b", branch, path)
         run_git("worktree", "add", "-q", *target, cwd=board.root)
+    require_ticket_worktree(board, ticket)
     if ticket.state != "doing":
         ticket.fields["state"] = "doing"
         ticket.save("start")
@@ -464,11 +500,12 @@ def cmd_commit(board, args):
             exists = run_git("branch", "--list", branch, cwd=worktree)
             target = (branch,) if exists else ("-b", branch, "knc")
             run_git("checkout", "-q", *target, cwd=worktree)
-    run_git("add", "-A", cwd=worktree)
-    if not run_git("status", "--porcelain", cwd=worktree):
+    git = run_git if args.gcc else functools.partial(run_git, ticket=ticket)
+    git("add", "-A", cwd=worktree)
+    if not git("status", "--porcelain", cwd=worktree):
         raise Refused("nothing to commit")
-    run_git("commit", "-q", "-m", args.message, cwd=worktree)
-    print(run_git("log", "-1", "--format=%h %s", cwd=worktree))
+    git("commit", "-q", "-m", args.message, cwd=worktree)
+    print(git("log", "-1", "--format=%h %s", cwd=worktree))
 
 
 def cmd_red(board, args):
@@ -476,7 +513,7 @@ def cmd_red(board, args):
     ticket = board.load(args.id)
     require_state(ticket, "doing")
     ticket.fields["state"] = "red-review"
-    ticket.fields["head"] = run_git("rev-parse", "--short", "HEAD", cwd=board.worktree(ticket))
+    ticket.fields["head"] = run_git("rev-parse", "--short", "HEAD", cwd=board.worktree(ticket), ticket=ticket)
     ticket.save("red", limit_text(board, args.note))
     print("%s is waiting for the lead to approve the failing tests" % ticket.id)
 
@@ -500,14 +537,14 @@ def cmd_submit(board, args):
     if soft:
         note += " | OVER BUDGET (%s): %s" % ("; ".join(soft), args.override)
     ticket.fields["state"] = "review"
-    ticket.fields["head"] = run_git("rev-parse", "--short", "HEAD", cwd=worktree)
+    ticket.fields["head"] = run_git("rev-parse", "--short", "HEAD", cwd=worktree, ticket=ticket)
     if ticket.fields.get("gcc") == "yes":
         ticket.fields["gcc_head"] = run_git("rev-parse", ticket.fields["branch"], cwd=gcc_checkout(board, ticket))
     ticket.save("submit", note)
     print("%s submitted at %s. End this session." % (ticket.id, ticket.fields["head"]))
 
 
-def machine_check(worktree, slot="1"):
+def machine_check(worktree, slot="1", *, ticket=None):
     """Run the branch's own T0 before it can merge, so approval never rests on a report alone.
     T0 uses the GCC build of the ticket's slot."""
     checks = []
@@ -516,7 +553,7 @@ def machine_check(worktree, slot="1"):
         checks.append(("tools/check t0", [sys.executable, os.path.join("tools", "check"), "t0"], env))
     card_paths = ("tools/card_run", "tools/card_run_remote.sh", "tools/claude-pin.c",
                   "tools/claude-unpack.c")
-    if run_git("diff", "--name-only", "main...HEAD", "--", *card_paths, cwd=worktree):
+    if run_git("diff", "--name-only", "main...HEAD", "--", *card_paths, cwd=worktree, ticket=ticket):
         env = os.environ.copy()
         python = sys.executable
         if sys.platform != "cygwin":
@@ -534,6 +571,8 @@ def machine_check(worktree, slot="1"):
                         "-p", "test_card_*.py"], env))
     note = ""
     for label, command, env in checks:
+        if ticket is not None:
+            require_ticket_worktree(ticket.board, ticket)
         try:
             done = subprocess.run(command, cwd=worktree, env=env, stdin=subprocess.DEVNULL,
                                   stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True,
@@ -561,40 +600,43 @@ def cmd_approve(board, args):
             print(ticket.id + ": failing tests approved")
             return
         branch = ticket.fields["branch"]
-        worktree = board.worktree(ticket)
+        worktree = require_ticket_worktree(board, ticket)
+        git = functools.partial(run_git, ticket=ticket)
         note = limit_text(board, args.note or "merged")
         message = "Merge %s: %s" % (ticket.id, ticket.fields.get("title", ""))
         gcc = gcc_checkout(board, ticket)
         if run_git("status", "--porcelain", cwd=board.root) or \
                 run_git("branch", "--show-current", cwd=board.root) != "main":
             raise Refused("main checkout must be clean and on main before merging a ticket")
-        if run_git("status", "--porcelain", cwd=worktree) or \
-                run_git("branch", "--show-current", cwd=worktree) != branch:
+        if git("status", "--porcelain", cwd=worktree) or \
+                git("branch", "--show-current", cwd=worktree) != branch:
             raise Refused("ticket worktree must be clean and on " + branch)
         if gcc and run_git("rev-parse", branch, cwd=gcc) != ticket.fields.get("gcc_head"):
             raise Refused("GCC branch moved since submit; submit again before approval")
         checked_main = run_git("rev-parse", "HEAD", cwd=board.root)
-        host_head = run_git("rev-parse", "HEAD", cwd=worktree)
+        host_head = run_git("rev-parse", "HEAD", cwd=worktree, ticket=ticket)
         if gcc:
             gcc_head = run_git("rev-parse", branch, cwd=gcc)
             previous = run_git("branch", "--show-current", cwd=gcc)
             run_git("checkout", "-q", branch, cwd=gcc)
         try:
-            merge_clean(worktree, "main", "--no-edit")
+            merge_clean(worktree, "main", "--no-edit", git=git)
             if gcc:
                 merge_clean(gcc, "knc", "--no-edit", integration="knc")
             locks.close()
             try:
-                note += machine_check(worktree, gcc_slot(ticket))
+                note += machine_check(worktree, gcc_slot(ticket), ticket=ticket)
             finally:
                 locks.enter_context(board_lock(board.root))
+            require_state(board.load(ticket.id), "review")
+            require_ticket_worktree(board, ticket)
             changed = run_git("log", "--format=", "--name-only", checked_main + "..HEAD", cwd=board.root)
             if any(path and not (path.startswith("work/") or path == "STATUS.md")
                    for path in changed.splitlines()):
                 raise Refused("main changed during approval checks; approve again")
         except Refused:
             # Keep submitted branch tips retryable if either integration or the check fails.
-            run_git("reset", "--hard", host_head, cwd=worktree)
+            git("reset", "--hard", host_head, cwd=worktree)
             if gcc:
                 run_git("reset", "--hard", gcc_head, cwd=gcc)
                 run_git("checkout", "-q", previous, cwd=gcc)
@@ -629,8 +671,13 @@ def cmd_approve(board, args):
                 raise
         else:
             merge_clean(board.root, branch, "--no-ff", "-q", "-m", message)
-        if os.path.isdir(worktree):
+        try:
+            require_ticket_worktree(board, ticket)
             run_git("worktree", "remove", "--force", worktree, cwd=board.root)
+        except (Refused, OSError) as error:
+            leftover = "leftover worktree folder %s: %s" % (worktree, error)
+            note += " | " + leftover
+            print(leftover)
         ticket.fields["state"] = "done"
         ticket.save("approve", note)
         print(ticket.id + ": approved and merged")

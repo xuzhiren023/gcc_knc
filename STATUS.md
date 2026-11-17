@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 18:11.
+Updated automatically at every ticket change. Last update: 2026-11-17 18:29.
 
-**Next: GPT-6.1, on S13-04 (Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
-Current tickets: `[##################--]` 282 of 308
+Current tickets: `[##################--]` 283 of 309
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 282 of 308
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
-| M5 | Program corpus | In progress | 36 of 51 tickets |
+| M5 | Program corpus | In progress | 37 of 52 tickets |
 | M6 | Release | In progress | 0 of 11 tickets |
 
 ## Tickets
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 282 of 308
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | Main is merged. Rerun tests/regress/test_source_release.py and the portability tests on CPUs 0-9, then subm... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Waiting for review | Set to review by the lead: work complete, reruns PASS (source_release 9, portability 6, logs in the 18:25 a... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft | Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our windo... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | sessions 6 -> 8 (header updated), recorded by the lead (owner 2026-11-17 OK). Lead ran the harness tests on... |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | **Waiting for you** | budget: 8 engineer sessions used; the budget is 8 |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -170,14 +170,15 @@ Current tickets: `[##################--]` 282 of 308
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | lead | Interactive lead: merge main into s14/S14-50 (submit refused: branch lacks real changes from main), then ap... |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Waiting for review | Set to review by the lead per the 18:10 scripted review (review changes done in 3fef5f08, main merged); the... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | WRF classic inputs are ready: .work/_shared/corpus-build/wrf-miami-classic/{wrfinput_d01,wrfinput_d02,wrfbd... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | Main merged into s14/S14-56 (ce9fb633). Size approved: submit now with --override 'M5 corpus units (Q1-Q6, ... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
-| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | lead | Review passed; ready to approve. My approve was killed at the 10-minute tool limit during T0, so nothing me... |
+| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | Done | The board tools now refuse to run git in a ticket folder unless it really is that ticket's worktree, never ... |
+| S14-66 | pm.py submit's "branch lacks real changes from main" check keeps refusing while main moves; accept a branch that merges cleanly and let approval integrate | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -333,23 +334,23 @@ Current tickets: `[##################--]` 282 of 308
 
 ## Recent activity
 
-- 2026-11-17 18:11 **S13-04** lead answer: Main is merged. Rerun tests/regress/test_source_release.py and the portability tests on CPUs 0-9, then submit with the approved --override (recount...
-- 2026-11-17 18:10 **S14-56** lead note: WRF classic inputs are ready: .work/_shared/corpus-build/wrf-miami-classic/{wrfinput_d01,wrfinput_d02,wrfbdy_d01} (NETCDF3_64BIT_OFFSET, same data ...
-- 2026-11-17 18:10 **S14-50** lead defer: Interactive lead: merge main into s14/S14-50 (submit refused: branch lacks real changes from main), then approve directly; the review changes are a...
-- 2026-11-17 18:10 **S13-04** owner decide: Recorded by the lead (owner 2026-11-17 OK): the interactive lead merged main into s13/S13-04 cleanly (49e27821). Engineer: rerun tests/regress/test...
-- 2026-11-17 18:10 **S13-04** lead escalate: lead session ended without a decision (exit 0)
-- 2026-11-17 18:09 **S13-04** lead resume: Lead merged main into s13/S13-04 cleanly (49e27821).
-- 2026-11-17 18:08 **S14-50** engineer ask: submit refused: the branch lacks real changes from main: ask the lead to merge main into the ticket branch
-- 2026-11-17 18:08 **S13-04** lead defer: Merge current main into s13/S13-04 by hand: main gained real code after the 17:21 merge (tools/check.py, pm.py, dispatch.py, harness/policy.json, t...
+- 2026-11-17 18:30 **S13-04** lead note: Set to review by the lead: work complete, reruns PASS (source_release 9, portability 6, logs in the 18:25 ask), size override approved; submit kept...
+- 2026-11-17 18:29 **S14-24** engineer escalate: budget: 8 engineer sessions used; the budget is 8
+- 2026-11-17 18:25 **S14-56** lead note: Donor OpenMP runtime ready: .work/_shared/donor-libgomp/lib64/{libgomp.a,libgomp.spec} (static GCC 5.1.1 libgomp that PhiWeather plain-GCC-5.1.1 WR...
+- 2026-11-17 18:25 **S13-04** engineer ask: After merge 49e27821, submission with approved 827-line override is refused again: branch lacks real changes from main. Please merge current main a...
+- 2026-11-17 18:23 **S14-24** lead answer: Yes. Add the two tests to the existing dispatcher test file (new_test_files: 0 is fine; that is a new test in an existing file, not a new file). Re...
+- 2026-11-17 18:21 **S14-56** lead answer: Main merged into s14/S14-56 (ce9fb633). Size approved: submit now with --override 'M5 corpus units (Q1-Q6, MilkyWay, WRF pin/case) with checkers an...
+- 2026-11-17 18:21 **S14-24** engineer ask: Two required tests are absent: the red commit 9957076b changes only tools/dispatch.py. Please allow adding/committing tests in the existing dispatc...
+- 2026-11-17 18:20 **S14-56** engineer ask: Submission refused: branch lacks real changes from main (pm requests lead merge main into ticket branch); 961 changed lines exceed 800-line budget....
 
 ## Cost
 
-- From the script, engineer: 889 sessions, 1886.8M input tokens
-- From the script, lead: 596 sessions, 162.8M input tokens
-- Started by hand, Claude: 385 sessions, 5124.9M input tokens
+- From the script, engineer: 894 sessions, 1891.4M input tokens
+- From the script, lead: 600 sessions, 164.2M input tokens
+- Started by hand, Claude: 389 sessions, 5157.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 44.7 GiB of 100 GiB. 300 GiB free on the drive.
+The project uses 44.7 GiB of 100 GiB. 301 GiB free on the drive.
