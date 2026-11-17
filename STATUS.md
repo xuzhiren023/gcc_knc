@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:31.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:32.
 
-**Next: the tech lead, on S13-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 282 of 308
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft | Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our windo... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | Recorded by the lead (owner 2026-11-17 OK): input_tokens 12M (re-applied after the main reset); finish gree... |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -336,20 +336,20 @@ Current tickets: `[##################--]` 282 of 308
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
+- 2026-11-17 17:32 **S14-24** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-17 17:31 **S12-38** lead approve: The -O3 -march=knc vectorizer crash on SLP reduction chains (gcc.dg vect-pr123221.c) is fixed: GCC-KNC now compiles it, with zero crashes across 8,...
 - 2026-11-17 17:29 **S13-04** engineer ask: Submission after the 17:21 lead instruction is refused: 827 changed lines exceed the 800-line budget. All work and staged exports remain as reporte...
 - 2026-11-17 17:25 **S14-50** owner decide: sessions 7 -> 8, recorded by the lead (owner 2026-11-17 OK): the lead made the two review changes (value {threads_1: 7.076, threads_2: 13.106}, uni...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
-- 2026-11-17 17:24 **S14-16** lead answer: Not building 494881688b9 yet: it will not compile. struct processor_costs (i386.h:122 on) has const int members, so 'processor_costs costs[8][2];' ...
 
 ## Cost
 
-- From the script, engineer: 883 sessions, 1875.7M input tokens
+- From the script, engineer: 884 sessions, 1876.4M input tokens
 - From the script, lead: 592 sessions, 162.0M input tokens
-- Started by hand, Claude: 377 sessions, 5094.4M input tokens
+- Started by hand, Claude: 378 sessions, 5095.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 43.9 GiB of 100 GiB. 301 GiB free on the drive.
+The project uses 44.0 GiB of 100 GiB. 301 GiB free on the drive.
