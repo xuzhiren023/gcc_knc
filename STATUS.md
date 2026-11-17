@@ -4,7 +4,7 @@ Updated automatically at every ticket change. Last update: 2026-11-17 17:02.
 
 **Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
-Current tickets: `[##################--]` 280 of 307
+Current tickets: `[##################--]` 281 of 307
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 280 of 307
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
-| M5 | Program corpus | In progress | 34 of 51 tickets |
+| M5 | Program corpus | In progress | 35 of 51 tickets |
 | M6 | Release | In progress | 0 of 10 tickets |
 
 ## Tickets
@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 280 of 307
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | Waiting for review | Recorded by the lead (owner 2026-11-17 OK for stuck tickets): the scripted review ended without a decision;... |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | Done | M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seve... |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -332,6 +332,7 @@ Current tickets: `[##################--]` 280 of 307
 
 ## Recent activity
 
+- 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
 - 2026-11-17 17:02 **S14-16** engineer ask: Cost 4 at 43801df4e93: scalar-mask-cost PASS (0 k operands/kmov); loop-store-mask FAIL (0 k operands/kmov/kxor). Reproducer: -O2 -march=knc tests/t...
 - 2026-11-17 17:01 **S14-56** lead answer: Drop nbody-wrapper-files.patch: it implements the BOINC wrapper's checkpoint/progress/graphics file protocol, which the standalone M5 unit does not...
 - 2026-11-17 17:00 **S14-50** owner decide: sessions 5 -> 6 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed; the last sessions were lost to the b...
@@ -339,13 +340,12 @@ Current tickets: `[##################--]` 280 of 307
 - 2026-11-17 16:59 **S14-50** engineer escalate: budget: 5 engineer sessions used; the budget is 5
 - 2026-11-17 16:55 **S14-24** owner decide: input_tokens 6M -> 12M (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: progress (fix 14df1710). Fi...
 - 2026-11-17 16:55 **S14-16** owner decide: sessions 8 -> 11 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the sessions since 15:01 were los...
-- 2026-11-17 16:55 **S12-38** engineer submit: T0-T2 PASS on gcc2 41bc85cf422. Torture 8012 cases and vect 2001 sources: zero ICEs; classifications match S12-09. Logs: .work/_state/logs/S12_38_t...
 
 ## Cost
 
-- From the script, engineer: 872 sessions, 1862.7M input tokens
+- From the script, engineer: 873 sessions, 1862.9M input tokens
 - From the script, lead: 587 sessions, 161.2M input tokens
-- Started by hand, Claude: 372 sessions, 5048.1M input tokens
+- Started by hand, Claude: 372 sessions, 5052.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
