@@ -101,7 +101,8 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
   generator maps only initialized pages; fixed on knc-twin main); job 9/10 lost because the twin restaged the folder
   mid-window. Rules: no restage of a staged folder until the window closes (new folder calib-w16/batch/); next window
   runs job 1 alone and the rest only on exit 0 or 6.
-- Owner 2026-11-17 00:30 EST: knc-boinc's next plan (after the laptop is freed) is to port MilkyWay 1.96's unshipped
+- Owner 2026-11-17 ~01:00 EST (via knc-boinc): knc-boinc is independent of GCC-KNC; it no longer adopts GCC-KNC plans (the GPU-algorithm port below is dropped). Compiler requests still come to us: S14-44 raised to next-to-dispatch, with a phase 0 flag set for x87 code.
+- (dropped) Owner 2026-11-17 00:30 EST: knc-boinc's next plan (after the laptop is freed) is to port MilkyWay 1.96's unshipped
   OpenCL N-body algorithm (nbody_kernels.cl, Burtscher GPU Barnes-Hut: parallel tree build, tree-order sort, group
   walks -> IMCI, 8 bodies per vector in FP64, 16 only if the tolerance allows FP32) to OpenMP+IMCI (knc-boinc Sprint 9), gated first on MilkyWay's validator tolerance (not bit-identical by design).
 - Window 14 closed 05:10:41Z (2026-11-17). Twin T1-07 single smoke PASSED on the card (first generated native to
