@@ -565,14 +565,15 @@ gather_core_reciprocal_throughput_endpoints:
   note: Four active threads; do not confuse one gather instruction with completion, or transfer these costs to scatter.
 
 scatter_completion_cost:
-  value: null
-  unit: core cycles per completion by occupied lines and residence
+  value: {one_thread_cycles_per_additional_line: 11.2}
+  unit: core cycles per additional completion line
   scope: thread
-  models: *models
-  profiles: *profiles
-  evidence: E
-  source: "R05 Table II p.4; s12-14-model-audit.md B06 (2026-11-14)"
-  note: Published gather and project gather endpoints do not measure scatter. Mask/index/retry setup also needs matching evidence.
+  models: ["7120"]
+  profiles: [full]
+  evidence: R
+  source: "window-10 B-scatter-t1.out, scatter_scattered/scatter_all one-thread rows (card-7120-measured); corroborated by knc-twin references/validation.md w10-scatter one-thread rows"
+  hardware_status: production project card, stepping unspecified
+  note: TSC ticks treated as core cycles. Marginal service per additional completion line, not total completion cost; excludes the first-line/base occupancy and mask/index/retry setup. Window-10's 2- and 4-context scattered rows exceed twin predictions by 44.1% and 47.6%; shared gather/scatter unit arbitration is not modeled, and fitted per-context values do not resolve this discrepancy.
 
 near_prefetch_hot_reciprocal_throughput:
   value: {threads_1: 1.07, threads_2: 1.09, threads_4: 2.13}
@@ -657,8 +658,24 @@ branch_mispredict_penalty:
   models: *models
   profiles: *profiles
   evidence: E
-  source: "knc-characterization.md C10 correction; R10 p.14"
-  note: The old estimate assumed a miss fraction without measuring it. C10 does not establish a numeric penalty.
+  source: "knc-characterization.md C10 correction; R10 p.14; knc-twin parameters.md card-7120-measured C10 row"
+  note: Twin's value 5 is the one-thread pseudorandom-minus-fixed pattern delta in cycles/branch, not per-misprediction penalty: miss fraction is unmeasured. Window-10 has no branch calibration row separating miss rate, so no numeric penalty per misprediction is established.
+
+# Reconciliation: twin latency.x87_compare remains 3 (assumed), while the
+# window-10 rows measure the full compare/status-transfer chain (about 7 ticks
+# per site at one thread and 13 at two). They do not identify isolated compare
+# latency; the twin validation rows retain x87_compare as assumed.
+
+x87_compare_chain:
+  value: null
+  unit: core cycles per compare dependency site
+  scope: thread
+  models: ["7120"]
+  profiles: [full]
+  evidence: R
+  source: "window-10 C2-x87-t1.out and C2-x87-t2.out, x87_fcoms_fnstsw.lat rows (card-7120-measured); knc-twin references/validation.md x87 compare validation rows"
+  hardware_status: production project card, stepping unspecified
+  note: Window-10 measured 7.076 TSC ticks/site at one thread and 13.106 at two for the complete compare/status-transfer chain. These sequence costs do not replace the twin's assumed latency.x87_compare=3 cycles because they do not isolate compare latency.
 
 c7_reduction_update_time:
   value: {accumulators_1: 4.13, accumulators_2: 4.13}
