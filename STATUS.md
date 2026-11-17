@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 13:12.
+Updated automatically at every ticket change. Last update: 2026-11-17 13:13.
 
 **Next: the tech lead, on S12-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -144,7 +144,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress | Good progress (zlib kmov 14->0). (1) Do not weaken knc-loop-store-mask.c: a flat 6 is too blunt, because it... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Question for the tech lead | GCC build needed at 43801df4e93254b10843041629857fb11abce1c8 (lane gcc, committed 4/4 fallback). HI-only ch... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 13:13 **S14-16** engineer ask: GCC build needed at 43801df4e93254b10843041629857fb11abce1c8 (lane gcc, committed 4/4 fallback). HI-only cheap moves cannot preserve S6-14's QI rel...
 - 2026-11-17 13:12 **S14-04** lead answer: The lock holder was a lead approve running t0 (it has finished). Retry pm.py submit now; if it waits again, retry once more later. S14-60 (board lo...
 - 2026-11-17 13:12 **S12-38** owner decide: Recorded by the lead (owner 2026-11-17 OK for stuck tickets): GCC built by the lead in slot 2 at 41bc85cf422 (gcc-build-2, cc1 12:32 EST, log .work...
 - 2026-11-17 13:11 **S14-22** owner decide: sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the red test exists in the worktree but is uncommit...
@@ -338,7 +339,6 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 13:10 **S14-04** engineer ask: Submission blocked: pm.py submit waited 900 seconds and refused because .work/_state/board.lock is held by live Python PID 31832. Ticket work is co...
 - 2026-11-17 12:55 **S14-44** lead approve: Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and no M4 program shows a 5% whole-program ga...
 - 2026-11-17 12:41 **S12-38** lead escalate: lead session ended without a decision (exit 0)
-- 2026-11-17 12:40 **S14-58** lead note: CARD RESULT (window 17, 2026-11-17 17:33-17:34Z, claude-torture -j 60, -O3 execute set at the installed prefix): 1797 PASS, 6 FAIL (all raw status ...
 
 ## Cost
 
