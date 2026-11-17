@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:52.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:54.
 
-**Waiting for you:** S14-24, S14-50. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 282 of 308
 
@@ -170,7 +170,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | **Waiting for you** | budget: 8 engineer sessions used; the budget is 8 |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions 8 -> 9, recorded by the lead (owner 2026-11-17 OK). The review changes are already committed by th... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | sessions 8 -> 12 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-... |
@@ -334,19 +334,19 @@ Current tickets: `[##################--]` 282 of 308
 ## Recent activity
 
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
+- 2026-11-17 17:54 **S14-50** owner decide: sessions 8 -> 9, recorded by the lead (owner 2026-11-17 OK). The review changes are already committed by the lead (3fef5f08) with main merged (0936...
 - 2026-11-17 17:52 **S14-56** owner decide: sessions 8 -> 12 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (Q1-Q6 built, lin...
 - 2026-11-17 17:50 **S13-04** engineer ask: Submit with the approved 827-line override now refuses: the branch lacks real changes from main. Please merge current main into s13/S13-04 and resu...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:49 **S14-56** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 17:48 **S14-56** lead answer: No host nccopy exists; the lead asked PhiWeather to write classic copies into .work/_shared/corpus-build/wrf-miami-classic/ (wrfinput_d01, wrfinput...
 - 2026-11-17 17:44 **S14-50** engineer escalate: budget: 8 engineer sessions used; the budget is 8
-- 2026-11-17 17:43 **S14-16** engineer ask: GCC build needed at d2ab3509a1e (lane gcc). Replaced the invalid const-member cost_table assignments with a static const processor_costs[8][2], all...
 
 ## Cost
 
-- From the script, engineer: 887 sessions, 1885.5M input tokens
+- From the script, engineer: 888 sessions, 1886.7M input tokens
 - From the script, lead: 592 sessions, 162.0M input tokens
-- Started by hand, Claude: 382 sessions, 5105.5M input tokens
+- Started by hand, Claude: 382 sessions, 5107.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
