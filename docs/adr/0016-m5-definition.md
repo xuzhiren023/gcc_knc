@@ -19,6 +19,13 @@ on what users write, faster on code styles M4 did not score, and buildable by an
    Q1-Q6 promoted to scored programs (Q1/Q2 count once, as in S11-20), WRF (one fixed-step case), FFTW through its
    generic-simd path, and one LLM decode kernel (quantized GEMV, S14-08). Every unit has a frozen input and a
    correctness check before any GCC-KNC tuning uses it.
+   **Amendment 1 (owner, 2026-11-16 21:10 EST: "yes, if you think MilkyWay is useful for M5"):** add MilkyWay@home
+   N-body as one development unit (N style: x87-heavy tree build and pointer-chasing walk, the code M4 did not
+   score). Source: the upstream 1.96 release pinned by knc-boinc, fetched plus correctness-only patches (its result
+   contract), not vendored (LGPL/GPL) and without knc-boinc's performance patches, so the unit measures the compiler.
+   Input: knc-boinc's core-small case from workunit 117676 (mixed dwarf, 4,000 bodies, 32 steps). Check: the
+   likelihood is bit-identical to the x86-64 build of the same source. Scored serial like every unit; the OpenMP
+   build is a labelled side track.
 3. **Speed.** Strict matched `-O2`, serial against serial, as ADR-0015 rules 1 and 5 (the SQLite donor exception
    stays and stays labelled). Median speedup over GCC 5.1.1, one-sided 95% lower bound, at least 1.25x on the 7120
    full profile.

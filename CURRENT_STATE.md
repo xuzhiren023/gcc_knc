@@ -16,6 +16,7 @@ M1 is accepted and tagged `m1` locally; nothing is pushed. Engineers are Claude 
 
 ## Proven, and how
 
+ADR-0016 amendment 1 (owner 2026-11-16 21:10 EST): MilkyWay N-body (core-small, pinned 1.96, serial) joins the M5 corpus as a development unit.
 M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.25x LB median, B 7120 scores and
 3100/5100 reported, C Q3/Q5/FFTW held out, D WRF one vote vs plain GCC 5.1.1).
 
