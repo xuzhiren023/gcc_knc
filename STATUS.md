@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:40.
+Updated automatically at every ticket change. Last update: 2026-11-17 10:41.
 
 **Waiting for you:** S14-04. Run `python tools/pm.py inbox`.
 
@@ -167,7 +167,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Done | Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xe... |
-| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | lead | Needs the interactive lead: no-go report done at 0f79b069 (4 new files: docs/research/s14-44-lane0-scalar.m... |
+| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Question for the tech lead | lead merged main into s14/S14-44 and reviewed: approve as is |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress |  |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 10:41 **S14-44** lead resume: lead merged main into s14/S14-44 and reviewed: approve as is
 - 2026-11-17 10:40 **S14-16** owner decide: input_tokens 12M -> 20M, recorded by the lead under the owner's standing budget rule (steady progress: GCC built by the lead at 407f1c63cc7, red te...
 - 2026-11-17 10:38 **S14-24** owner decide: sessions 2 -> 4, recorded by the lead under the owner's standing budget rule (2026-11-09/10: raise on steady progress) and the owner's 2026-11-17 O...
 - 2026-11-17 10:36 **S14-16** engineer escalate: budget: 14669748 input tokens used; the budget is 12000000
@@ -337,13 +338,12 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 10:34 **S14-44** lead defer: Needs the interactive lead: no-go report done at 0f79b069 (4 new files: docs/research/s14-44-lane0-scalar.md, tools/s14_44_lane0.asm, s14_44_mix.c,...
 - 2026-11-17 10:32 **S14-56** owner decide: Owner decision recorded by the lead (owner 2026-11-17: 'Yes, allow it' - the lead records routine owner decisions for stuck tickets). The escalatio...
 - 2026-11-17 10:31 **S13-04** lead changes: Transport red is good: the 2 POSIX failures are the hardcoded ssh.exe/NUL and claude-transfer.exe in tools/card_run connect(), and the Windows and ...
-- 2026-11-17 10:29 **S12-38** lead answer: Yes. Keep the original vect-pr123221.c shape (main, the local assignment, the return) as the T1 red test; an ICE-preserving reproducer is enough, i...
 
 ## Cost
 
 - From the script, engineer: 830 sessions, 1758.6M input tokens
 - From the script, lead: 570 sessions, 158.5M input tokens
-- Started by hand, Claude: 295 sessions, 4830.2M input tokens
+- Started by hand, Claude: 295 sessions, 4830.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
