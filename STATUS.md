@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 15:09.
+Updated automatically at every ticket change. Last update: 2026-11-17 15:10.
 
 **Waiting for you:** S14-60. Run `python tools/pm.py inbox`.
 
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | Rule block: AGENTS.md bans hashing and hash manifests; approved M5Pins tests require them. Authorize record... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | AGENTS.md wins; my ticket's 'and hash' was wrong. A pin is the upstream URL plus a release tag or git commi... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | For the triage: 930529-1.c already failed in the S12-09 batch (1680/1681) and was ruled a known harness opt... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | **Waiting for you** | budget: 8379481 input tokens used; the budget is 6000000 |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 15:10 **S14-56** lead answer: AGENTS.md wins; my ticket's 'and hash' was wrong. A pin is the upstream URL plus a release tag or git commit id (git identifies content); compute n...
 - 2026-11-17 15:09 **S14-60** engineer escalate: budget: 8379481 input tokens used; the budget is 6000000
 - 2026-11-17 15:08 **S14-56** engineer ask: Rule block: AGENTS.md bans hashing and hash manifests; approved M5Pins tests require them. Authorize recording/computing pins or supply approved pi...
 - 2026-11-17 15:06 **S14-04** owner decide: Recorded by the lead (owner 2026-11-17 OK for stuck tickets): the scripted review ended without a decision; the interactive lead reviewed the proto...
@@ -338,13 +339,12 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 15:02 **S12-38** engineer ask: Submission blocked: pm.py submit waited 15 minutes and refused because .work/_state/board.lock is held by another pm or dispatcher process (observe...
 - 2026-11-17 15:01 **S14-16** lead answer: Build ready (43801df4e93, cost 4). Check: knc-scalar-mask-cost.c green AND knc-loop-store-mask.c still emits kxor, vector_checks.py after-run (16 t...
 - 2026-11-17 14:59 **S14-24** owner decide: sessions 4 -> 6 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (red 9957076b, fix...
-- 2026-11-17 14:43 **S14-60** owner decide: sessions 3 -> 5 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (fix f92da326 rele...
 
 ## Cost
 
-- From the script, engineer: 859 sessions, 1842.2M input tokens
+- From the script, engineer: 860 sessions, 1849.0M input tokens
 - From the script, lead: 585 sessions, 160.8M input tokens
-- Started by hand, Claude: 349 sessions, 4976.3M input tokens
+- Started by hand, Claude: 349 sessions, 4979.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
