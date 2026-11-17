@@ -24,8 +24,9 @@ M4 = {'PB-gemm', 'PB-atax', 'PB-cholesky', 'PB-ludcmp', 'PB-jacobi-2d',
 class M5Pins(unittest.TestCase):
     """Proposed manifest API: M5_SOURCES[unit], also embedded in plan rows.
 
-    Each source has source_url, version and hash; WRF inputs have source and
-    hash. These assert recorded pins only; tests never compute file hashes.
+    Each source has source_url and a release/edition or commit pin. WRF inputs
+    retain the original source paths and the authorized conversion command.
+    S14-56 lead correction 2026-11-17: no content digests.
     """
 
     def sources(self):
@@ -33,12 +34,7 @@ class M5Pins(unittest.TestCase):
         self.assertIsInstance(sources, dict, 'missing pinned M5 source manifest')
         return sources
 
-    def assert_hash(self, value):
-        self.assertIsInstance(value, str)
-        self.assertRegex(value, r'\A(?:[0-9a-f]{40}|[0-9a-f]{64})\Z')
-        self.assertNotEqual(set(value), {'0'})
-
-    def test_every_new_unit_records_source_version_and_hash(self):
+    def test_every_new_unit_records_source_and_release_or_commit(self):
         sources = self.sources()
         for unit in UNITS:
             with self.subTest(unit=unit):
@@ -47,7 +43,8 @@ class M5Pins(unittest.TestCase):
                 self.assertRegex(pin['source_url'], r'\Ahttps?://\S+\Z')
                 self.assertIsInstance(pin['version'], str)
                 self.assertTrue(pin['version'].strip())
-                self.assert_hash(pin['hash'])
+                self.assertTrue(pin.get('tag') or pin.get('commit') or pin.get('edition'))
+                self.assertNotIn('hash', pin)
         for row in corpus.make_plan(core_count=60):
             if row['program'] in UNITS:
                 self.assertEqual(row['source'], sources[row['program']])
@@ -57,7 +54,7 @@ class M5Pins(unittest.TestCase):
         self.assertEqual(pin['source_url'],
                          'https://github.com/Milkyway-at-home/milkywayathome_client')
         self.assertEqual(pin['version'], 'nbody_1.96')
-        self.assertEqual(pin['hash'], '1e640779f1cabf88aaa49e4db569cfe7e09016c4')
+        self.assertEqual(pin['commit'], '1e640779f1cabf88aaa49e4db569cfe7e09016c4')
         patches = pin['patches']
         expected = {'crlibm-config-path.patch', 'nbody-king-const.patch',
                     'nbody-result-contract.patch', 'nbody-wrapper-files.patch',
@@ -65,7 +62,7 @@ class M5Pins(unittest.TestCase):
         self.assertEqual(set(patches), expected)
         self.assertEqual(len(patches), len(expected))
 
-    def test_wrf_input_and_namelist_sources_have_frozen_hashes(self):
+    def test_wrf_input_sources_and_conversion_are_frozen(self):
         pin = self.sources()['WRF']
         base = 'C:/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/'
         case = base + 'accuracy-downloads-20261112/cases/miami-20240106/hn12rlh/inputs/'
@@ -77,7 +74,10 @@ class M5Pins(unittest.TestCase):
             with self.subTest(input=name):
                 record = pin['inputs'][name]
                 self.assertEqual(record['source'].replace('\\', '/'), source)
-                self.assert_hash(record['hash'])
+                self.assertNotIn('hash', record)
+                if name != 'namelist.input':
+                    self.assertEqual(record['conversion'],
+                                     'nccopy -k 64-bit-offset <in> <out>')
 
 
 class M5Manifest(unittest.TestCase):

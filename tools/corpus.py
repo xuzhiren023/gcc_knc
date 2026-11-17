@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Frozen M4 corpus: stage on host, lead launches on card, collect on host.
+"""Frozen M4/M5 corpus: stage on host, lead launches on card, collect on host.
 
 See corpus/README.md. Only the ticket-authorized staged HPCG fix is applied.
 No compiler builds or implicit card jobs.
@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SHARED = ROOT.parent / '_shared' if ROOT.parent.name == '.work' else ROOT / '.work/_shared'
 SUPPORT = ROOT / 'tools/corpus'
 DONOR, KNC = 'gcc-5.1.1', 'gcc-knc'
-HELD_OUT = {'PB-adi', 'PB-durbin', 'bzip2'}
+HELD_OUT = {'PB-adi', 'PB-durbin', 'bzip2', 'Q3', 'Q5'}
 PB = {
     'gemm': dict(NI=512, NJ=512, NK=512),
     'atax': dict(M=4096, N=4096),
@@ -38,6 +38,40 @@ PB = {
 OPENMP = ('STREAM', 'NPB-CG', 'NPB-EP', 'NPB-MG', 'NPB-IS', 'HPCG')
 OPENMP_PANEL = 'the donor toolchain has no OpenMP runtime'
 PROGRAMS = tuple('PB-' + name for name in PB) + OPENMP + ('zlib', 'SQLite', 'bzip2')
+M5_Q_UNITS = ('Q1/Q2', 'Q3', 'Q4', 'Q5', 'Q6')
+M5_STYLES = dict(zip(M5_Q_UNITS, ('C', 'N', 'H', 'N', 'G')),
+                 **{'MilkyWay-Nbody': 'S', 'WRF': 'S'})
+PROGRAMS += tuple(M5_STYLES)
+PHIWEATHER_STATE = 'C:/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/'
+WRF_CASE = PHIWEATHER_STATE + 'accuracy-downloads-20261112/cases/miami-20240106/hn12rlh/inputs/'
+WRF_PLAN = (PHIWEATHER_STATE + 'claude-mentor-performance-20261105/'
+            'bt-20240106-MIA-HN12RLH-S1126-04/')
+M5_SOURCES = {
+    'Q1/Q2': dict(source_url='https://github.com/RayTracing/raytracing.github.io',
+                  version='v4.0.2', tag='v4.0.2'),
+    'Q3': dict(source_url='https://people.math.sc.edu/Burkardt/cpp_src/md/md.cpp',
+               version='2014-12-27', edition='2014-12-27'),
+    'Q4': dict(source_url='https://github.com/Reference-LAPACK/lapack',
+               version='3.12.0', tag='v3.12.0'),
+    'Q5': dict(source_url='https://www.kevinbeason.com/smallpt/',
+               version='2008', edition='original 2008'),
+    'Q6': dict(source_url='https://github.com/skvadrik/re2c', version='3.1', tag='3.1'),
+    'MilkyWay-Nbody': dict(
+        source_url='https://github.com/Milkyway-at-home/milkywayathome_client',
+        version='nbody_1.96', tag='nbody_1.96',
+        commit='1e640779f1cabf88aaa49e4db569cfe7e09016c4',
+        patches=['crlibm-config-path.patch', 'nbody-king-const.patch',
+                 'nbody-result-contract.patch', 'nbody-wrapper-files.patch', 'popt-cygwin.patch']),
+    'WRF': dict(source_url='https://github.com/wrf-model/WRF', version='4.8.0', tag='v4.8.0',
+                inputs={name: dict(source=WRF_CASE + name,
+                                   conversion='nccopy -k 64-bit-offset <in> <out>')
+                        for name in ('wrfinput_d01', 'wrfinput_d02', 'wrfbdy_d01')},
+                layout=dict(ranks=8, threads_per_rank=15, nproc_x=2, nproc_y=4,
+                            tiles_x=5, tiles_y=3),
+                time_step=60, steps=dict(d01=60, d02=180)),
+}
+M5_SOURCES['WRF']['inputs']['namelist.input'] = dict(
+    source=WRF_PLAN + 'namelist.input', edits=dict(run_hours='1', end_day='6,6', end_hour='13,13'))
 INPUTS = {'PB-' + name: 'polybench-4.2.1-double-' + '-'.join('%s=%s' % x for x in dims.items())
           for name, dims in PB.items()}
 INPUTS.update({p: 'NPB-3.4.2-class-A' for p in OPENMP if p.startswith('NPB-')})
@@ -45,6 +79,15 @@ INPUTS.update(STREAM='STREAM-5.10-3x16777216-double-20-iterations',
               HPCG='HPCG-3.1-104x104x104-rt0',
               zlib='lcg-seed-11-8MiB-level6', bzip2='lcg-seed-11-8MiB-level9',
               SQLite='sqlite-3.46.1-recursive-100000-v1')
+INPUTS.update({
+    'Q1/Q2': 'S12-02-Q1-32x24-depth5-Q2-13-lengths-130-cases',
+    'Q3': 'S12-02-Q3-32-particles-3-dimensions-3-steps-dt0.001',
+    'Q4': 'S12-02-Q4-M17-N31-K9-LD40-four-transposes-two-orders',
+    'Q5': 'S12-02-Q5-16x12-one-ray-fixed-erand48-seeds',
+    'Q6': 'S12-02-Q6-nine-frozen-passwd-records',
+    'MilkyWay-Nbody': 'nbody_1.96-workunit117676-core-small-4000-bodies-32-steps-seed65477096',
+    'WRF': 'WRF-4.8.0-miami-20240106-12Z-13Z-d01-60-d02-180-steps-dm+sm-8x15',
+})
 RTOL, ATOL = 1e-8, 1e-10
 
 
@@ -78,7 +121,7 @@ def make_plan(repetitions=3, extra_flags=None, *, core_count=None):
       for run in range(repetitions):
        for profile, cores in [('full', core_count), ('3100', 56), ('5100', 59)]:
         for program in PROGRAMS:
-            panels = [(1, 'serial', 'primary')]
+            panels = [(120, 'dm+sm', 'primary')] if program == 'WRF' else [(1, 'serial', 'primary')]
             if side_panel:
                 panels = ([(t, 'openmp', OPENMP_PANEL) for t in (cores, cores * 2, cores * 4)]
                           if program in OPENMP else [])
@@ -95,7 +138,9 @@ def make_plan(repetitions=3, extra_flags=None, *, core_count=None):
                                 profile=profile, variant=variant, panel=panel,
                                 pair_id=None if side_panel else '%s/%s/%d/%d' % (profile, program, index, run),
                                 start_order=start_order, launch_order=len(plan),
-                                held_out=program in HELD_OUT))
+                                held_out=program in HELD_OUT,
+                                **(dict(style=M5_STYLES[program], source=M5_SOURCES[program])
+                                   if program in M5_STYLES else {})))
     return plan
 
 
@@ -642,7 +687,6 @@ def write_lead_script(stage_dir):
     shutil.copyfile(SUPPORT / 'README.md', stage_dir / 'README.md')
 
 
-M5_Q_UNITS = ('Q1/Q2', 'Q3', 'Q4', 'Q5', 'Q6')
 WRF_FIELDS = ('T', 'QVAPOR', 'U', 'V', 'W', 'PH', 'MU', 'PSFC',
               'T2', 'Q2', 'U10', 'V10', 'RAINNC')
 
