@@ -332,7 +332,8 @@ class Runner:
         self.cc = Path(args.cc) if args.cc else (build / 'xgcc' if args.compiler == 'gcc16' else self.tool('gcc'))
         self.cc_flags = ['-B' + str(build) + '/'] if args.compiler == 'gcc16' and not args.cc else []
         self.env = os.environ.copy()
-        self.env['PATH'] = os.pathsep.join(str(self.tc / p) for p in ('cross/bin', 'cygwin/bin')) + os.pathsep + self.env.get('PATH', '')
+        tool_paths = ['cross/bin'] + (['cygwin/bin'] if sys.platform == 'cygwin' or os.name == 'nt' else [])
+        self.env['PATH'] = os.pathsep.join(str(self.tc / p) for p in tool_paths) + os.pathsep + self.env.get('PATH', '')
         output_root = PROJECT / '.work/_shared/check'
         output_root.mkdir(parents=True, exist_ok=True)
         self._output = tempfile.TemporaryDirectory(dir=output_root,
@@ -347,7 +348,8 @@ class Runner:
         self.off_object = None
 
     def tool(self, name):
-        return self.tc / ('cross/bin/k1om-mpss-linux-' + name + '.exe')
+        suffix = '.exe' if os.name == 'nt' or sys.platform == 'cygwin' else ''
+        return self.tc / ('cross/bin/k1om-mpss-linux-' + name + suffix)
 
     def say(self, text):
         print(text, flush=True)

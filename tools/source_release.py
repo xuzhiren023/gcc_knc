@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
-"""Audit committed sources and export a full-history bundle and numbered patches.
+"""Audit committed sources and export a full-history bundle and squashed diff.
 
 No working-tree files enter an export. Rejected tracked files are reported, never
 silently filtered: filtering would change the branch identity and its history.
-An export audits every reachable tree, including historical trees. Large real
-repositories therefore need a reviewed release policy before using this strict
-fixture/project policy; there is deliberately no skip-audit switch.
+The tip must pass the audit. Published history is retained, never rewritten.
 """
 import argparse
 import json
@@ -56,6 +54,7 @@ def ignored_paths(repo, tree):
                 target.write_bytes(git(repo, 'cat-file', 'blob', oid))
         data = b''.join(os.fsencode(row[0]) + b'\0' for row in tree)
         output = git(scratch, '-c', 'core.excludesFile=' + os.devnull,
+                     '-c', 'core.ignoreCase=false',
                      'check-ignore', '--no-index', '-z', '--stdin', data=data,
                      codes=(0, 1)) if data else b''
         return {os.fsdecode(name) for name in output.split(b'\0') if name}
@@ -88,9 +87,41 @@ def path_reasons(name, mode, kind, size):
     return reasons
 
 
+def binary_blobs(repo, oids, blob_cache):
+    """Inspect blobs through one Git process, without loading a tree into memory."""
+    missing = set(oids) - blob_cache.keys()
+    if not missing:
+        return
+    with subprocess.Popen(['git', '-C', str(repo), 'cat-file', '--batch'],
+                          stdin=subprocess.PIPE, stdout=subprocess.PIPE) as process:
+        for oid in missing:
+            process.stdin.write((oid + '\n').encode())
+            process.stdin.flush()
+            header = process.stdout.readline().split()
+            if len(header) != 3 or header[1] != b'blob':
+                raise RuntimeError('cannot read source blob ' + oid)
+            size = int(header[2])
+            prefix = process.stdout.read(min(size, 8))
+            remaining = size - len(prefix)
+            while remaining:
+                chunk = process.stdout.read(min(remaining, 65536))
+                if not chunk:
+                    raise RuntimeError('truncated source blob ' + oid)
+                remaining -= len(chunk)
+            process.stdout.read(1)
+            blob_cache[oid] = prefix.startswith((b'\x7fELF', b'MZ', b'!<arch>\n',
+                                                b'%PDF-', b'PK\x03\x04', b'\x1f\x8b'))
+        process.stdin.close()
+        if process.wait():
+            raise RuntimeError('source blob inspection failed')
+
+
 def audit(repo, revision, blob_cache):
     tree = entries(repo, revision)
     ignored = ignored_paths(repo, tree)
+    binary_blobs(repo, (oid for name, mode, kind, oid, size in tree
+                       if kind == b'blob' and name not in ignored
+                       and not path_reasons(name, mode, kind, size)), blob_cache)
     excluded = []
     for name, mode, kind, oid, size in tree:
         reasons = path_reasons(name, mode, kind, size)
@@ -99,10 +130,6 @@ def audit(repo, revision, blob_cache):
         # Do not open prohibited vendor content. Small source blobs are checked
         # for executable/archive magic even when their names disguise the type.
         if kind == b'blob' and not reasons:
-            if oid not in blob_cache:
-                data = git(repo, 'cat-file', 'blob', oid)
-                blob_cache[oid] = data.startswith((b'\x7fELF', b'MZ', b'!<arch>\n',
-                                                   b'%PDF-', b'PK\x03\x04', b'\x1f\x8b'))
             if blob_cache[oid]:
                 reasons.append('binary executable, archive or document signature')
         if reasons:
@@ -121,12 +148,14 @@ def export(repo, ref, revision, base, output):
             raise ValueError('--base must name the upstream tag')
         base_commit = git(repo, 'rev-parse', '--verify', base + '^{commit}').decode().strip()
         git(repo, 'merge-base', '--is-ancestor', base_commit, revision)
-        # format-patch drops merge commits. Refuse rather than omit their edits.
-        if git(repo, 'rev-list', '--merges', base_commit + '..' + revision).strip():
-            raise ValueError('merge commits require a reviewed patch-series policy')
     if output.exists() and any(output.iterdir()):
         raise ValueError('output must be empty; remove the previous release deliberately')
     cache, seen = {}, set()
+    rejected = audit(repo, revision, cache)
+    if rejected:
+        print(json.dumps({'commit': revision, 'excluded': rejected}, indent=2))
+        return 1
+    historical = {}
     for row in git(repo, 'log', '--format=%H %T', revision).decode().splitlines():
         commit, tree = row.split()
         if tree in seen:
@@ -134,8 +163,8 @@ def export(repo, ref, revision, base, output):
         seen.add(tree)
         rejected = audit(repo, commit, cache)
         if rejected:
-            print(json.dumps({'commit': commit, 'excluded': rejected}, indent=2))
-            return 1
+            for item in rejected:
+                historical.setdefault((item['path'], item['reason']), commit)
     # Freeze refs in a small temporary bare repository sharing only the source
     # object store. No refs are changed in the source repository, and a branch
     # advancing during export cannot change the already audited revision.
@@ -156,16 +185,20 @@ def export(repo, ref, revision, base, output):
         if base_commit:
             patches = output / 'patches'
             patches.mkdir()
-            git(scratch, 'format-patch', '--no-signature', '--no-renames', '--full-index',
-                '--binary', '--numbered', '--output-directory', patches,
-                base_commit + '..' + revision)
+            (patches / '0001-knc-squashed.patch').write_bytes(
+                git(scratch, 'diff', '--no-ext-diff', '--no-textconv', '--no-renames',
+                    '--full-index', '--binary', base_commit, revision))
     (output / 'README.txt').write_text(
         'Source release\nBranch: ' + branch + '\nCommit: ' + revision + '\n'
         + ('Upstream tag: ' + base + '\nUpstream commit: ' + base_commit + '\n' if base else '')
         + 'source.bundle contains complete reachable history, without prerequisites.\n'
-        + 'All reachable committed trees passed the strict source audit.\n'
+        + 'The tip tree passed the strict source audit. Historical artifacts are retained.\n'
         + 'Untracked/ignored workspace files are excluded because only Git objects are exported.\n'
-        + ('Apply patches in numbered order with git am from the upstream tag.\n' if base else ''),
+        + ('Apply patches/0001-knc-squashed.patch with git apply from the upstream tag.\n'
+           'The squashed diff includes merge resolutions; the bundle preserves full history.\n' if base else '')
+        + '\nHistorical findings (path: reason; example commit):\n'
+        + ''.join(path + ': ' + reason + '; ' + commit + '\n'
+                  for (path, reason), commit in sorted(historical.items())),
         encoding='utf8')
     print('Exported ' + revision + ' to ' + str(output))
     return 0
@@ -175,13 +208,14 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('audit', 'export'))
     parser.add_argument('--repo', required=True, type=Path)
-    parser.add_argument('--ref', required=True)
+    parser.add_argument('--ref', help='default: knc with --base, otherwise main')
     parser.add_argument('--base')
     parser.add_argument('--output', type=Path)
     parser.add_argument('--json', action='store_true')
     args = parser.parse_args()
     try:
         repo = args.repo.resolve()
+        args.ref = args.ref or ('knc' if args.base else 'main')
         revision = git(repo, 'rev-parse', '--verify', args.ref + '^{commit}').decode().strip()
         if args.action == 'export':
             if args.output is None:

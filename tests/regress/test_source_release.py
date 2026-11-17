@@ -24,7 +24,8 @@ class SourceRelease(unittest.TestCase):
     audit --repo REPO --ref REF --json emits {"excluded": [{"path": ...,
     "reason": ...}]} and fails if a tracked path is unsuitable for release.
     export adds --base TAG --output DIR and writes source.bundle plus
-    patches/0001-*.patch, etc. It exports committed source, not workspace files.
+    patches/0001-knc-squashed.patch. Published history is retained and reported;
+    only the tip must be clean (lead decision 2026-11-17).
     """
 
     def setUp(self):
@@ -95,12 +96,25 @@ class SourceRelease(unittest.TestCase):
                 self.assertRegex(" ".join(reasons[path]).lower(), reason)
 
     def test_clean_tracked_tree_passes_audit(self):
+        self.write("src/handwritten.S", ".text\n")
+        self.write(".gitignore", "ignored/\n.work/\n*.o\n*.exe\n*.s\n")
+        self.commit("fixture case-sensitive source assembly")
         result = self.release("audit", "--json")
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(json.loads(result.stdout)["excluded"], [])
 
-    def test_exports_only_committed_source_as_bundle_and_numbered_patches(self):
+    def test_exports_clean_tip_with_history_and_squashed_merge_diff(self):
         expected = {".gitignore", "src/example.c", "src/extra.c"}
+        self.write("old.o", "historical synthetic artifact\n")
+        self.commit("fixture historical artifact")
+        (self.repo / "old.o").unlink()
+        self.commit("fixture remove historical artifact")
+        self.git("checkout", "-qb", "side", self.base)
+        self.write("src/side.c", "int side(void) { return 3; }\n")
+        self.commit("fixture side")
+        self.git("checkout", "-q", "main")
+        self.git("merge", "--no-ff", "-qm", "fixture merge", "side")
+        expected.add("src/side.c")
         # These exist on disk but must never enter either export.
         for path in ("ignored/local.txt", ".work/card-output.txt", "obj/local.o",
                      "tool.exe", "vendor/intel-manual.pdf", "untracked.txt"):
@@ -121,11 +135,14 @@ class SourceRelease(unittest.TestCase):
         for revision in self.git("rev-list", "main", cwd=clone).splitlines():
             paths = set(self.git("ls-tree", "-r", "--name-only", revision,
                                  cwd=clone).splitlines())
-            self.assertTrue(paths <= expected, paths - expected)
+            self.assertTrue(paths <= expected | {"old.o"}, paths - expected)
         self.assertEqual(set(self.git("ls-tree", "-r", "--name-only", "main",
                                       cwd=clone).splitlines()), expected)
         patches = sorted((output / "patches").glob("*.patch"))
-        self.assertEqual(len(patches), 2)
+        self.assertEqual(len(patches), 1)
+        readme = (output / "README.txt").read_text()
+        self.assertIn("old.o: build artifact", readme)
+        self.assertIn(self.git("rev-parse", "main").strip(), readme)
         self.git("checkout", "-q", self.base, cwd=clone)
         for number, patch in enumerate(patches, 1):
             self.assertRegex(patch.name, rf"^{number:04d}-.+\.patch$")
@@ -192,6 +209,32 @@ class LinuxCardTransport(unittest.TestCase):
         self.assertEqual(command[command.index("-F") + 1].lower(), "nul")
         self.assertIn("globalknownhostsfile=nul", [part.lower() for part in command])
         self.assertEqual(session.host_helper.name, "claude-transfer.exe")
+
+
+class LinuxHostTools(unittest.TestCase):
+    def test_native_check_tools_and_x86_configuration(self):
+        sys.path.insert(0, str(ROOT / "tools"))
+        self.addCleanup(sys.path.pop, 0)
+        host_os = SimpleNamespace(**vars(os))
+        host_os.name = "posix"
+        with mock.patch("sys.platform", "linux"):
+            runner = runpy.run_path(str(ROOT / "tools/check.py"))["Runner"]
+            with mock.patch.dict(runner.tool.__globals__, os=host_os):
+                instance = object.__new__(runner)
+                instance.tc = Path("toolchain")
+                self.assertEqual(instance.tool("as").as_posix(),
+                                 "toolchain/cross/bin/k1om-mpss-linux-as")
+            # runpy uses the real os; patch only the module binding at import.
+            with mock.patch.dict(sys.modules, os=host_os):
+                portability = runpy.run_path(str(ROOT / "tools/portability.py"))
+        self.assertEqual(portability["EXE_SUFFIX"], "")
+        self.assertFalse(any("cygwin" in flag for flag in portability["CONFIGURE_ARGS"]))
+        with mock.patch("subprocess.check_output", return_value="python3\nmake\n") as ps:
+            self.assertTrue(portability["make_is_running"]())
+        ps.assert_called_once_with(["ps", "-eo", "comm="], text=True,
+                                   stderr=subprocess.STDOUT)
+        with mock.patch("subprocess.check_output", return_value="python3\n"):
+            self.assertFalse(portability["make_is_running"]())
 
 
 if __name__ == "__main__":
