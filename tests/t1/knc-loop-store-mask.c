@@ -1,4 +1,5 @@
-// options: -O2 -march=knc
+// options: -O2 -march=knc --param=knc-mask-gpr-move-cost=1
+// Keep cheap mask transfers to exercise the S6-14 reload path.
 // scan-asm-func batch: \bkxor\s+%k([0-7]),\s*%k\1\s*$
 // S6-14: reload creates k1:QI=0 for a loop-store-motion flag.
 // S6-10 already handles it; the reported ICE was an unmerged S6-05 WIP.
