@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 11:47.
+Updated automatically at every ticket change. Last update: 2026-11-17 11:49.
 
-**Waiting for you:** S14-50. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-22, S14-50. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 276 of 306
 
@@ -150,7 +150,7 @@ Current tickets: `[##################--]` 276 of 306
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
-| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | In progress | See the lead resume note above: the hang is your red test waiting out card_run's admission timeout; give wa... |
+| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | sessions 2 -> 4, recorded by the lead under the owner's standing budget rule (2026-11-09/10: raise on stead... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 276 of 306
 
 ## Recent activity
 
+- 2026-11-17 11:49 **S14-22** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 11:45 **S14-04** engineer ask: Complete at 85d26a25 (red c652530b): M5 protocol and triage extension, seven properties, bounds/gaps, four outcomes/levels, style and donor-margin ...
 - 2026-11-17 11:40 **S14-50** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 11:40 **S12-20** lead note: Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log and atan (exp easy, pow hard), so vector...
@@ -338,16 +339,15 @@ Current tickets: `[##################--]` 276 of 306
 - 2026-11-17 11:36 **S12-38** engineer ask: GCC build needed at 41bc85cf422 (gcc2). Generic SLP indexes an empty scalar_stmts after cast forwarding folds the reduction cycle to a no-op conver...
 - 2026-11-17 11:33 **S14-56** engineer red: Red commit 0704996e: one host-only run of test_corpus_m5*.py completed with 15 expected assertion failures across 5 tests: seven missing scored uni...
 - 2026-11-17 11:32 **S14-16** lead answer: Good progress (zlib kmov 14->0). (1) Do not weaken knc-loop-store-mask.c: a flat 6 is too blunt, because it also pushes genuine mask values out of ...
-- 2026-11-17 11:26 **S14-16** engineer ask: Reused completed runs: scalar T1 and T2 pass; 16 vector tests retain masked-vector counts; zlib kmov 14->0. Log .work/_state/logs/S14_16_T0_T2-2026...
 
 ## Cost
 
-- From the script, engineer: 840 sessions, 1781.4M input tokens
+- From the script, engineer: 841 sessions, 1784.5M input tokens
 - From the script, lead: 573 sessions, 159.1M input tokens
-- Started by hand, Claude: 309 sessions, 4856.5M input tokens
+- Started by hand, Claude: 309 sessions, 4857.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 315 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 314 GiB free on the drive.
