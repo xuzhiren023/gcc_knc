@@ -97,6 +97,10 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Window 14 approved by the owner 2026-11-16 22:05 EST: knc-boinc's N-body check batch (~25-30 min), queued 03:04Z
+  behind PhiWeather's warm twin (ends ~05:21Z); script .work/_shared/tmp/claude-s14-w14.sh, log window14.out; lead
+  sends knc-boinc "go" on "card free" and touches .work/_state/w14-boinc-done on "boinc done"; cap card-free + 40 min.
+  Laptop: owner asked to unload it; no gcc_knc dispatchers running (also disk 28 GB < 30 GB stop).
 - Window 13 (2026-11-17 02:33-02:36Z): all ten twin-generated programs (T1-15 generator, host smoke passed) segfault
   at start on the card again (exit 139). Lead rule: no more batches of generated programs; next window runs one
   diagnostic program (SIGSEGV report, --reps 1) as a single smoke job, and the batch only after it passes.
