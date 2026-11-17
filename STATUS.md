@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:29.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:31.
 
-**Next: the tech lead, on S12-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S13-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 281 of 308
+Current tickets: `[##################--]` 282 of 308
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 281 of 308
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
-| M5 | Program corpus | In progress | 35 of 51 tickets |
+| M5 | Program corpus | In progress | 36 of 51 tickets |
 | M6 | Release | In progress | 0 of 11 tickets |
 
 ## Tickets
@@ -118,7 +118,7 @@ Current tickets: `[##################--]` 281 of 308
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Done | T1 and T2 checks now write every generated file into the run's own output folder, so a file left by another... |
-| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Waiting for review | State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatche... |
+| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Done | The -O3 -march=knc vectorizer crash on SLP reduction chains (gcc.dg vect-pr123221.c) is fixed: GCC-KNC now ... |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Folded into S12-30 (sparse indexed reductions),... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: M4 harness item; the M5 donor-margin ch... |
@@ -336,17 +336,17 @@ Current tickets: `[##################--]` 281 of 308
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
+- 2026-11-17 17:31 **S12-38** lead approve: The -O3 -march=knc vectorizer crash on SLP reduction chains (gcc.dg vect-pr123221.c) is fixed: GCC-KNC now compiles it, with zero crashes across 8,...
 - 2026-11-17 17:29 **S13-04** engineer ask: Submission after the 17:21 lead instruction is refused: 827 changed lines exceed the 800-line budget. All work and staged exports remain as reporte...
 - 2026-11-17 17:25 **S14-50** owner decide: sessions 7 -> 8, recorded by the lead (owner 2026-11-17 OK): the lead made the two review changes (value {threads_1: 7.076, threads_2: 13.106}, uni...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
 - 2026-11-17 17:24 **S14-16** lead answer: Not building 494881688b9 yet: it will not compile. struct processor_costs (i386.h:122 on) has const int members, so 'processor_costs costs[8][2];' ...
-- 2026-11-17 17:22 **S14-50** lead escalate: budget: 7 engineer sessions used; the budget is 7
 
 ## Cost
 
 - From the script, engineer: 883 sessions, 1875.7M input tokens
 - From the script, lead: 592 sessions, 162.0M input tokens
-- Started by hand, Claude: 377 sessions, 5093.6M input tokens
+- Started by hand, Claude: 377 sessions, 5094.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
