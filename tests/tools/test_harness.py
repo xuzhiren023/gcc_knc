@@ -470,6 +470,7 @@ class BoardLockRaces(Sandbox):
                 mock.patch.object(pm, "cmd_start", side_effect=[pm.Refused("the board is busy: lock"),
                                                                pm.Refused("the board is busy: lock"), None]) as step, \
                 mock.patch.object(dispatch, "engineer_command", return_value=[]), \
+                mock.patch.object(pm, "require_ticket_worktree"), \
                 mock.patch.object(dispatch, "session_env", return_value={}), \
                 mock.patch.object(dispatch, "run_session_process", side_effect=FileNotFoundError), \
                 mock.patch.object(dispatch, "over_budget", return_value=None), \

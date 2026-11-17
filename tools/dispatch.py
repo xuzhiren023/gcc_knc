@@ -259,6 +259,8 @@ def run_session(board, ticket, role, dry_run):
     if role == "engineer":
         try:
             retry_busy(pm.cmd_start, board, argparse.Namespace(id=ticket.id))
+            ticket = board.load(ticket.id)
+            pm.require_ticket_worktree(board, ticket)
         except pm.Refused as refused:
             print("  %s could not start, so no session ran: %s" % (ticket.id, refused))
             return False
