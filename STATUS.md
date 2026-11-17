@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 281 of 308
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | (1) Yes: the GCC artifact audit covers only files that differ from releases/gcc-16.2.0 (git diff --name-onl... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | 0e78d2f1: 8 host tests PASS; log .work/_state/logs/S13_04_source_release_history-20261117-170448.log. GCC b... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -335,18 +335,18 @@ Current tickets: `[##################--]` 281 of 308
 
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:09 **S13-04** engineer ask: 0e78d2f1: 8 host tests PASS; log .work/_state/logs/S13_04_source_release_history-20261117-170448.log. GCC b2ce6a9eebf exported to .work/_shared/S13...
 - 2026-11-17 17:08 **S14-24** owner decide: Recorded by the lead (owner 2026-11-17 OK): input_tokens 12M (re-applied after the main reset); finish green and submit.
 - 2026-11-17 17:07 **S12-38** engineer escalate: This engineer session was dispatched after the successful 16:55 submission; ticket is already in review. submit refuses expected doing, and ask ref...
 - 2026-11-17 17:06 **S14-16** owner decide: Recorded by the lead (owner 2026-11-17 OK; budget sessions 11). Decision on the 17:02 ask: keep cost 4 as the default; preserve S6-14's reload cove...
 - 2026-11-17 17:05 **S14-04** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 17:04 **S14-16** engineer escalate: budget: 9 engineer sessions used; the budget is 8
-- 2026-11-17 17:03 **S14-24** engineer escalate: budget: 7592950 input tokens used; the budget is 6000000
 
 ## Cost
 
 - From the script, engineer: 876 sessions, 1863.9M input tokens
 - From the script, lead: 589 sessions, 161.4M input tokens
-- Started by hand, Claude: 373 sessions, 5062.6M input tokens
+- Started by hand, Claude: 373 sessions, 5064.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
