@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 12:02.
+Updated automatically at every ticket change. Last update: 2026-11-17 12:05.
 
 **Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 276 of 306
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | The failing tests for the source release are approved: they check that a release audit reports and rejects ... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | Commit fe1f9683: all 7 source-export/SSH host tests PASS. Log: .work/_state/logs/S13_04_source_release_gree... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 276 of 306
 
 ## Recent activity
 
+- 2026-11-17 12:05 **S13-04** engineer ask: Commit fe1f9683: all 7 source-export/SSH host tests PASS. Log: .work/_state/logs/S13_04_source_release_green-20261117-113152.log. Need frozen GCC k...
 - 2026-11-17 12:02 **S14-44** engineer submit: Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x, below the 1.5x bar, and no existing flag set beats the conservati...
 - 2026-11-17 11:56 **S14-50** owner decide: sessions 3 -> 4, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the work was complete but uncommitted; the lead com...
 - 2026-11-17 11:53 **S14-44** lead answer: Main merged into s14/S14-44 again (c6e88d7b; main had moved). Size: approved, submit with --override 'research report and model tools the ticket as...
@@ -338,13 +339,12 @@ Current tickets: `[##################--]` 276 of 306
 - 2026-11-17 11:45 **S14-04** engineer ask: Complete at 85d26a25 (red c652530b): M5 protocol and triage extension, seven properties, bounds/gaps, four outcomes/levels, style and donor-margin ...
 - 2026-11-17 11:40 **S14-50** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 11:40 **S12-20** lead note: Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log and atan (exp easy, pow hard), so vector...
-- 2026-11-17 11:37 **S14-44** engineer ask: Submission after the lead merge and approve-as-is instruction was refused: the branch lacks real changes from main (checker asks to merge main into...
 
 ## Cost
 
 - From the script, engineer: 842 sessions, 1786.1M input tokens
 - From the script, lead: 573 sessions, 159.1M input tokens
-- Started by hand, Claude: 312 sessions, 4862.8M input tokens
+- Started by hand, Claude: 312 sessions, 4863.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
