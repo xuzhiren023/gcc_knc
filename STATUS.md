@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 18:01.
+Updated automatically at every ticket change. Last update: 2026-11-17 18:03.
 
-**Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S13-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 282 of 308
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft | Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our windo... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | sessions 6 -> 8 (header updated), recorded by the lead (owner 2026-11-17 OK). Lead ran the harness tests on... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -334,19 +334,19 @@ Current tickets: `[##################--]` 282 of 308
 ## Recent activity
 
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
+- 2026-11-17 18:03 **S14-24** owner decide: sessions 6 -> 8 (header updated), recorded by the lead (owner 2026-11-17 OK). Lead ran the harness tests on your branch (Cygwin, tests/tools): 58 r...
 - 2026-11-17 18:01 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc d2ab3509a1e (s14/S14-16). Reviewed: static const table[8][2] fixes the const-member error; index...
 - 2026-11-17 17:59 **S14-64** lead defer: Review passed; ready to approve. My approve was killed at the 10-minute tool limit during T0, so nothing merged and the ticket is still in review. ...
 - 2026-11-17 17:54 **S14-50** owner decide: sessions 8 -> 9, recorded by the lead (owner 2026-11-17 OK). The review changes are already committed by the lead (3fef5f08) with main merged (0936...
 - 2026-11-17 17:52 **S14-56** owner decide: sessions 8 -> 12 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (Q1-Q6 built, lin...
 - 2026-11-17 17:50 **S13-04** engineer ask: Submit with the approved 827-line override now refuses: the branch lacks real changes from main. Please merge current main into s13/S13-04 and resu...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
-- 2026-11-17 17:49 **S14-56** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 
 ## Cost
 
 - From the script, engineer: 888 sessions, 1886.7M input tokens
-- From the script, lead: 592 sessions, 162.0M input tokens
-- Started by hand, Claude: 383 sessions, 5107.5M input tokens
+- From the script, lead: 593 sessions, 162.1M input tokens
+- Started by hand, Claude: 384 sessions, 5112.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
