@@ -118,7 +118,7 @@ Current tickets: `[##################--]` 280 of 307
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Done | T1 and T2 checks now write every generated file into the run's own output folder, so a file left by another... |
-| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | In progress | Main merged into s12/S12-38 (1abf4e92, includes S14-62). Submit now with the 13:55 results, no reruns; note... |
+| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Waiting for review | T0-T2 PASS on gcc2 41bc85cf422. Torture 8012 cases and vect 2001 sources: zero ICEs; classifications match ... |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Folded into S12-30 (sparse indexed reductions),... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: M4 harness item; the M5 donor-margin ch... |
@@ -334,18 +334,18 @@ Current tickets: `[##################--]` 280 of 307
 
 - 2026-11-17 16:55 **S14-24** owner decide: input_tokens 6M -> 12M (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: progress (fix 14df1710). Fi...
 - 2026-11-17 16:55 **S14-16** owner decide: sessions 8 -> 11 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the sessions since 15:01 were los...
+- 2026-11-17 16:55 **S12-38** engineer submit: T0-T2 PASS on gcc2 41bc85cf422. Torture 8012 cases and vect 2001 sources: zero ICEs; classifications match S12-09. Logs: .work/_state/logs/S12_38_t...
 - 2026-11-17 16:54 **S14-22** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 16:54 **S12-38** lead answer: Main merged into s12/S12-38 (1abf4e92, includes S14-62). Submit now with the 13:55 results, no reruns; note under 600 characters.
 - 2026-11-17 16:53 **S14-24** engineer escalate: budget: 7389102 input tokens used; the budget is 6000000
 - 2026-11-17 16:52 **S12-38** engineer ask: Submission still blocked: pm.py submit refuses because the branch lacks real changes from main and instructs asking the lead to merge main into the...
 - 2026-11-17 16:51 **S14-16** engineer escalate: budget: 8 engineer sessions used; the budget is 8
-- 2026-11-17 16:50 **S12-38** lead note: x86 identity PASS for s12/S12-38 (41bc85cf422) against releases/gcc-16.2.0: -O2 identical=1962 different=0 both-failed=41 errors=0; -O2 -mavx512f i...
 
 ## Cost
 
-- From the script, engineer: 868 sessions, 1859.9M input tokens
+- From the script, engineer: 869 sessions, 1860.2M input tokens
 - From the script, lead: 587 sessions, 161.2M input tokens
-- Started by hand, Claude: 370 sessions, 5041.9M input tokens
+- Started by hand, Claude: 370 sessions, 5042.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
