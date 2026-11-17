@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 13:10.
+Updated automatically at every ticket change. Last update: 2026-11-17 13:11.
 
-**Waiting for you:** S12-38, S14-22. Run `python tools/pm.py inbox`.
+**Waiting for you:** S12-38. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 277 of 306
 
@@ -150,7 +150,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
-| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
+| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | In progress | sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the red tes... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | sessions 2 -> 4, recorded by the lead under the owner's standing budget rule (2026-11-09/10: raise on stead... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 13:11 **S14-22** owner decide: sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the red test exists in the worktree but is uncommit...
 - 2026-11-17 13:10 **S14-04** engineer ask: Submission blocked: pm.py submit waited 900 seconds and refused because .work/_state/board.lock is held by live Python PID 31832. Ticket work is co...
 - 2026-11-17 12:55 **S14-44** lead approve: Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and no M4 program shows a 5% whole-program ga...
 - 2026-11-17 12:41 **S12-38** lead escalate: lead session ended without a decision (exit 0)
@@ -338,7 +339,6 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 12:37 **S14-04** lead answer: Main merged into s14/S14-04 (5c88a2de). Submit now; passing tests reused is fine.
 - 2026-11-17 12:36 **S14-56** lead changes: Red is right in shape (manifest, styles, held-out sealing, pass marker not overriding corrupt output; failures are the intended ones), but the corr...
 - 2026-11-17 12:34 **S14-58** lead answer: Committed for you by the lead (6e32b7a4, converted to LF) and main merged (96420e21). The board lock was held by a lead approve running t0. Submit ...
-- 2026-11-17 12:20 **S14-60** lead note: Second cause of the contention, larger than the PermissionError: pm.py approve runs tools/check t0 (11-20 min on a loaded host) while holding board...
 
 ## Cost
 
