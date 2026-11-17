@@ -97,6 +97,10 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Window 16 (2026-11-17 05:42-05:45Z): all ten twin-generated programs PASS on the card (checks ok, 0 mismatches);
+  knc-twin ranked all 8 WRF variants right (2 ctx within 1-4%, 1 ctx +19-24%; sixth +30%/+7%). Issue #32: at n=8,
+  partial-vector-usage=2 is 5.7% (1 ctx) / 7.2% (2 ctx) faster than the shipped =1 on rk_update_scalar (S14-30 note);
+  needs n=6/10/16 and a whole-WRF A/B before any default change.
 - Window 15 (2026-11-17 05:32-05:35Z): twin batch faulted (body pushes below the captured rsp, unmapped since the
   generator maps only initialized pages; fixed on knc-twin main); job 9/10 lost because the twin restaged the folder
   mid-window. Rules: no restage of a staged folder until the window closes (new folder calib-w16/batch/); next window
