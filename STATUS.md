@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 01:29.
+Updated automatically at every ticket change. Last update: 2026-11-17 01:30.
 
 **Next: GPT-6.1, on S14-16 (bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
@@ -342,7 +342,7 @@ Current tickets: `[##################--]` 275 of 305
 ## Cost
 
 - From the script, engineer: 820 sessions, 1727.1M input tokens
-- From the script, lead: 565 sessions, 157.9M input tokens
+- From the script, lead: 566 sessions, 158.1M input tokens
 - Started by hand, Claude: 186 sessions, 4928.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
