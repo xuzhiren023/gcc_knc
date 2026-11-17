@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:00.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:01.
 
-**Waiting for you:** S14-22, S14-50. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 280 of 307
 
@@ -170,7 +170,7 @@ Current tickets: `[##################--]` 280 of 307
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | **Waiting for you** | budget: 5 engineer sessions used; the budget is 5 |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions 5 -> 6 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committ... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | Rule block: cannot read knc-boinc work branches. Supplied nbody-wrapper-files.patch includes knc_graphics_f... |
@@ -332,6 +332,7 @@ Current tickets: `[##################--]` 280 of 307
 
 ## Recent activity
 
+- 2026-11-17 17:00 **S14-50** owner decide: sessions 5 -> 6 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed; the last sessions were lost to the b...
 - 2026-11-17 16:59 **S14-56** engineer ask: Rule block: cannot read knc-boinc work branches. Supplied nbody-wrapper-files.patch includes knc_graphics_format.h; neither checkout nor support co...
 - 2026-11-17 16:59 **S14-50** engineer escalate: budget: 5 engineer sessions used; the budget is 5
 - 2026-11-17 16:55 **S14-24** owner decide: input_tokens 6M -> 12M (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: progress (fix 14df1710). Fi...
@@ -339,16 +340,15 @@ Current tickets: `[##################--]` 280 of 307
 - 2026-11-17 16:55 **S12-38** engineer submit: T0-T2 PASS on gcc2 41bc85cf422. Torture 8012 cases and vect 2001 sources: zero ICEs; classifications match S12-09. Logs: .work/_state/logs/S12_38_t...
 - 2026-11-17 16:54 **S14-22** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 16:54 **S12-38** lead answer: Main merged into s12/S12-38 (1abf4e92, includes S14-62). Submit now with the 13:55 results, no reruns; note under 600 characters.
-- 2026-11-17 16:53 **S14-24** engineer escalate: budget: 7389102 input tokens used; the budget is 6000000
 
 ## Cost
 
 - From the script, engineer: 872 sessions, 1862.7M input tokens
 - From the script, lead: 587 sessions, 161.2M input tokens
-- Started by hand, Claude: 371 sessions, 5045.5M input tokens
+- Started by hand, Claude: 371 sessions, 5047.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.9 GiB of 100 GiB. 302 GiB free on the drive.
+The project uses 42.9 GiB of 100 GiB. 303 GiB free on the drive.
