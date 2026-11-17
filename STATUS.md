@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 18:12.
+Updated automatically at every ticket change. Last update: 2026-11-17 18:13.
 
 **Next: the tech lead, on S14-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Waiting for review | Set to review by the lead per the 18:10 scripted review (review changes done in 3fef5f08, main merged); the... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | WRF classic inputs are ready: .work/_shared/corpus-build/wrf-miami-classic/{wrfinput_d01,wrfinput_d02,wrfbd... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | eda3c1e3: WRF classic pin test and 30-file fixed-step case staging PASS; _shared/S14-56/wrf-case.json. Two ... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
@@ -334,13 +334,13 @@ Current tickets: `[##################--]` 282 of 308
 ## Recent activity
 
 - 2026-11-17 18:15 **S14-50** lead note: Set to review by the lead per the 18:10 scripted review (review changes done in 3fef5f08, main merged); the lead approves.
+- 2026-11-17 18:13 **S14-56** engineer ask: eda3c1e3: WRF classic pin test and 30-file fixed-step case staging PASS; _shared/S14-56/wrf-case.json. Two preflights failed: donor gcc and gfortra...
 - 2026-11-17 18:12 **S14-24** engineer submit: Preflight and diagnosis implemented; targeted PM integration test passes (including main-conflict path).
 - 2026-11-17 18:11 **S13-04** lead answer: Main is merged. Rerun tests/regress/test_source_release.py and the portability tests on CPUs 0-9, then submit with the approved --override (recount...
 - 2026-11-17 18:10 **S14-56** lead note: WRF classic inputs are ready: .work/_shared/corpus-build/wrf-miami-classic/{wrfinput_d01,wrfinput_d02,wrfbdy_d01} (NETCDF3_64BIT_OFFSET, same data ...
 - 2026-11-17 18:10 **S14-50** lead defer: Interactive lead: merge main into s14/S14-50 (submit refused: branch lacks real changes from main), then approve directly; the review changes are a...
 - 2026-11-17 18:10 **S13-04** owner decide: Recorded by the lead (owner 2026-11-17 OK): the interactive lead merged main into s13/S13-04 cleanly (49e27821). Engineer: rerun tests/regress/test...
 - 2026-11-17 18:10 **S13-04** lead escalate: lead session ended without a decision (exit 0)
-- 2026-11-17 18:09 **S13-04** lead resume: Lead merged main into s13/S13-04 cleanly (49e27821).
 
 ## Cost
 
