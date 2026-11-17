@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | Red is right in shape (manifest, styles, held-out sealing, pass marker not overriding corrupt output; failu... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Tests waiting for review | Red revision d8cad5e1 adds MilkyWay nextafter 1-ULP rejection, synthetic WRF NaN/missing-success and just-b... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | input_tokens 16M -> 30M, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: ste... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | In progress | Second cause of the contention, larger than the PermissionError: pm.py approve runs tools/check t0 (11-20 m... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 13:37 **S14-56** engineer red: Red revision d8cad5e1 adds MilkyWay nextafter 1-ULP rejection, synthetic WRF NaN/missing-success and just-below/above frozen RMS bounds for all 13 ...
 - 2026-11-17 13:37 **S14-50** owner decide: sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed on s14/S14-50 with main merged; this se...
 - 2026-11-17 13:37 **S13-04** engineer ask: 83fd20c7: release/transport 8 PASS, portability 6 PASS; Linux recipe unrun. Logs: .work/_state/logs/S13_04_source_release_revision-20261117-131720....
 - 2026-11-17 13:36 **S14-58** owner decide: input_tokens 16M -> 30M, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (card execute run 1797/1803...
@@ -338,13 +339,12 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 13:21 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 43801df4e93 (s14/S14-16; one hunk in i386-knc.cc, GPR/mask transfer costs 1 to 4, equal to a spi...
 - 2026-11-17 13:20 **S14-58** engineer escalate: budget: 19034927 input tokens used; the budget is 16000000
 - 2026-11-17 13:14 **S12-38** lead answer: GCC is built in slot 2 at 41bc85cf422 (see the 13:12 note). Continue: T1 green, T0-T2, baseline ICE sweeps on that build; submit.
-- 2026-11-17 13:13 **S14-16** engineer ask: GCC build needed at 43801df4e93254b10843041629857fb11abce1c8 (lane gcc, committed 4/4 fallback). HI-only cheap moves cannot preserve S6-14's QI rel...
 
 ## Cost
 
 - From the script, engineer: 850 sessions, 1814.1M input tokens
 - From the script, lead: 581 sessions, 160.3M input tokens
-- Started by hand, Claude: 331 sessions, 4921.4M input tokens
+- Started by hand, Claude: 331 sessions, 4922.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
