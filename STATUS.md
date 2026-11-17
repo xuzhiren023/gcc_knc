@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 11:29.
+Updated automatically at every ticket change. Last update: 2026-11-17 11:32.
 
-**Next: the tech lead, on S14-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S12-38 (ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 276 of 306
 
@@ -144,7 +144,7 @@ Current tickets: `[##################--]` 276 of 306
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Question for the tech lead | Reused completed runs: scalar T1 and T2 pass; 16 vector tests retain masked-vector counts; zlib kmov 14->0.... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress | Good progress (zlib kmov 14->0). (1) Do not weaken knc-loop-store-mask.c: a flat 6 is too blunt, because it... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -332,22 +332,22 @@ Current tickets: `[##################--]` 276 of 306
 ## Recent activity
 
 - 2026-11-17 11:40 **S12-20** lead note: Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log and atan (exp easy, pow hard), so vector...
+- 2026-11-17 11:32 **S14-16** lead answer: Good progress (zlib kmov 14->0). (1) Do not weaken knc-loop-store-mask.c: a flat 6 is too blunt, because it also pushes genuine mask values out of ...
 - 2026-11-17 11:26 **S14-16** engineer ask: Reused completed runs: scalar T1 and T2 pass; 16 vector tests retain masked-vector counts; zlib kmov 14->0. Log .work/_state/logs/S14_16_T0_T2-2026...
 - 2026-11-17 11:19 **S14-04** owner decide: Recorded by the lead (owner 2026-11-17: plenty of Codex usage; standing budget rule): the standard budget is now 16M tokens and 5 sessions in harne...
 - 2026-11-17 10:47 **S14-58** owner decide: input_tokens 6M -> 16M, sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and the owner's 2026-11-17 OK for stuck ticket...
 - 2026-11-17 10:47 **S14-58** lead escalate: budget: 12208740 input tokens used; the budget is 6000000
 - 2026-11-17 10:46 **S13-04** lead approve-red: The failing tests for the source release are approved: they check that a release audit reports and rejects ignored, .work, build-artifact, oversize...
 - 2026-11-17 10:45 **S14-58** lead answer: (1) builtins: those 144 are not failures; gcc.c-torture/execute/builtins/*.c only link with their harness. Apply builtins.exp's rules in the tool (...
-- 2026-11-17 10:44 **S14-58** engineer ask: Two attempts: parser abort fixed; sweep at 0dad19ba completed 12518 cases (one S12-38 ICE), but 144 builtins links fail. Repro: $CC -O3 -march=knc ...
 
 ## Cost
 
 - From the script, engineer: 835 sessions, 1773.5M input tokens
 - From the script, lead: 573 sessions, 159.1M input tokens
-- Started by hand, Claude: 305 sessions, 4849.9M input tokens
+- Started by hand, Claude: 306 sessions, 4852.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 316 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 315 GiB free on the drive.
