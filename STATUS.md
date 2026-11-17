@@ -177,7 +177,7 @@ Current tickets: `[##################--]` 281 of 308
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
-| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | Not started |  |
+| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -344,7 +344,7 @@ Current tickets: `[##################--]` 281 of 308
 
 ## Cost
 
-- From the script, engineer: 874 sessions, 1863.4M input tokens
+- From the script, engineer: 875 sessions, 1863.5M input tokens
 - From the script, lead: 589 sessions, 161.4M input tokens
 - Started by hand, Claude: 373 sessions, 5062.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
