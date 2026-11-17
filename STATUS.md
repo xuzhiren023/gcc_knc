@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:34.
+Updated automatically at every ticket change. Last update: 2026-11-17 10:35.
 
 **Waiting for you:** S14-04, S14-24. Run `python tools/pm.py inbox`.
 
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress |  |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | Owner decision recorded by the lead (owner 2026-11-17: 'Yes, allow it' - the lead records routine owner dec... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | See the lead resume note: MilkyWay facts posted; start Q1-Q6 and MilkyWay; WRF inputs follow. |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 10:35 **S14-56** lead answer: See the lead resume note: MilkyWay facts posted; start Q1-Q6 and MilkyWay; WRF inputs follow.
 - 2026-11-17 10:34 **S14-44** lead defer: Needs the interactive lead: no-go report done at 0f79b069 (4 new files: docs/research/s14-44-lane0-scalar.md, tools/s14_44_lane0.asm, s14_44_mix.c,...
 - 2026-11-17 10:32 **S14-56** owner decide: Owner decision recorded by the lead (owner 2026-11-17: 'Yes, allow it' - the lead records routine owner decisions for stuck tickets). The escalatio...
 - 2026-11-17 10:31 **S13-04** lead changes: Transport red is good: the 2 POSIX failures are the hardcoded ssh.exe/NUL and claude-transfer.exe in tools/card_run connect(), and the Windows and ...
@@ -337,7 +338,6 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 10:28 **S14-24** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-17 10:12 **S14-04** engineer escalate: budget: 7064106 input tokens used; the budget is 6000000
 - 2026-11-17 09:55 **S14-56** lead escalate: lead session ended without a decision (exit 0)
-- 2026-11-17 09:52 **S12-38** engineer ask: Installed gcc-knc-16.2.0-2 reproduces vect-pr123221.c ICE at tree-vect-slp.cc:4275 with -O3 -march=knc -fno-tree-pre, no S12-30 switch. Revision 7a...
 
 ## Cost
 
