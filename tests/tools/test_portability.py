@@ -153,6 +153,8 @@ class PortabilityTest(unittest.TestCase):
     def test_x86_refuses_running_make(self):
         with mock.patch.object(portability.subprocess, 'check_output',
                                return_value='"make.exe","123","Console","1","100 K"\n'), \
+                mock.patch.object(portability, 'WINDOWS_HOST', True), \
+                mock.patch.object(portability, 'EXE_SUFFIX', '.exe'), \
                 mock.patch.object(portability, 'build_cc1') as build, \
                 contextlib.redirect_stdout(io.StringIO()) as output:
             self.assertEqual(portability.main(['x86', '--tree', 'base', '--tree', 'knc']), 2)
@@ -171,7 +173,7 @@ class PortabilityTest(unittest.TestCase):
             calls.append((list(map(str, argv)), Path(cwd)))
             if argv[0] == 'make':
                 (Path(cwd) / 'gcc').mkdir(parents=True, exist_ok=True)
-                (Path(cwd) / 'gcc/cc1.exe').write_text('')
+                (Path(cwd) / ('gcc/cc1' + portability.EXE_SUFFIX)).write_text('')
             elif 'worktree' in argv:
                 Path(argv[-2]).mkdir(parents=True)
 
