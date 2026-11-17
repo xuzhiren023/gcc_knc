@@ -144,7 +144,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | lead | GCC build needed: build gcc16 at .work/_shared/gcc 43801df4e93 (s14/S14-16; one hunk in i386-knc.cc, GPR/ma... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Question for the tech lead | GCC built by the lead at 43801df4e93 (spill-level cost 4; gcc-build cc1 13:16 EST, log .work/_state/logs/S1... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -332,19 +332,19 @@ Current tickets: `[##################--]` 277 of 306
 ## Recent activity
 
 - 2026-11-17 14:43 **S14-60** owner decide: sessions 3 -> 5 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (fix f92da326 rele...
+- 2026-11-17 14:43 **S14-16** lead resume: GCC built by the lead at 43801df4e93 (spill-level cost 4; gcc-build cc1 13:16 EST, log .work/_state/logs/S14_16_gcc_build_2-20261117-131420.log).
 - 2026-11-17 14:27 **S14-60** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 14:26 **S12-38** lead answer: Main is already merged into s12/S12-38 (ca37b628, 13:56); the branch now lacks only work/ and STATUS.md changes, which submit allows. Submit now wi...
 - 2026-11-17 14:11 **S14-04** engineer submit: Completed at 85d26a25 (red c652530b); main merged again at 5ec24581 per lead answer. Reused authorized passing host run: 15 tests including serial-...
 - 2026-11-17 14:10 **S14-56** lead approve-red: S14-56 red approved: the tests now require the seven new M5 scored units (Q1/Q2, Q3-Q6, MilkyWay N-body, WRF) in the corpus with pinned sources, st...
 - 2026-11-17 13:55 **S12-38** engineer ask: gcc2 41bc85cf422: T0-T2 PASS including SLP reproducer. Torture 8012 cases and vect 2001 sources: zero ICEs; classifications match S12-09 exactly. L...
 - 2026-11-17 13:54 **S14-24** engineer escalate: budget: 4 engineer sessions used; the budget is 4
-- 2026-11-17 13:54 **S14-04** lead answer: Main merged again (5ec24581). Submit right away in this session, before main moves again.
 
 ## Cost
 
 - From the script, engineer: 858 sessions, 1840.8M input tokens
 - From the script, lead: 584 sessions, 160.7M input tokens
-- Started by hand, Claude: 344 sessions, 4955.5M input tokens
+- Started by hand, Claude: 344 sessions, 4956.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
