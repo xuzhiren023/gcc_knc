@@ -94,6 +94,10 @@ class SourceRelease(unittest.TestCase):
             with self.subTest(path=path):
                 self.assertIn(path, reasons)
                 self.assertRegex(" ".join(reasons[path]).lower(), reason)
+        gcc = self.release("audit", "--base", self.base, "--json")
+        self.assertNotEqual(gcc.returncode, 0, gcc.stdout + gcc.stderr)
+        self.assertEqual({entry["path"] for entry in json.loads(gcc.stdout)["excluded"]},
+                         set(forbidden) - {"large.txt"})
 
     def test_clean_tracked_tree_passes_audit(self):
         self.write("src/handwritten.S", ".text\n")
@@ -105,6 +109,15 @@ class SourceRelease(unittest.TestCase):
 
     def test_exports_clean_tip_with_history_and_squashed_merge_diff(self):
         expected = {".gitignore", "src/example.c", "src/extra.c"}
+        # Unchanged upstream artifacts remain in history and the tip, while the
+        # GCC audit applies to fork changes and has no project-only size limit.
+        self.write("upstream.obj", "synthetic upstream object\n")
+        self.commit("fixture upstream artifact exemption")
+        self.git("tag", "-f", self.base)
+        expected.add("upstream.obj")
+        self.write("large-source.txt", "x" * (1024 * 1024 + 1))
+        self.commit("fixture large GCC source")
+        expected.add("large-source.txt")
         self.write("old.o", "historical synthetic artifact\n")
         self.commit("fixture historical artifact")
         (self.repo / "old.o").unlink()

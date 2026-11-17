@@ -60,7 +60,7 @@ def ignored_paths(repo, tree):
         return {os.fsdecode(name) for name in output.split(b'\0') if name}
 
 
-def path_reasons(name, mode, kind, size):
+def path_reasons(name, mode, kind, size, size_limit=True):
     path = PurePosixPath(name)
     lower = name.lower()
     reasons = []
@@ -73,7 +73,7 @@ def path_reasons(name, mode, kind, size):
             or lower.endswith('.opt-record.json.gz')
             or path.name in {'config.status', 'config.log', 'CMakeCache.txt'}):
         reasons.append('build artifact, generated binary or compiler output')
-    if size > LIMIT:
+    if size_limit and size > LIMIT:
         reasons.append('size exceeds 1 MiB file limit')
     if (path.suffix.lower() in {'.pdf', '.chm'}
             or ('intrinsic' in lower and path.suffix.lower() == '.xml')
@@ -116,15 +116,20 @@ def binary_blobs(repo, oids, blob_cache):
             raise RuntimeError('source blob inspection failed')
 
 
-def audit(repo, revision, blob_cache):
+def audit(repo, revision, blob_cache, upstream=None):
     tree = entries(repo, revision)
     ignored = ignored_paths(repo, tree)
+    if upstream is not None:
+        # Compare mode, type and object identity, including renamed paths.
+        # Unchanged upstream content remains in the export but is exempt.
+        tree = [row for row in tree if upstream.get(row[0]) != row[1:]]
+    size_limit = upstream is None
     binary_blobs(repo, (oid for name, mode, kind, oid, size in tree
                        if kind == b'blob' and name not in ignored
-                       and not path_reasons(name, mode, kind, size)), blob_cache)
+                       and not path_reasons(name, mode, kind, size, size_limit)), blob_cache)
     excluded = []
     for name, mode, kind, oid, size in tree:
-        reasons = path_reasons(name, mode, kind, size)
+        reasons = path_reasons(name, mode, kind, size, size_limit)
         if name in ignored:
             reasons.append('tracked path matches committed gitignore rules')
         # Do not open prohibited vendor content. Small source blobs are checked
@@ -150,18 +155,20 @@ def export(repo, ref, revision, base, output):
         git(repo, 'merge-base', '--is-ancestor', base_commit, revision)
     if output.exists() and any(output.iterdir()):
         raise ValueError('output must be empty; remove the previous release deliberately')
+    upstream = {row[0]: row[1:] for row in entries(repo, base_commit)} if base_commit else None
     cache, seen = {}, set()
-    rejected = audit(repo, revision, cache)
+    rejected = audit(repo, revision, cache, upstream)
     if rejected:
         print(json.dumps({'commit': revision, 'excluded': rejected}, indent=2))
         return 1
     historical = {}
-    for row in git(repo, 'log', '--format=%H %T', revision).decode().splitlines():
+    history = base_commit + '..' + revision if base_commit else revision
+    for row in git(repo, 'log', '--format=%H %T', history).decode().splitlines():
         commit, tree = row.split()
         if tree in seen:
             continue
         seen.add(tree)
-        rejected = audit(repo, commit, cache)
+        rejected = audit(repo, commit, cache, upstream)
         if rejected:
             for item in rejected:
                 historical.setdefault((item['path'], item['reason']), commit)
@@ -192,7 +199,11 @@ def export(repo, ref, revision, base, output):
         'Source release\nBranch: ' + branch + '\nCommit: ' + revision + '\n'
         + ('Upstream tag: ' + base + '\nUpstream commit: ' + base_commit + '\n' if base else '')
         + 'source.bundle contains complete reachable history, without prerequisites.\n'
-        + 'The tip tree passed the strict source audit. Historical artifacts are retained.\n'
+        + ('The tip changes from upstream passed the source audit; unchanged upstream files\n'
+           'are exempt and retained. The project-only 1 MiB limit does not apply here.\n'
+           'Historical findings cover fork changes after the upstream tag.\n' if base else
+           'The entire tip tree passed the source audit, including the 1 MiB file limit.\n')
+        + 'Historical artifacts are retained; published history is never rewritten.\n'
         + 'Untracked/ignored workspace files are excluded because only Git objects are exported.\n'
         + ('Apply patches/0001-knc-squashed.patch with git apply from the upstream tag.\n'
            'The squashed diff includes merge resolutions; the bundle preserves full history.\n' if base else '')
@@ -209,7 +220,7 @@ def main():
     parser.add_argument('action', choices=('audit', 'export'))
     parser.add_argument('--repo', required=True, type=Path)
     parser.add_argument('--ref', help='default: knc with --base, otherwise main')
-    parser.add_argument('--base')
+    parser.add_argument('--base', help='GCC upstream tag: audit only changes; no project size limit')
     parser.add_argument('--output', type=Path)
     parser.add_argument('--json', action='store_true')
     args = parser.parse_args()
@@ -221,7 +232,12 @@ def main():
             if args.output is None:
                 parser.error('export needs --output')
             return export(repo, args.ref, revision, args.base, args.output.resolve())
-        report = {'commit': revision, 'excluded': audit(repo, revision, {})}
+        upstream = None
+        if args.base:
+            base_commit = git(repo, 'rev-parse', '--verify', args.base + '^{commit}').decode().strip()
+            git(repo, 'merge-base', '--is-ancestor', base_commit, revision)
+            upstream = {row[0]: row[1:] for row in entries(repo, base_commit)}
+        report = {'commit': revision, 'excluded': audit(repo, revision, {}, upstream)}
         if args.json:
             print(json.dumps(report, indent=2))
         else:

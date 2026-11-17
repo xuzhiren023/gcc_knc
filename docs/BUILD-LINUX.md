@@ -5,9 +5,6 @@ Every shell block below is an unexecuted Linux procedure. Host fixture tests
 exercise export integrity and host selection, not a Linux compiler build or
 native card execution. The owner runs the first Linux build and the x86 check.
 
-Release preparation is pending resolution of the upstream GCC audit findings
-and the missing batch-count reference described at the end of this document.
-
 ## Sources and release policy
 
 Use `tools/source_release.py` from the reviewed project checkout. The default
@@ -34,8 +31,13 @@ Only committed Git objects enter an export. Untracked source, ignored workspace
 files, toolchains, build trees, card outputs and local connection settings do
 not enter it. Tracked forbidden paths cause failure rather than silent removal.
 The audit checks committed ignore rules case-sensitively, output directories,
-artifact extensions and binary signatures, vendor document names and files over
-1 MiB. It does not redistribute the external toolchain or sysroot. Shipped
+artifact extensions and binary signatures, and vendor document names. The
+project audit covers every tip file and rejects files over 1 MiB. With `--base`,
+the GCC audit covers only files differing from the upstream tag; unchanged
+upstream files remain in the bundle and are exempt. GCC has no 1 MiB limit.
+GCC historical findings cover fork changes after the tag, while project findings
+cover all reachable history. Neither export rewrites that history.
+It does not redistribute the external toolchain or sysroot. Shipped
 `contrib/knc-vecmath/` sources and their existing license files belong to the
 project bundle; `tools/knc_vmath.py` builds them.
 
@@ -167,10 +169,23 @@ corpus at `-O2` and `-O2 -mavx512f`; expect `different=0`, `errors=0`, and inspe
 `both-failed` separately from `identical`. It can take hours; the lead/owner runs
 it, not the ticket engineer.
 
-The requested final S12/S13 T0/T1 counts and x86 identical counts are **pending a
-lead reference**. `docs/research/m4-result.md` records the M4 application gate
-and every launch passing, but contains no compiler-batch or x86 count table.
-Do not substitute its 17-program application result for those counts.
+The last full batch reference is **S12-09**, GCC `knc` commit `b2ce6a9eebf`:
+`work/tickets/S12-09.md` (15:45 submit, 17:45 approval), with evidence in
+`tests/baseline/S12-09-*`, supplied by the lead on 2026-11-17. Expected results:
+
+| Check | Reference result |
+| --- | --- |
+| T0 | 59 tests PASS |
+| T1 | PASS (no numerical count supplied) |
+| T2 | PASS (no numerical count supplied) |
+| x86 identity | 1962 identical / 0 different |
+| Native execute | 1680/1681; `930529-1.c` is a known harness-option case |
+
+The native execute result is historical card evidence, not an expected host
+execution result or a card job requested here. Newer exported tips can add tests;
+report actual counts and explain differences from this reference instead of
+claiming an exact match. `docs/research/m4-result.md` separately records the M4
+application gate; its application counts do not replace compiler-batch counts.
 
 For later owner-authorized card use, `tools/card_run` selects native `ssh` and
 `/dev/null` on Linux. Supply Linux paths for the identity, known-hosts file and
