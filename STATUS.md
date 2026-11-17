@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:11.
+Updated automatically at every ticket change. Last update: 2026-11-17 10:12.
 
-**Waiting for you:** S14-56. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-04, S14-56. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 276 of 305
 
@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | In progress | Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json ... |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | **Waiting for you** | budget: 7064106 input tokens used; the budget is 6000000 |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 10:12 **S14-04** engineer escalate: budget: 7064106 input tokens used; the budget is 6000000
 - 2026-11-17 09:55 **S14-56** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 09:52 **S12-38** engineer ask: Installed gcc-knc-16.2.0-2 reproduces vect-pr123221.c ICE at tree-vect-slp.cc:4275 with -O3 -march=knc -fno-tree-pre, no S12-30 switch. Revision 7a...
 - 2026-11-17 09:48 **S14-56** lead resume: Lead answer (2026-11-17). (1) MilkyWay N-body: upstream https://github.com/Milkyway-at-home/milkywayathome_client, tag nbody_1.96, commit 1e640779f...
@@ -337,16 +338,15 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 09:43 **S14-56** lead defer: Needs interactive lead (this session cannot read knc-boinc or PhiWeather). Post on the ticket: (1) MilkyWay 1.96 upstream URL, tag/commit, hash as ...
 - 2026-11-17 09:37 **S14-22** lead resume: Lead diagnosis (2026-11-17): tools/run.py does not hang. Your new red test test_open_own_turn_admits_nonbenchmark_and_preserves_original_queue_posi...
 - 2026-11-17 09:35 **S13-04** engineer red: Red commit fce7a6fb. Via tools/run.py, Cygwin python3.12 ran tests/regress/test_source_release.py: 4 tests, 2 expected failures (POSIX selects Wind...
-- 2026-11-17 09:33 **S14-44** engineer ask: Completed no-go report at 0f79b069: neither gain gate established, conservative general flags retained, mix analytical bound and corpus gaps record...
 
 ## Cost
 
 - From the script, engineer: 829 sessions, 1750.1M input tokens
 - From the script, lead: 567 sessions, 158.2M input tokens
-- Started by hand, Claude: 289 sessions, 4821.8M input tokens
+- Started by hand, Claude: 290 sessions, 4822.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.4 GiB of 100 GiB. 323 GiB free on the drive.
+The project uses 42.4 GiB of 100 GiB. 322 GiB free on the drive.
