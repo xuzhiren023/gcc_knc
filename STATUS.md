@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 15:17.
+Updated automatically at every ticket change. Last update: 2026-11-17 15:18.
 
 **Next: the tech lead, on S14-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -350,4 +350,4 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 306 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 305 GiB free on the drive.
