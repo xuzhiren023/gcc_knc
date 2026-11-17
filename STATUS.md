@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-17 16:53.
 
-**Waiting for you:** S14-16. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-16, S14-24. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 280 of 307
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 280 of 307
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | In progress | sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the red tes... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | sessions 4 -> 6 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-1... |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | **Waiting for you** | budget: 7389102 input tokens used; the budget is 6000000 |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -332,6 +332,7 @@ Current tickets: `[##################--]` 280 of 307
 
 ## Recent activity
 
+- 2026-11-17 16:53 **S14-24** engineer escalate: budget: 7389102 input tokens used; the budget is 6000000
 - 2026-11-17 16:52 **S12-38** engineer ask: Submission still blocked: pm.py submit refuses because the branch lacks real changes from main and instructs asking the lead to merge main into the...
 - 2026-11-17 16:51 **S14-16** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 16:50 **S12-38** lead note: x86 identity PASS for s12/S12-38 (41bc85cf422) against releases/gcc-16.2.0: -O2 identical=1962 different=0 both-failed=41 errors=0; -O2 -mavx512f i...
@@ -339,13 +340,12 @@ Current tickets: `[##################--]` 280 of 307
 - 2026-11-17 16:34 **S14-62** engineer submit: Approved as is after lead merged main (66d22771); Cygwin test_harness + test_pm_integration on CPUs 0-9 passed 58/61 including all three regression...
 - 2026-11-17 16:33 **S14-62** lead answer: Main merged into s14/S14-62 (66d22771). Lead review: approve as is. Submit now. Two follow-ups for the note, not for this ticket: the lock release ...
 - 2026-11-17 16:32 **S14-62** engineer ask: Fixes committed at 9a11df09 (red ff970c8a); Cygwin tests/tools test_harness + test_pm_integration on CPUs 0-9: 58/61 pass, including all 3 new regr...
-- 2026-11-17 16:20 **S14-60** lead close: Abandoned (owner); not merged. Replaced by S14-62.
 
 ## Cost
 
 - From the script, engineer: 868 sessions, 1859.9M input tokens
 - From the script, lead: 587 sessions, 161.2M input tokens
-- Started by hand, Claude: 370 sessions, 5038.7M input tokens
+- Started by hand, Claude: 370 sessions, 5039.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
