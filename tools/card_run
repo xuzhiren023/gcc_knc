@@ -709,12 +709,16 @@ class SSHTransport:
         self.dma_latch = main_root(ROOT) / ".work/_state/card-dma-active.lock"
         self.helper_free = transfer == "ssh" or not all(
             self.helper(key, name).is_file() for key, name in
-            (("transferHelper", "claude-transfer.mic"), ("transferHost", "claude-transfer.exe")))
+            (("transferHelper", "claude-transfer.mic"), ("transferHost", self.host_helper_name())))
         if self.helper_free and (transfer == "dma" or collect):
             raise Refused("DMA/--collect requires both transfer helpers and --transfer auto or dma")
 
     def helper(self, key, name):
         return Path(self.config.get(key, str(main_root(ROOT) / ".work/_shared" / name)))
+
+    @staticmethod
+    def host_helper_name():
+        return "claude-transfer.exe" if os.name == "nt" else "claude-transfer"
 
     def stage_overhead(self, packed=False):
         unpack = self.helper("unpackHelper", "claude-unpack.mic").stat().st_size if packed else 0
@@ -728,9 +732,11 @@ class SSHTransport:
         host = c["host"]
         if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.:-]*", host):
             raise OSError("invalid card hostname/address")
-        command = ["C:/Windows/System32/OpenSSH/ssh.exe", "-F", "NUL", "-i", c["identity"],
+        ssh = "C:/Windows/System32/OpenSSH/ssh.exe" if os.name == "nt" else "ssh"
+        null = "NUL" if os.name == "nt" else os.devnull
+        command = [ssh, "-F", null, "-i", c["identity"],
                    "-o", "IdentitiesOnly=yes", "-o", "BatchMode=yes",
-                   "-o", "StrictHostKeyChecking=yes", "-o", "GlobalKnownHostsFile=NUL",
+                   "-o", "StrictHostKeyChecking=yes", "-o", "GlobalKnownHostsFile=" + null,
                    "-o", "UserKnownHostsFile=" + c["knownHosts"],
                    "-o", "HostKeyAlgorithms=ssh-ed25519", "-o", "ConnectTimeout=5",
                    "root@" + host, "exec sh"]
@@ -747,7 +753,7 @@ class SSHTransport:
             session.pin_helper = self.helper("pinHelper", "claude-pin.mic")
             session.unpack_helper = self.helper("unpackHelper", "claude-unpack.mic")
             session.card_helper = self.helper("transferHelper", "claude-transfer.mic")
-            session.host_helper = self.helper("transferHost", "claude-transfer.exe")
+            session.host_helper = self.helper("transferHost", self.host_helper_name())
             session.cygwin_bin = self.helper("cygwinBin", "toolchain/cygwin/bin")
             session.dma_enabled = c.get("dmaEnabled", True)
             session.transfer_method, session.threshold_bytes = self.transfer, self.threshold_bytes
