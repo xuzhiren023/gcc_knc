@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:13.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:14.
 
 **Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
@@ -177,7 +177,7 @@ Current tickets: `[##################--]` 281 of 308
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
-| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | In progress |  |
+| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | Waiting for review | Host CPUs 0-9: empty-folder and done-ticket checks passed in .work/_state/logs/S14_64_green-20261117-171308... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -336,11 +336,11 @@ Current tickets: `[##################--]` 281 of 308
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:14 **S14-64** engineer submit: Host CPUs 0-9: empty-folder and done-ticket checks passed in .work/_state/logs/S14_64_green-20261117-171308.log, and cleanup failure records done a...
 - 2026-11-17 17:13 **S14-50** engineer submit: knc-machine.yaml now carries the measured scatter cost and the x87 compare-chain cost from the card, and says where it still disagrees with knc-twin.
 - 2026-11-17 17:12 **S14-56** lead answer: Done by the lead: .work/_shared/corpus-build/milkyway-nbody is now an LF clone at branch m5-nbody-1.96-correctness (commit 064e2d7 = nbody_1.96 1e6...
 - 2026-11-17 17:11 **S14-50** owner decide: sessions 6 -> 7, recorded by the lead under the owner's 2026-11-17 OK. The work is committed and main is merged into s14/S14-50 now. This session r...
 - 2026-11-17 17:10 **S14-50** engineer escalate: budget: 6 engineer sessions used; the budget is 6
-- 2026-11-17 17:10 **S13-04** lead answer: Main merged into s13/S13-04 (23e078f8). Continue: fix the export's path handling so a Windows path from 'git rev-parse --git-common-dir' or objects...
 
 ## Cost
 
