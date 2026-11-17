@@ -100,7 +100,7 @@ Current tickets: `[##################--]` 276 of 305
 | S12-17 | claude-torture -j N refuses to start in exclusive card runs (no inherited RLIMIT_AS since S11-29), so the execute suite cannot run | Done | The parallel execute-suite runner starts again in exclusive card runs: claude-torture -j N with an explicit... |
 | S12-18 | Double-precision vector exp, log and pow ran slower than scalar libm on the card (0.82x, 0.63x, 0.49x) - confirm with valid batches, then fix the library or stop the vectorizer calling them where they lose | Done | The vector math benchmark now always times valid 50-200 ms batches, and the valid card runs show double exp... |
 | S12-19 | Profile-guided missed-vectorization triage - join hot loops with the vectorizer's reasons and observed strides/masks, so tuning targets what is hot and fixable | Done | tools/vec_triage.py now ranks each development program's hot loops by sampled time with GCC's vectorizer ve... |
-| S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
+| S12-20 | libknc_vmath accuracy and exception contract, with an independent validation design (rounding modes, special values, flags, scalar fallback) | draft | Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log ... |
 | S12-21 | Scheduling model for M4's serial runs - measure density-1 tuning and the integer-multiply cost against today's density-4 defaults (S12-14 B02, B04, B05) | Done | GCC-KNC now prices scalar integer multiply at its measured cost (about 10 cycles instead of 3) and keeps sc... |
 | S12-22 | Low-risk corrections from the S12-14 audit - wrong comments and citations (N01-N09) and the far-prefetch-distance range bug (B10) | Done | The audit's comment and citation fixes are in GCC-KNC and the far prefetch distance can no longer be set eq... |
 | S12-23 | Floating-point environment correctness on KNC - fix the underflow probe that cannot tell flushing from rounding, and handle x87 erratum CD28 (S12-14 N06, N07, B16, B17) | Done | GCC-KNC's floating-point environment handling is now correct on the card: x87 exception clearing uses the C... |
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 276 of 305
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | Transport red is good: the 2 POSIX failures are the hardcoded ssh.exe/NUL and claude-transfer.exe in tools/... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Tests waiting for review | Red commit 77865d3c. Added 3 tests in the existing file for tools/source_release.py: tagged dirty fixture a... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -330,20 +330,20 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 11:40 **S12-20** lead note: Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log and atan (exp easy, pow hard), so vector...
 - 2026-11-17 10:44 **S14-58** engineer ask: Two attempts: parser abort fixed; sweep at 0dad19ba completed 12518 cases (one S12-38 ICE), but 144 builtins links fail. Repro: $CC -O3 -march=knc ...
+- 2026-11-17 10:44 **S13-04** engineer red: Red commit 77865d3c. Added 3 tests in the existing file for tools/source_release.py: tagged dirty fixture audit rejects ignored, .work, .o, oversiz...
 - 2026-11-17 10:43 **S12-38** lead approve-red: A T1 test now reproduces the -O3 -march=knc -fno-tree-pre SLP reduction segfault (tree-vect-slp.cc:4275, vect_analyze_slp_reduc_chain) on the insta...
 - 2026-11-17 10:42 **S14-44** lead answer: Merge done by the lead (main merged into s14/S14-44; diff vs main is the four new files only). Lead review: approve as is. Submit now with note: Sc...
 - 2026-11-17 10:41 **S14-44** lead resume: lead merged main into s14/S14-44 and reviewed: approve as is
 - 2026-11-17 10:41 **S12-38** engineer red: Red commit 32a04338: original main/local-assignment/return reproducer plus --slp-pr123221 T1 selection. Installed gcc-knc-16.2.0-2 passes -O3 -marc...
 - 2026-11-17 10:40 **S14-16** owner decide: input_tokens 12M -> 20M, recorded by the lead under the owner's standing budget rule (steady progress: GCC built by the lead at 407f1c63cc7, red te...
-- 2026-11-17 10:38 **S14-24** owner decide: sessions 2 -> 4, recorded by the lead under the owner's standing budget rule (2026-11-09/10: raise on steady progress) and the owner's 2026-11-17 O...
-- 2026-11-17 10:36 **S14-16** engineer escalate: budget: 14669748 input tokens used; the budget is 12000000
 
 ## Cost
 
 - From the script, engineer: 831 sessions, 1759.4M input tokens
 - From the script, lead: 571 sessions, 158.8M input tokens
-- Started by hand, Claude: 296 sessions, 4836.6M input tokens
+- Started by hand, Claude: 296 sessions, 4837.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
