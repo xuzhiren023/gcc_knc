@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 15:10.
+Updated automatically at every ticket change. Last update: 2026-11-17 15:11.
 
 **Waiting for you:** S14-60. Run `python tools/pm.py inbox`.
 
@@ -118,7 +118,7 @@ Current tickets: `[##################--]` 277 of 306
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Done | T1 and T2 checks now write every generated file into the run's own output folder, so a file left by another... |
-| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Question for the tech lead | Submission blocked: pm.py submit waited 15 minutes and refused because .work/_state/board.lock is held by a... |
+| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | In progress | The board lock is held briefly by the dispatcher and other pm commands; it is not stale and needs no cleari... |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Folded into S12-30 (sparse indexed reductions),... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: M4 harness item; the M5 donor-margin ch... |
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | AGENTS.md wins; my ticket's 'and hash' was wrong. A pin is the upstream URL plus a release tag or git commi... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | correction to the ticket text above: no hashes (AGENTS.md); pins are URL plus tag or commit. |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | For the triage: 930529-1.c already failed in the S12-09 batch (1680/1681) and was ruled a known harness opt... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | **Waiting for you** | budget: 8379481 input tokens used; the budget is 6000000 |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -331,23 +331,23 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 15:15 **S14-56** lead note: correction to the ticket text above: no hashes (AGENTS.md); pins are URL plus tag or commit.
+- 2026-11-17 15:11 **S12-38** lead answer: The board lock is held briefly by the dispatcher and other pm commands; it is not stale and needs no clearing. Retry pm.py submit now with the 13:5...
 - 2026-11-17 15:10 **S14-56** lead answer: AGENTS.md wins; my ticket's 'and hash' was wrong. A pin is the upstream URL plus a release tag or git commit id (git identifies content); compute n...
 - 2026-11-17 15:09 **S14-60** engineer escalate: budget: 8379481 input tokens used; the budget is 6000000
 - 2026-11-17 15:08 **S14-56** engineer ask: Rule block: AGENTS.md bans hashing and hash manifests; approved M5Pins tests require them. Authorize recording/computing pins or supply approved pi...
 - 2026-11-17 15:06 **S14-04** owner decide: Recorded by the lead (owner 2026-11-17 OK for stuck tickets): the scripted review ended without a decision; the interactive lead reviewed the proto...
 - 2026-11-17 15:03 **S14-04** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 15:02 **S12-38** engineer ask: Submission blocked: pm.py submit waited 15 minutes and refused because .work/_state/board.lock is held by another pm or dispatcher process (observe...
-- 2026-11-17 15:01 **S14-16** lead answer: Build ready (43801df4e93, cost 4). Check: knc-scalar-mask-cost.c green AND knc-loop-store-mask.c still emits kxor, vector_checks.py after-run (16 t...
-- 2026-11-17 14:59 **S14-24** owner decide: sessions 4 -> 6 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (red 9957076b, fix...
 
 ## Cost
 
 - From the script, engineer: 860 sessions, 1849.0M input tokens
 - From the script, lead: 585 sessions, 160.8M input tokens
-- Started by hand, Claude: 349 sessions, 4979.3M input tokens
+- Started by hand, Claude: 350 sessions, 4980.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 303 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 306 GiB free on the drive.
