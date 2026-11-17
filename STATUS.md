@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 18:14.
+Updated automatically at every ticket change. Last update: 2026-11-17 18:15.
 
 **Next: the tech lead, on S14-50.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft | Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our windo... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Changes requested | 1. No tests: the [red] commit 9957076b only touches tools/dispatch.py; the diff has no dispatcher test. Add... |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | 1. No tests: the [red] commit 9957076b only touches tools/dispatch.py; the diff has no dispatcher test. Add... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -346,7 +346,7 @@ Current tickets: `[##################--]` 282 of 308
 
 - From the script, engineer: 891 sessions, 1888.5M input tokens
 - From the script, lead: 597 sessions, 163.0M input tokens
-- Started by hand, Claude: 386 sessions, 5127.9M input tokens
+- Started by hand, Claude: 386 sessions, 5134.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
