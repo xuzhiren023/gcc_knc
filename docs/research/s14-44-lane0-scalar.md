@@ -1,8 +1,10 @@
-﻿# S14-44: scalar lane 0 feasibility — results and open gate
+# S14-44: scalar lane 0 feasibility — no-go
 
 2026-11-17. **Do not start compiler implementation on this evidence.** No
 complete tree model or 5% whole-program gain on two M4 programs is established.
-Acceptance remains incomplete. No GCC change/build, card job, application
+**Verdict: no-go on the available evidence**, closing the research gate as
+directed by the lead on 2026-11-17. This is not proof that lane 0 can never help.
+No GCC change/build, card job, application
 source change, or x86 check was made. Predictions below are not native results.
 
 ## Model
@@ -68,6 +70,15 @@ gap forward without another request for tree source.
 
 ## Phase 0: existing flags
 
+General-purpose recommendation: retain the conservative baseline
+`-O2 -march=knc -fno-fast-math -ffp-contract=off`, with runtime PC=53 and
+the application's required rounding/FTZ/DAZ state. This is a contract-preserving
+starting point, **not a demonstrated fastest flag set**. No change to
+`-mphinix` is justified. The scheduling-density and no-scheduling candidates
+below are tied within uncertainty on one example; there is no M4/M5-wide
+flag ranking. Do not generalize the example's no-errno, aliasing or OpenMP
+options into a compiler preset. Existing callers' errno requirements remain.
+
 Common flags: `-march=knc -ffp-contract=off -fno-fast-math -fno-math-errno
 -fno-strict-aliasing -std=gnu99 -fopenmp`. No-errno is already in the application
 configuration and stays constant; it is not recommended for a new caller that
@@ -126,7 +137,7 @@ This is neither an exceptional-value proof nor a card pass.
 | Octant helper, nine calls | 1 | 229 / 2020 | 179 / 1689 | 1.196x |
 | PB-ludcmp, eight products per context | 1 | 65 / 163 | 75 / 149 | 1.094x |
 | Same ludcmp work on each context | 2 | 66 / 182 | 76 / 151 | 1.205x |
-| Integer/hash plus FP-score, 32 bytes | 1/2 | unsupported / unknown | unknown / unknown | unknown |
+| Integer/hash plus FP-score, 32 bytes | 1/2 | analytical issue floor 254/255; twin unsupported | analytical issue floor 254/255; twin unsupported | unknown |
 
 Units: total core cycles for the fixed work, not per-operation throughput.
 Bounds are `conditional_bound`; predictions are `unvalidated_scenario_estimate`.
@@ -150,7 +161,65 @@ returned `unsupported` for `rol $0x5,%eax`. No cost was invented or workload
 rewritten to evade this limitation. The lane version also contains `rol` and
 has no claimed prediction. Both objects passed instruction linting.
 
-## Per-operation evidence (partial)
+### Mix analytical bound (lead-authorized unsupported fallback)
+
+This is an analytical model, **not a twin prediction**. Sources for operation
+counts are `mix-x87.s:.L3` in the shared ticket directory and
+`tools/s14_44_lane0.asm:.Lmix`. Fixed work is 32 bytes and 32 ordered indexed
+double additions per context, on one core with one or two contexts. Assume
+resident code/data, predicted loop branches and independent private outputs.
+The 256-entry score table occupies 2048 bytes; each stream reads 32 byte
+elements and 32 doubles and stores one final double: **296 logical bytes**.
+This is not 296 bytes of physical memory traffic; reuse, cache-line fills and
+write allocation depend on residency. With the stated all-L1 assumption,
+lower-level demand fills are zero; cold/missing-cache costs are excluded.
+
+| Model term, per iteration | x87 | lane 0 |
+| --- | --- | --- |
+| Instructions | 7 | 8 |
+| Integer/control | byte load, rotate, pointer add, XOR, compare, branch | same six |
+| FP work | one memory-operand add | one broadcast load plus masked add |
+| Logical reads | 1 + 8 bytes | 1 + 8 bytes |
+| Optimistic minimum issue bundles | 1 unpaired x87 + ceil(6/2) = 4 | ceil(8/2) = 4 |
+| FP accumulator recurrence | 3 cycles | 4 cycles |
+| Indexed input path, excluding issue/AGI | byte load 3 + operand read 1 + add 3 = 7 cycles | byte load 3 + vector load 5 + add 4 = 12 cycles |
+| Hash recurrence | rotate latency + XOR latency, rotate unknown | identical unknown chain |
+
+Issue inputs: machine `thread_issue_interval=2` and `core_bundle_rate=1`
+(V, architectural evidence R01 pp.19,23-24; R02 pp.34,56; not stepping-specific).
+The optimistic packing is a lower bound on bundles, not a claim that every
+adjacent pair is legal. X87 unpaired issue is reported production-card S12-31
+evidence in twin `parameters.md:pairing.x87_pairs_with_scalar`. FP latencies
+come from machine `x87_dependency` / `vector_arithmetic_latency` and twin
+`latency.x87_add=3`, `latency.vector_arith=4` (R, project production card;
+vector architectural support R17 slide 12). The split memory costs 3/1/5
+come from twin `latency.scalar_load_l1` (reported S6-03),
+`latency.x87_mem_operand_load` and `latency.vector_load_l1` (derived, E;
+production-card S12-31/S6-03 composites, not isolated measurements).
+The full indexed-input path is cold-start latency, **not a recurrence floor**:
+loads for later iterations can overlap. Rotate timing is deliberately unknown;
+no vendor latency has been invented to fill the adapter gap.
+
+For C contexts each doing N=32 iterations, a finite body issue-span floor is
+`max(2*(4*N-1), (4*N*C-1)/1)` = **254 core cycles for C=1, 255 for C=2**,
+for either implementation. The endpoint subtraction excludes the final
+instruction's completion latency, so this is also a conservative completion
+floor. The FP recurrence contributes 96 cycles (x87) or 128 cycles (lane),
+and cannot strengthen that floor. Two loads per iteration would
+require at least 64/128 core load slots at C=1/2, also below the issue bound.
+Thus **T_lb=254/255 cycles for either body at one/two contexts** under
+these assumptions; the asymptotic issue budget is eight cycles per iteration.
+Entry, exit, mask initialization, initial accumulator and final store are
+outside this body-only budget: x87 has eight entry instructions and two exit
+instructions; lane has eight entry instructions and two exit instructions.
+Alignment padding is also omitted, making this optimistic. No bound ratio is
+a speedup estimate. T_pred and native T_meas remain unknown because rotate
+timing and the executable pairing schedule are unsupported; all utilization
+ratios are unknown. Integer issue and indexed loads remain in both versions,
+and lane 0 adds an instruction and lengthens the FP chain. This provides no
+demonstrated gain for a codec or the general integer/FP mix.
+
+## Per-operation evidence and remaining unknowns
 
 Reported production-card measurements from `knc-characterization.md`, S6-03,
 **TSC ticks per operation per thread**, one / two contexts:
@@ -186,22 +255,42 @@ chain completion, not independent-operation reciprocal throughput:
 | divide | 1216 / 2432 | not run |
 | sqrt | 2240 / 4480 | not run |
 | compare + status/mask transfer + test + branch | 355 / 645 | 259 / 261 |
-| load + store same double | 320 / unsupported | not run |
+| load + store same double | 320 / 322 | 384 / 386 |
+| x87 store + broadcast to lane 0 | 198 / 199 | N/A (bridge sequence) |
+| lane-0 packstore + x87 load + pop | 387 / 389 | N/A (bridge sequence) |
+| int32 load/convert + int32 store/convert, RN | 320 / 322 | not run |
+| double to int32, repeated independent source | N/A | 69 / 70 |
 
 Compare rows are composite fixed-input paths, not isolated compare latency.
 Sqrt uses the twin's **assumed** 70-cycle P5 prior, not measured KNC evidence.
 FMA is inventory only; contraction stays off. These operation probes have no
 independent expected-value oracle: tracing them is not numerical qualification.
+The double-to-int row uses the same source register for each operation, so
+it is an independent-input stream, not a conversion dependency chain. The
+measured 7.04/7.11 latency and 2.08/2.07 reciprocal throughput above remain
+the appropriate per-operation evidence. The x87 integer roundtrip uses RN;
+it excludes C truncation's control-word save/change/restore sequence.
+Bridge rows include scratch dependencies and, for lane-to-x87, a balancing
+pop; repeated x87-to-lane stores have no feedback from the broadcast result.
+Their cycles divided by 32 are composite stream costs, not isolated ABI
+latencies. None may be subtracted wholesale from a caller's execution time.
 
 The operation batch stopped because its two-context load/store input shared
 scratch: `context 0 stores to lines that context 1 loads; contexts communicating
 through memory are not supported by the sequential functional model`. The
 reporting helper then mishandled the null prediction. Both staging bugs are
-fixed (private scratch and nullable prediction), **not rerun** after the second
-failed batch. Successful rows are retained.
+fixed (private scratch and nullable prediction). The lead-authorized single
+rerun on 2026-11-17 passed: 34 simulations and 34 bounds returned `ok`, with
+`unsupported: []`; assembly and instruction lint also passed. No native test
+ran. Log: `.work/_state/logs/s14_44_operations_fixed-20261117-092440.log`.
 
-Missing: independent throughput for unmeasured forms, conversion paths, both
-ABI bridge directions and lane-0 S10-09 div/sqrt costs. The S10-09 masked
+Missing: independent throughput for unmeasured forms, isolated conversion
+and bridge latencies, int32-to-double lane-0 cost and lane-0 S10-09 div/sqrt
+costs. Machine-file values do not supply these missing sequence costs;
+their one/two-context latency and reciprocal throughput remain **unknown**.
+Subtraction uses the twin add class (prediction); its isolated production
+latency/throughput was not measured here. X87 FMA has no single-instruction
+equivalent and contraction is forbidden. The S10-09 masked
 `div_kernel_n`/`sqrt_kernel_n` assembly and ADR-0003 qualification were inspected.
 Instruction counts are not scalar latency. No fast reciprocal or scalar x87
 path is presented as the correctly rounded IMCI sequence's cost.
@@ -245,6 +334,54 @@ re-audit at each donor update. No quantitative staffing estimate is established.
 
 ## Qualification and handoff
 
+### General-purpose decision, including M4/M5 coverage
+
+The primary evidence is the M4 scalar/reduction work, not knc-boinc's tree.
+S12-06 and S12-08 do not provide a removable whole-program gain for the
+lane-0 proposal. The latter's modeled ludcmp residual is outside its selected
+hot factorization ranges. Its 1.094x/1.205x predictions apply only to eight
+products per context, not ludcmp as a whole. To obtain a 1.05x program speedup,
+`p >= (1-1/1.05)/(1-1/s)`: at the exact modeled ratios 163/149 and 182/151,
+the changed region would need **55.4% / 28.0%** of program time. Its share
+is unknown. The two-context figure also does not represent the serial M4
+primary configuration.
+
+NPB-EP has 51.174 s of transform/call-site CPU exposure and 36.794 s in the
+log path in S12-06; those are sampled CPU attribution estimates, not measured
+wall fractions of a lane-0-removable region. `m4-baseline.md` records
+97.999557 s interior wall and 97.990 s user time for the matching sampled
+run. Even treating 51.174/97.999557 = 52.2% as a conditional share would
+require about **1.100x** over that entire site for 1.05x whole-program speedup.
+No such lane-0 transform prediction exists; the log library body is not a
+compiler-removal budget. S12-06's returned diagnostic used 240 workers and
+established no serial whole-program improvement or removable-time floor.
+
+S11-20's `code-style-coverage.md` lists C/N checks Q1/Q2 (ray/container and
+small double value types), Q3 (MD) and Q5 (smallpt) as proposed unscored checks,
+with no performance results. No retained S11-20 shared experiment directory
+is present here. This ticket has no compiled/timed C/N flag ranking and no
+M5 generalization claim. The compression-style probe is original synthetic
+work, not measured zlib/bzip2 execution; its rotate adapter failure and equal
+analytical issue floors cannot establish a codec gain. These are coverage
+gaps, retained rather than replaced with application-specific successes.
+
+**No-go:** neither a >=1.5x complete-tree bound nor >=5% whole-program gain
+on two M4 programs is established. The tree example's octant prediction is
+1.196x, below 1.5x even before accounting for unchanged tree work; it is not
+a bound on all tree phases. The whole-run free-tree caps are 1.0064x
+(core-small) and 1.4909x (large). The latter does not itself disqualify the
+tree-local gate; it limits the payoff even if that gate later clears.
+Strict FP remains a separate gate: ordinary lane-0 DF changes x87 exponent
+range and exception behavior, so no default replacement is approved.
+
+Phase 0 likewise yields **no supported faster general-purpose flag set**:
+retain the conservative baseline and do not alter `-mphinix`. The sole
+ranked example differs by 0.69%, inside model uncertainty. Keep the staged
+core-small/large A/B list as a falsifiable secondary example for the lead,
+not as primary evidence or a per-application compiler policy. Remaining
+sequence-cost and corpus gaps do not reopen this ticket: the lead directed
+recording them and closing with this no-go, with no further card/GCC work.
+
 Successful predictions report `unsupported: []`, calibration state
 `imported_microbenchmarks_with_compiled_heldout_check`, and
 `unvalidated_scenario_estimate`. The 105 compiled-loop validation set is HPCG
@@ -257,19 +394,47 @@ Leading printed constraints (context-cycle attribution, not additive bounds):
 - Ludcmp one-context x87: spacing 48, x87_serial 40, agi 8; lane: spacing 57, dependency 24, agi 8.
 - Ludcmp two-context x87: spacing 96, x87_serial 80, not_picked 27, agi 16; lane: spacing 114, dependency 48, agi 16, core_busy 1.
 
+Operation rerun constraints below reproduce the printed context-cycle
+attributions (not additive bounds). `S=spacing`, `D=dependency`,
+`B=core_busy`, `N=not_picked`, `R=resource`, `X=x87_serial`,
+`I=store_interlock`; omitted constraints were not printed.
+
+| Probe | One context | Two contexts |
+| --- | --- | --- |
+| x87 add/sub | S32 D31 | S64 D62 B1 N1 |
+| x87 multiply | S32 D31 | S64 R63 D62 N2 |
+| x87 divide | D1116 S32 | R2330 D2232 S64 N63 |
+| x87 sqrt | D2108 S32 | R4346 D4216 S64 N63 |
+| lane add/sub/multiply/FMA | D62 S32 | D124 S64 B1 N1 |
+| x87 compare | B224 S32 | B897 N129 S64 |
+| lane compare | S96 D64 | S192 D128 B1 N1 |
+| x87 load/store and int roundtrip | X157 I64 S32 | X314 I128 S64 B1 |
+| lane load/store | D189 S64 I64 | D378 S128 I128 B1 |
+| x87 to lane | S64 I64 | S128 I128 B1 N1 |
+| lane to x87 | X160 S64 I64 | X320 S128 I128 B1 |
+| lane to int | S32 | S64 B1 N1; core_issue_slots: issue utilization 0.99: the core issues nearly every cycle |
+
 Successful commands used tools/run.py. Logs under `.work/_state/logs/`:
 
 - `s14_44_phase0-20261117-011337.log`: PASS; 40 compilations and ten octant models.
 - `s14_44_regions-20261117-011751.log`: FAIL at unsupported mix rol; preceding octant/ludcmp results retained.
 - `s14_44_operations-20261117-012000.log`: FAIL at scratch sharing/null reporting; preceding operation results retained.
+- `s14_44_operations_fixed-20261117-092440.log`: PASS; authorized single rerun, all 68 model results ok and assembly/lint passed.
 
 Artifacts remain in shared S14-44. Tool-generated cache hashes are not copied
 or committed. Do not rerun passing batches; narrow a follow-up to missing work.
-After two failed batches, hand off through pm.py ask: should knc-twin gain rol
-support before completing the mix comparison, or should the ticket close with
-an explicitly incomplete/no-go evidence gate? No further tree-source request.
+The lead resolved the previous ask: retain unsupported rotate, use an
+analytical mix bound, rerun operations once and close the gate. No further
+tree-source or twin-support request; no passing experiment was rerun except
+the explicitly authorized operations batch.
 
 ## Twin assumptions retained verbatim (region runs)
+
+The operation rerun uses the same printed precision, fixed-level memory,
+prefix/loop-boundary, resident-code, forward-branch, result-availability and
+x87-serialization assumptions below, plus this printed conversion assumption:
+
+- vcvtfxpntpd2dq/udq write the 8 results to the low lanes and zero the upper 8 (assumed)
 
 - L2 hardware prefetcher sub-model: a stream per 4 KiB page after two accesses with the same stride (<= 2 lines), prefetching 16 lines ahead within the page into L2; prefetched fills do not use L1 demand-miss slots (assumed)
 - OF after a shift by more than 1 is architecturally undefined; the model leaves it unchanged
@@ -301,6 +466,9 @@ Assumed/derived parameters used by those runs (values as printed):
 | latency.store_to_load_same_line | 7 | derived | cycles after a store issues before a load of the same line sees the data |
 | latency.vector_load_l1 | 5 | derived | cycles, L1 hit plain vector load to dependent use |
 | latency.x87_control | 7 | assumed | cycles |
+| latency.x87_compare | 3 | assumed | cycles |
+| latency.x87_move | 3 | assumed | cycles |
+| latency.x87_sqrt | 70 | assumed | cycles |
 | latency.x87_load | 3 | derived | cycles from issue until the loaded value is on the x87 stack |
 | latency.x87_mem_operand_load | 1 | derived | cycles for the memory operand of an x87 arithmetic instruction before the operation starts |
 | pairing.load_store_pair | True | derived | boolean |
