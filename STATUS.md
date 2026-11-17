@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 13:21.
+Updated automatically at every ticket change. Last update: 2026-11-17 13:36.
 
-**Waiting for you:** S14-50, S14-58. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-50. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 277 of 306
 
@@ -174,7 +174,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | Red is right in shape (manifest, styles, held-out sealing, pass marker not overriding corrupt output; failu... |
-| S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | **Waiting for you** | budget: 19034927 input tokens used; the budget is 16000000 |
+| S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | input_tokens 16M -> 30M, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: ste... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | In progress | Second cause of the contention, larger than the PermissionError: pm.py approve runs tools/check t0 (11-20 m... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 13:36 **S14-58** owner decide: input_tokens 16M -> 30M, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (card execute run 1797/1803...
 - 2026-11-17 13:21 **S14-50** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 13:21 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 43801df4e93 (s14/S14-16; one hunk in i386-knc.cc, GPR/mask transfer costs 1 to 4, equal to a spi...
 - 2026-11-17 13:20 **S14-58** engineer escalate: budget: 19034927 input tokens used; the budget is 16000000
@@ -338,13 +339,12 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 13:13 **S14-16** engineer ask: GCC build needed at 43801df4e93254b10843041629857fb11abce1c8 (lane gcc, committed 4/4 fallback). HI-only cheap moves cannot preserve S6-14's QI rel...
 - 2026-11-17 13:12 **S14-04** lead answer: The lock holder was a lead approve running t0 (it has finished). Retry pm.py submit now; if it waits again, retry once more later. S14-60 (board lo...
 - 2026-11-17 13:12 **S12-38** owner decide: Recorded by the lead (owner 2026-11-17 OK for stuck tickets): GCC built by the lead in slot 2 at 41bc85cf422 (gcc-build-2, cc1 12:32 EST, log .work...
-- 2026-11-17 13:11 **S14-22** owner decide: sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the red test exists in the worktree but is uncommit...
 
 ## Cost
 
-- From the script, engineer: 849 sessions, 1811.3M input tokens
-- From the script, lead: 580 sessions, 160.0M input tokens
-- Started by hand, Claude: 327 sessions, 4915.9M input tokens
+- From the script, engineer: 850 sessions, 1814.1M input tokens
+- From the script, lead: 581 sessions, 160.3M input tokens
+- Started by hand, Claude: 330 sessions, 4920.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
