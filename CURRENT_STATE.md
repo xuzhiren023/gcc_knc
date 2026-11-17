@@ -96,6 +96,10 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Window 12 (owner 2026-11-16 19:15 EST): no BOINC launch tonight; knc-boinc runs short optimization checks in our
+  turn until 02:59:39Z at the latest (extension to 04:15Z denied); PhiWeather's next ~3 h job goes after us, earlier
+  if they are ready. knc-boinc's packaged S8-03 build passed core-small on the card (68 s, bit-identical); not run on
+  a real workunit yet.
 - knc-optimize installed at ~/.claude/skills/knc-optimize/ (2026-11-16 18:14 EST, from the reviewed S14-42 branch
   e7b4956c; approve to main still running). knc-boinc asked (owner request) to optimize MilkyWay N-body toward a
   1-2 TFLOPS GPU's time-to-solution with knc-optimize and knc-twin, Model table first, batched card windows via the lead.
