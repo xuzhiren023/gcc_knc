@@ -175,7 +175,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Changes requested | Red is right in shape (manifest, styles, held-out sealing, pass marker not overriding corrupt output; failu... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | CARD RESULT (window 17, 2026-11-17 17:33-17:34Z, claude-torture -j 60, -O3 execute set at the installed pre... |
-| S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Not started | Second cause of the contention, larger than the PermissionError: pm.py approve runs tools/check t0 (11-20 m... |
+| S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | In progress | Second cause of the contention, larger than the PermissionError: pm.py approve runs tools/check t0 (11-20 m... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -344,7 +344,7 @@ Current tickets: `[##################--]` 277 of 306
 
 - From the script, engineer: 848 sessions, 1810.8M input tokens
 - From the script, lead: 580 sessions, 160.0M input tokens
-- Started by hand, Claude: 326 sessions, 4907.2M input tokens
+- Started by hand, Claude: 326 sessions, 4907.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
