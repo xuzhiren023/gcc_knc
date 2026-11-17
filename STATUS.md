@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 09:53.
+Updated automatically at every ticket change. Last update: 2026-11-17 09:55.
 
-**Next: the tech lead, on S12-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S14-56. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 276 of 305
 
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress |  |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | Lead answer (2026-11-17). (1) MilkyWay N-body: upstream https://github.com/Milkyway-at-home/milkywayathome_... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | **Waiting for you** | lead session ended without a decision (exit 0) |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 09:55 **S14-56** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 09:52 **S12-38** engineer ask: Installed gcc-knc-16.2.0-2 reproduces vect-pr123221.c ICE at tree-vect-slp.cc:4275 with -O3 -march=knc -fno-tree-pre, no S12-30 switch. Revision 7a...
 - 2026-11-17 09:48 **S14-56** lead resume: Lead answer (2026-11-17). (1) MilkyWay N-body: upstream https://github.com/Milkyway-at-home/milkywayathome_client, tag nbody_1.96, commit 1e640779f...
 - 2026-11-17 09:45 **S14-22** lead answer: See the lead resume note above: the hang is your red test waiting out card_run's admission timeout; give wait-path tests a short timeout, commit th...
@@ -337,13 +338,12 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 09:37 **S14-22** lead resume: Lead diagnosis (2026-11-17): tools/run.py does not hang. Your new red test test_open_own_turn_admits_nonbenchmark_and_preserves_original_queue_posi...
 - 2026-11-17 09:35 **S13-04** engineer red: Red commit fce7a6fb. Via tools/run.py, Cygwin python3.12 ran tests/regress/test_source_release.py: 4 tests, 2 expected failures (POSIX selects Wind...
 - 2026-11-17 09:33 **S14-44** engineer ask: Completed no-go report at 0f79b069: neither gain gate established, conservative general flags retained, mix analytical bound and corpus gaps record...
-- 2026-11-17 09:28 **S14-56** engineer ask: Ticket-required acquisition question: please supply MilkyWay N-body 1.96 upstream URL/pin, correctness-only patches and locations, and core-small w...
 
 ## Cost
 
-- From the script, engineer: 826 sessions, 1735.1M input tokens
+- From the script, engineer: 827 sessions, 1742.1M input tokens
 - From the script, lead: 567 sessions, 158.2M input tokens
-- Started by hand, Claude: 286 sessions, 4810.4M input tokens
+- Started by hand, Claude: 286 sessions, 4813.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
