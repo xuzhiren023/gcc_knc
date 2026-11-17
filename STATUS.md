@@ -2,9 +2,9 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-17 17:06.
 
-**Waiting for you:** S14-04, S14-16, S14-22, S14-24. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-22, S14-24. Run `python tools/pm.py inbox`.
 
-Current tickets: `[##################--]` 280 of 307
+Current tickets: `[##################--]` 281 of 308
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 280 of 307
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
-| M5 | Program corpus | In progress | 34 of 51 tickets |
+| M5 | Program corpus | In progress | 35 of 52 tickets |
 | M6 | Release | In progress | 0 of 10 tickets |
 
 ## Tickets
@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 280 of 307
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | **Waiting for you** | M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seve... |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | Done | State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting ... |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -144,7 +144,7 @@ Current tickets: `[##################--]` 280 of 307
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | **Waiting for you** | budget: 9 engineer sessions used; the budget is 8 |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress | Recorded by the lead (owner 2026-11-17 OK; budget sessions 11). Decision on the 17:02 ask: keep cost 4 as t... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -177,6 +177,7 @@ Current tickets: `[##################--]` 280 of 307
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
+| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -332,20 +333,20 @@ Current tickets: `[##################--]` 280 of 307
 
 ## Recent activity
 
+- 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:06 **S14-16** owner decide: Recorded by the lead (owner 2026-11-17 OK; budget sessions 11). Decision on the 17:02 ask: keep cost 4 as the default; preserve S6-14's reload cove...
 - 2026-11-17 17:05 **S14-04** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 17:04 **S14-16** engineer escalate: budget: 9 engineer sessions used; the budget is 8
 - 2026-11-17 17:03 **S14-24** engineer escalate: budget: 7592950 input tokens used; the budget is 6000000
 - 2026-11-17 17:02 **S14-16** engineer ask: Cost 4 at 43801df4e93: scalar-mask-cost PASS (0 k operands/kmov); loop-store-mask FAIL (0 k operands/kmov/kxor). Reproducer: -O2 -march=knc tests/t...
 - 2026-11-17 17:01 **S14-56** lead answer: Drop nbody-wrapper-files.patch: it implements the BOINC wrapper's checkpoint/progress/graphics file protocol, which the standalone M5 unit does not...
-- 2026-11-17 17:00 **S14-50** owner decide: sessions 5 -> 6 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed; the last sessions were lost to the b...
-- 2026-11-17 16:59 **S14-56** engineer ask: Rule block: cannot read knc-boinc work branches. Supplied nbody-wrapper-files.patch includes knc_graphics_format.h; neither checkout nor support co...
 
 ## Cost
 
 - From the script, engineer: 874 sessions, 1863.4M input tokens
 - From the script, lead: 589 sessions, 161.4M input tokens
-- Started by hand, Claude: 372 sessions, 5060.6M input tokens
+- Started by hand, Claude: 372 sessions, 5062.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
