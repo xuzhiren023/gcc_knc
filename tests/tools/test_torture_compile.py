@@ -14,6 +14,51 @@ SHARED = Path(storage.shared_area(storage.main_root(ROOT)))
 
 
 class TortureOptionsTest(unittest.TestCase):
+    def test_s14_58_native_failure_options(self):
+        tool = runpy.run_path(str(ROOT / 'tools/torture_compile.py'))
+        with tempfile.TemporaryDirectory(dir=SHARED) as temporary:
+            root = Path(temporary)
+            source = root / '930529-1.c'
+            source.write_text('/* { dg-options { "-fwrapv" } } */\n')
+            self.assertEqual(tool['source_options'](source), ['-fwrapv'])
+            ieee = root / 'ieee/pr109008.c'
+            ieee.parent.mkdir()
+            ieee.write_text('int x;\n')
+            self.assertEqual(tool['source_options'](ieee), ['-fno-inline', '-ffloat-store'])
+            builtin = root / 'builtins/abs-1.c'
+            builtin.parent.mkdir()
+            builtin.write_text('int x;\n')
+            builtin.with_suffix('.x').write_text('set additional_flags -fno-builtin-abs\nreturn 0\n')
+            self.assertIn('-fno-builtin-abs', tool['source_options'](builtin))
+
+    def test_s14_58_builtins_harness(self):
+        tool = runpy.run_path(str(ROOT / 'tools/torture_compile.py'))
+        with tempfile.TemporaryDirectory(dir=SHARED) as temporary:
+            root = Path(temporary)
+            builtins = root / 'gcc.c-torture/execute/builtins'
+            (builtins / 'lib').mkdir(parents=True)
+            for name in ('abs.c', 'abs-lib.c', 'lib/main.c', 'lib/abs.c'):
+                (builtins / name).write_text('int x;\n')
+            self.assertEqual(tool['suite_sources'](root, ['builtins']),
+                             [(builtins / 'abs.c', 'gcc.c-torture/execute/builtins/abs.c')])
+            sources, flags = tool['builtin_harness'](builtins / 'abs.c')
+            self.assertEqual(sources, [builtins / 'abs-lib.c', builtins / 'lib/main.c'])
+            self.assertEqual(flags, ['-fno-tree-dse', '-fno-tree-loop-distribute-patterns',
+                                    '-fno-tracer', '-fno-ipa-ra', '-fno-inline-functions'])
+
+    def test_s14_58_all_suites_have_distinct_relative_names(self):
+        discover = runpy.run_path(str(ROOT / 'tools/torture_compile.py'))['suite_sources']
+        with tempfile.TemporaryDirectory(dir=SHARED) as temporary:
+            root = Path(temporary)
+            for suite in ('gcc.c-torture/compile', 'gcc.c-torture/execute', 'gcc.dg/vect'):
+                source = root / suite / 'same.c'
+                source.parent.mkdir(parents=True)
+                source.write_text('int x;\n')
+            rows = discover(root, ['compile', 'execute', 'vect'])
+            self.assertEqual(len(rows), 3)
+            self.assertEqual(len({name for _, name in rows}), 3)
+            self.assertIn('gcc.c-torture/execute/same.c', {name for _, name in rows})
+
     def test_both_option_directives(self):
         summary = SHARED / 'torture-options.txt'
         subprocess.run([sys.executable, str(ROOT / 'tools/torture_compile.py'),
