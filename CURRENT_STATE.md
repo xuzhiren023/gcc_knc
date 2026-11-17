@@ -101,7 +101,7 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
   at start on the card again (exit 139). Lead rule: no more batches of generated programs; next window runs one
   diagnostic program (SIGSEGV report, --reps 1) as a single smoke job, and the batch only after it passes.
   Cause (twin, 2026-11-17): Fortran by-reference pointers stored in the captured image point at its synthetic
-  addresses after relocation; host smoke stubs the body. Fix twin T1-21 (identity-mapped image); window-13 binaries void.
+  addresses after relocation; host smoke stubs the body. Fix twin T1-07 (identity-mapped image, after T1-17); window-13 binaries void.
 - Window 12 closed 00:32:57Z (2026-11-17), card handed to PhiWeather (warm-start screen, then 25 h twin). Results: all
   ten twin-generated natives segfaulted (generator bug, twin T1-15; rerun in the next window, owner-approved);
   knc-boinc checks only, no BOINC task. Next GCC-KNC window: the ten twin programs plus knc-boinc's staged list.
