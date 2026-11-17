@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 13:55.
+Updated automatically at every ticket change. Last update: 2026-11-17 14:10.
 
 **Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Tests waiting for review | Red revision d8cad5e1 adds MilkyWay nextafter 1-ULP rejection, synthetic WRF NaN/missing-success and just-b... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | S14-56 red approved: the tests now require the seven new M5 scored units (Q1/Q2, Q3-Q6, MilkyWay N-body, WR... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | For the triage: 930529-1.c already failed in the S12-09 batch (1680/1681) and was ruled a known harness opt... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | In progress | Second cause of the contention, larger than the PermissionError: pm.py approve runs tools/check t0 (11-20 m... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 14:10 **S14-56** lead approve-red: S14-56 red approved: the tests now require the seven new M5 scored units (Q1/Q2, Q3-Q6, MilkyWay N-body, WRF) in the corpus with pinned sources, st...
 - 2026-11-17 13:55 **S12-38** engineer ask: gcc2 41bc85cf422: T0-T2 PASS including SLP reproducer. Torture 8012 cases and vect 2001 sources: zero ICEs; classifications match S12-09 exactly. L...
 - 2026-11-17 13:54 **S14-24** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 - 2026-11-17 13:54 **S14-04** lead answer: Main merged again (5ec24581). Submit right away in this session, before main moves again.
@@ -338,16 +339,15 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 13:53 **S14-04** engineer ask: Submission retried as directed: first attempt waited 900 seconds and refused on board.lock; second attempt acquired the lock but refused: the branc...
 - 2026-11-17 13:45 **S14-58** lead note: For the triage: 930529-1.c already failed in the S12-09 batch (1680/1681) and was ruled a known harness option, not the compiler (work/tickets/S12-...
 - 2026-11-17 13:37 **S14-56** engineer red: Red revision d8cad5e1 adds MilkyWay nextafter 1-ULP rejection, synthetic WRF NaN/missing-success and just-below/above frozen RMS bounds for all 13 ...
-- 2026-11-17 13:37 **S14-50** owner decide: sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed on s14/S14-50 with main merged; this se...
 
 ## Cost
 
-- From the script, engineer: 854 sessions, 1827.6M input tokens
+- From the script, engineer: 857 sessions, 1840.6M input tokens
 - From the script, lead: 582 sessions, 160.5M input tokens
-- Started by hand, Claude: 334 sessions, 4930.8M input tokens
+- Started by hand, Claude: 337 sessions, 4942.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 313 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 312 GiB free on the drive.
