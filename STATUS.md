@@ -345,8 +345,8 @@ Current tickets: `[##################--]` 281 of 308
 ## Cost
 
 - From the script, engineer: 878 sessions, 1869.2M input tokens
-- From the script, lead: 589 sessions, 161.4M input tokens
-- Started by hand, Claude: 374 sessions, 5073.0M input tokens
+- From the script, lead: 590 sessions, 161.7M input tokens
+- Started by hand, Claude: 374 sessions, 5073.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
