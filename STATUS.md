@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:12.
+Updated automatically at every ticket change. Last update: 2026-11-17 10:28.
 
-**Waiting for you:** S14-04, S14-56. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-04, S14-24, S14-56. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 276 of 305
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | In progress | See the lead resume note above: the hang is your red test waiting out card_run's admission timeout; give wa... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress |  |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | **Waiting for you** | budget: 2 engineer sessions used; the budget is 2 |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 10:28 **S14-24** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-17 10:12 **S14-04** engineer escalate: budget: 7064106 input tokens used; the budget is 6000000
 - 2026-11-17 09:55 **S14-56** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 09:52 **S12-38** engineer ask: Installed gcc-knc-16.2.0-2 reproduces vect-pr123221.c ICE at tree-vect-slp.cc:4275 with -O3 -march=knc -fno-tree-pre, no S12-30 switch. Revision 7a...
@@ -337,16 +338,15 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 09:45 **S14-22** lead answer: See the lead resume note above: the hang is your red test waiting out card_run's admission timeout; give wait-path tests a short timeout, commit th...
 - 2026-11-17 09:43 **S14-56** lead defer: Needs interactive lead (this session cannot read knc-boinc or PhiWeather). Post on the ticket: (1) MilkyWay 1.96 upstream URL, tag/commit, hash as ...
 - 2026-11-17 09:37 **S14-22** lead resume: Lead diagnosis (2026-11-17): tools/run.py does not hang. Your new red test test_open_own_turn_admits_nonbenchmark_and_preserves_original_queue_posi...
-- 2026-11-17 09:35 **S13-04** engineer red: Red commit fce7a6fb. Via tools/run.py, Cygwin python3.12 ran tests/regress/test_source_release.py: 4 tests, 2 expected failures (POSIX selects Wind...
 
 ## Cost
 
-- From the script, engineer: 829 sessions, 1750.1M input tokens
+- From the script, engineer: 830 sessions, 1758.6M input tokens
 - From the script, lead: 567 sessions, 158.2M input tokens
-- Started by hand, Claude: 290 sessions, 4822.1M input tokens
+- Started by hand, Claude: 293 sessions, 4824.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.4 GiB of 100 GiB. 322 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 322 GiB free on the drive.
