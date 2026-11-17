@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-17 13:37.
 
-**Next: GPT-6.1, on S12-38 (ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S13-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 277 of 306
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 277 of 306
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | (1) No frozen heads: both repos are public, so the exporter takes refs as arguments (default: the current t... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | 83fd20c7: release/transport 8 PASS, portability 6 PASS; Linux recipe unrun. Logs: .work/_state/logs/S13_04_... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -332,19 +332,19 @@ Current tickets: `[##################--]` 277 of 306
 ## Recent activity
 
 - 2026-11-17 13:37 **S14-50** owner decide: sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed on s14/S14-50 with main merged; this se...
+- 2026-11-17 13:37 **S13-04** engineer ask: 83fd20c7: release/transport 8 PASS, portability 6 PASS; Linux recipe unrun. Logs: .work/_state/logs/S13_04_source_release_revision-20261117-131720....
 - 2026-11-17 13:36 **S14-58** owner decide: input_tokens 16M -> 30M, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (card execute run 1797/1803...
 - 2026-11-17 13:21 **S14-50** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 13:21 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 43801df4e93 (s14/S14-16; one hunk in i386-knc.cc, GPR/mask transfer costs 1 to 4, equal to a spi...
 - 2026-11-17 13:20 **S14-58** engineer escalate: budget: 19034927 input tokens used; the budget is 16000000
 - 2026-11-17 13:14 **S12-38** lead answer: GCC is built in slot 2 at 41bc85cf422 (see the 13:12 note). Continue: T1 green, T0-T2, baseline ICE sweeps on that build; submit.
 - 2026-11-17 13:13 **S14-16** engineer ask: GCC build needed at 43801df4e93254b10843041629857fb11abce1c8 (lane gcc, committed 4/4 fallback). HI-only cheap moves cannot preserve S6-14's QI rel...
-- 2026-11-17 13:12 **S14-04** lead answer: The lock holder was a lead approve running t0 (it has finished). Retry pm.py submit now; if it waits again, retry once more later. S14-60 (board lo...
 
 ## Cost
 
 - From the script, engineer: 850 sessions, 1814.1M input tokens
 - From the script, lead: 581 sessions, 160.3M input tokens
-- Started by hand, Claude: 331 sessions, 4920.5M input tokens
+- Started by hand, Claude: 331 sessions, 4921.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
