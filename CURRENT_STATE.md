@@ -98,6 +98,9 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Owner 2026-11-17: Sprints 14-15 refocused on general-purpose compiler work. S14-30 closed (PhiWeather's question);
+  S14-48, S14-08, S14-28 deferred to M6; S14-44, S14-52, S14-54 recast to judge on corpus and generic code; S14-22
+  scoped to our own windows. Open question to the owner: keep MilkyWay N-body and WRF as M5 corpus units (ADR-0016)?
 - Owner 2026-11-17: knc-boinc books its own card windows. Until its S9-02 lands (own card_run copy, project
   "knc-boinc", turn rows claude-turn-knc-boinc-*), its rows carry project "gcc-knc" and look like ours to card_run and
   our window scripts; asked it not to book before S9-02. GCC-KNC windows no longer host knc-boinc jobs.
