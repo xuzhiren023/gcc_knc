@@ -32,7 +32,14 @@ CORPUS = Path(storage.gcc_tree(PROJECT)) / 'gcc/testsuite/gcc.c-torture/compile'
 LEVELS = {'O0': ['-O0'], 'O2': ['-O2'], 'O2-g': ['-O2', '-g'], 'O3': ['-O3']}
 CLASSES = ('pass', 'slow', 'hang', 'ICE', 'compiler error', 'float/double ABI error',
            'assembler rejection', 'lint failure', 'infrastructure failure',
-           'user inline asm rejected')
+           'user inline asm rejected', 'link failure')
+SUITES = {'compile': 'gcc.c-torture/compile', 'execute': 'gcc.c-torture/execute',
+          'vect': 'gcc.dg/vect'}
+
+
+def suite_sources(testsuite, suites):
+    return [(source, source.relative_to(testsuite).as_posix())
+            for suite in suites for source in sorted((testsuite / SUITES[suite]).rglob('*.c'))]
 
 
 def user_asm_rejection(asm, diagnostics):
@@ -96,6 +103,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--cc', type=Path, help='installed compiler, without a build-tree -B')
     parser.add_argument('--source', type=Path, help='one reduced case instead of the corpus')
+    parser.add_argument('--suite', action='append', choices=SUITES)
+    parser.add_argument('--stage-execute', action='store_true',
+                        help='link and lint successful O3 execute objects; never run them')
     parser.add_argument('--level', choices=tuple(LEVELS), action='append')
     parser.add_argument('--jobs', type=int, default=8, choices=range(1, 9))
     parser.add_argument('--timeout', type=float, default=60)
@@ -109,12 +119,16 @@ def main():
     env['TMPDIR'] = str(SHARED / 'tmp')
     env['LC_ALL'] = 'C'
     lint = runpy.run_path(str(ROOT / 'tools/knc_lint'))
-    sources = [args.source.resolve()] if args.source else sorted(CORPUS.rglob('*.c'))
+    entries = ([(args.source.resolve(), args.source.name)] if args.source else
+               suite_sources(CORPUS.parents[1], args.suite) if args.suite else
+               [(s, s.relative_to(CORPUS).as_posix()) for s in sorted(CORPUS.rglob('*.c'))])
+    sources = [source for source, _ in entries]
+    names = dict(entries)
     if not sources:
         raise RuntimeError('empty torture corpus')
     options = {
         source: [flag for match in re.finditer(
-            r'\{\s*dg-(?:additional-)?options\s+(?:"([^"\n]*)"|([^\s{}]+))'
+            r'\{\s*dg-(?:additional-)?options\s+(?:"((?:\\.|[^"\\])*)"|([^\s{}]+))'
             r'(\s*\{\s*target\b)?',
             source.read_text(encoding='utf8', errors='replace'))
                  if match[3] is None
@@ -140,10 +154,16 @@ def main():
 
     def measure(job):
         source, level = job
-        name = source.name if args.source else source.relative_to(CORPUS).as_posix()
+        name = names[source]
         base = args.output / level / name
         base.parent.mkdir(parents=True, exist_ok=True)
         asm, obj, log = [Path(str(base) + suffix) for suffix in ('.s', '.o', '.log')]
+        binary = args.output / 'card' / ('claude-t-' + name.replace('/', '__') + '.mic')
+        stage = (args.stage_execute and level == 'O3' and
+                 name.startswith('gcc.c-torture/execute/'))
+        if stage:
+            binary.parent.mkdir(parents=True, exist_ok=True)
+            binary.unlink(missing_ok=True)
         for path in (asm, obj, log):
             path.unlink(missing_ok=True)
         diagnostic = []
@@ -172,8 +192,8 @@ def main():
         kind = 'infrastructure failure'
         try:
             cc = [args.cc] if args.cc else [BUILD / 'xgcc', '-B' + str(BUILD) + '/']
-            result = invoke([*cc, '-march=knc',
-                             *LEVELS[level], *options[source], '-S', source, '-o', asm],
+            result = invoke([*cc, *options[source], '-march=knc',
+                             *LEVELS[level], '-S', source, '-o', asm],
                             compiler=True)
             if result.returncode:
                 if 'internal compiler error:' in result.stdout:
@@ -197,6 +217,17 @@ def main():
                     violations.extend(lint['decoded_violations'](
                         obj, TC / 'cross/bin/k1om-mpss-linux-objdump', env))
                     kind = 'lint failure' if violations else 'pass'
+                if kind == 'pass' and stage:
+                    linked = invoke([*cc, '-march=knc', *LEVELS[level], obj,
+                                     '-lm', '-o', binary])
+                    if linked.returncode:
+                        kind = 'link failure'
+                    else:
+                        violations.extend(lint['lint'](binary, TC, env))
+                        if violations:
+                            kind = 'lint failure'
+                    if kind != 'pass':
+                        binary.unlink(missing_ok=True)
                 for violation in violations:
                     diagnostic.append('%s:%s:%s: forbidden: %s' % violation)
         except CompilerHang as error:
@@ -224,11 +255,30 @@ def main():
             if number % 250 == 0:
                 print('measured %d/%d' % (number, len(sources) * len(levels)), flush=True)
     elapsed = time.monotonic() - start
+    if args.stage_execute:
+        card = args.output / 'card'
+        card.mkdir(parents=True, exist_ok=True)
+        binaries = [card / ('claude-t-' + name.replace('/', '__') + '.mic')
+                    for level, kind, name, _ in results
+                    if level == 'O3' and kind == 'pass' and
+                    name.startswith('gcc.c-torture/execute/')]
+        listing = card / 'claude-torture.list'
+        listing.write_text(''.join(p.name + ' ' + p.name[9:-4] + '\n' for p in binaries))
+        driver = card / 'claude-torture.mic'
+        cc = [args.cc] if args.cc else [BUILD / 'xgcc', '-B' + str(BUILD) + '/']
+        result = run([*cc, '-march=knc', '-O2', ROOT / 'tools/claude-torture.c',
+                      '-o', driver], args.timeout)
+        (card / 'driver.log').write_text(result.stdout)
+        if result.returncode or list(lint['lint'](driver, TC, env)):
+            raise RuntimeError('driver build/lint failed; see ' + str(card / 'driver.log'))
+        (card / 'card-files.list').write_text(''.join(
+            p.relative_to(PROJECT).as_posix() + '\n' for p in [listing, *binaries]))
+        print('Staged %d execute binaries; native execution NOT RUN.' % len(binaries), flush=True)
     counts = Counter((level, kind) for level, kind, _, _ in results)
     counts.update((level, 'slow') for level, kind, _, seconds in results
                   if seconds is not None and kind not in ('hang', 'infrastructure failure'))
     lines = ['GCC 16 KNC C torture compile corpus (S1-05)',
-             'Scope: ' + (str(args.source) if args.source else 'gcc/testsuite/gcc.c-torture/compile/**/*.c'),
+             'Scope: ' + (str(args.source) if args.source else ', '.join(args.suite or ['compile'])),
              'dg-options and dg-additional-options without target selectors are appended; selected directives are skipped.',
              'Flags: -march=knc -S, plus each level below.',
              'Assembler: binutils 2.22, --march=k1om.',
@@ -262,7 +312,7 @@ def main():
     print('Summary: ' + str(args.summary), flush=True)
     print('Detailed failures: ' + str(args.output), flush=True)
     return int(any(counts[level, kind] for level in levels for kind in
-                   ('hang', 'ICE', 'assembler rejection', 'lint failure', 'infrastructure failure')))
+                   ('hang', 'ICE', 'assembler rejection', 'lint failure', 'infrastructure failure', 'link failure')))
 
 
 if __name__ == '__main__':
