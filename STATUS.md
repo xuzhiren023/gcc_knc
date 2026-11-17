@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 09:43.
+Updated automatically at every ticket change. Last update: 2026-11-17 09:45.
 
 **Next: the tech lead, on S13-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -150,7 +150,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
-| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | Question for the tech lead | Lead diagnosis (2026-11-17): tools/run.py does not hang. Your new red test test_open_own_turn_admits_nonben... |
+| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | In progress | See the lead resume note above: the hang is your red test waiting out card_run's admission timeout; give wa... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 09:45 **S14-22** lead answer: See the lead resume note above: the hang is your red test waiting out card_run's admission timeout; give wait-path tests a short timeout, commit th...
 - 2026-11-17 09:43 **S14-56** lead defer: Needs interactive lead (this session cannot read knc-boinc or PhiWeather). Post on the ticket: (1) MilkyWay 1.96 upstream URL, tag/commit, hash as ...
 - 2026-11-17 09:37 **S14-22** lead resume: Lead diagnosis (2026-11-17): tools/run.py does not hang. Your new red test test_open_own_turn_admits_nonbenchmark_and_preserves_original_queue_posi...
 - 2026-11-17 09:35 **S13-04** engineer red: Red commit fce7a6fb. Via tools/run.py, Cygwin python3.12 ran tests/regress/test_source_release.py: 4 tests, 2 expected failures (POSIX selects Wind...
@@ -337,13 +338,12 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 09:28 **S14-56** engineer ask: Ticket-required acquisition question: please supply MilkyWay N-body 1.96 upstream URL/pin, correctness-only patches and locations, and core-small w...
 - 2026-11-17 09:20 **S14-04** lead note: Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json (model and effort by depth). Lane method...
 - 2026-11-17 09:20 **S13-04** lead note: Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json (model and effort by depth). M4 is decid...
-- 2026-11-17 09:20 **S12-38** lead note: Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json (model and effort by depth). Runs in the...
 
 ## Cost
 
 - From the script, engineer: 826 sessions, 1735.1M input tokens
 - From the script, lead: 566 sessions, 158.1M input tokens
-- Started by hand, Claude: 285 sessions, 5026.1M input tokens
+- Started by hand, Claude: 284 sessions, 4803.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
