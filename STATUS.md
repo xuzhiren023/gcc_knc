@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-17 16:55.
 
-**Waiting for you:** S14-22, S14-24. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 280 of 307
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 280 of 307
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | **Waiting for you** | budget: 7389102 input tokens used; the budget is 6000000 |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | input_tokens 6M -> 12M (header updated), recorded by the lead under the owner's standing budget rule and 20... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -332,6 +332,7 @@ Current tickets: `[##################--]` 280 of 307
 
 ## Recent activity
 
+- 2026-11-17 16:55 **S14-24** owner decide: input_tokens 6M -> 12M (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: progress (fix 14df1710). Fi...
 - 2026-11-17 16:55 **S14-16** owner decide: sessions 8 -> 11 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the sessions since 15:01 were los...
 - 2026-11-17 16:54 **S14-22** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 16:54 **S12-38** lead answer: Main merged into s12/S12-38 (1abf4e92, includes S14-62). Submit now with the 13:55 results, no reruns; note under 600 characters.
@@ -339,7 +340,6 @@ Current tickets: `[##################--]` 280 of 307
 - 2026-11-17 16:52 **S12-38** engineer ask: Submission still blocked: pm.py submit refuses because the branch lacks real changes from main and instructs asking the lead to merge main into the...
 - 2026-11-17 16:51 **S14-16** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 16:50 **S12-38** lead note: x86 identity PASS for s12/S12-38 (41bc85cf422) against releases/gcc-16.2.0: -O2 identical=1962 different=0 both-failed=41 errors=0; -O2 -mavx512f i...
-- 2026-11-17 16:45 **S14-62** lead approve: A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals release the lock during their long checks, s...
 
 ## Cost
 
