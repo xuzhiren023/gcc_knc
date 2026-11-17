@@ -108,6 +108,27 @@ def engineer_command(board, ticket, worktree):
             ENGINEER_PROMPT.format(id=ticket.id)]
 
 
+def codex_sandbox_command(board, ticket, worktree, command, *args):
+    """Run a command in the engineer's workspace-write sandbox with its writable roots."""
+    if (ticket.fields.get("backend") or board.policy.get("engineer_backend", "codex")) == "claude":
+        raise ValueError("Claude has no non-interactive sandbox probe command")
+    codex = newest(r"%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe") or "codex"
+    roots = [storage.state_dir(board.root), storage.shared_area(board.root)]
+    try:
+        with open(os.path.join(board.root, "config", "card.local.json"), encoding="utf8") as f:
+            ledger = json.load(f).get("ledger")
+    except (OSError, ValueError):
+        ledger = None
+    if ledger:
+        roots.append(os.path.dirname(os.path.abspath(ledger)))
+    trust = 'projects."%s".trust_level="trusted"' % worktree.replace("\\", "\\\\")
+    writable = "sandbox_workspace_write.writable_roots=" + json.dumps(roots)
+    return [codex, "exec", "--ephemeral", "-C", worktree, "--sandbox", "workspace-write",
+            "--dangerously-bypass-hook-trust", "-c", trust, "-c", writable,
+            "-c", 'approval_policy="never"', "-c", 'model_reasoning_effort="low"', "--json",
+            "--", command, *args]
+
+
 def lead_command(board, ticket):
     # A Microsoft Store install keeps %APPDATA% in its package folder, which only the app sees as %APPDATA%.
     claude = newest(r"%LOCALAPPDATA%\Packages\*Claude*\LocalCache\Roaming\Claude\claude-code\*\*\claude.exe",
@@ -186,6 +207,39 @@ def over_budget(board, ticket):
     return None
 
 
+def preflight_engineer(board, ticket, worktree):
+    """Check write access from the exact workspace-write sandbox used by Codex."""
+    git_dir = subprocess.run(["git", "rev-parse", "--absolute-git-dir"], cwd=worktree,
+                             stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    if git_dir.returncode:
+        return "cannot locate worktree git dir: " + worktree
+    probe_code = ("import os,sys\n"
+                  "for path in sys.argv[1:]:\n"
+                  " name=os.path.join(path, '.dispatch-write-probe-%d' % os.getpid())\n"
+                  " try:\n"
+                  "  with open(name, 'x', encoding='ascii'): pass\n"
+                  "  os.remove(name)\n"
+                  " except OSError:\n"
+                  "  print(path)\n"
+                  "  sys.exit(1)\n")
+    try:
+        result = subprocess.run(codex_sandbox_command(board, ticket, worktree, "python", "-c", probe_code,
+                                                      git_dir.stdout.strip(), os.path.join(worktree, "work", "tickets")),
+                                cwd=worktree, env=session_env(board, ticket, "engineer"),
+                                stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    except OSError as error:
+        return "sandbox write probe could not run: %s" % error
+    except ValueError as error:
+        return str(error) + ": " + worktree
+    if result.returncode:
+        failed_path = next((line.strip() for line in result.stdout.splitlines()
+                            if line.strip().startswith((git_dir.stdout.strip(),
+                                                        os.path.join(worktree, "work", "tickets")))),
+                           git_dir.stdout.strip())
+        return "sandbox cannot write %s" % failed_path
+    return None
+
+
 def refresh_status(board):
     """The session's last ticket change came before its tokens were recorded, so show them now."""
     try:
@@ -239,6 +293,14 @@ def run_session(board, ticket, role, dry_run):
         return False
     os.environ["PM_ROLE"] = role
     if role == "engineer":
+        worktree = board.worktree(ticket)
+        reason = preflight_engineer(board, ticket, worktree)
+        if reason:
+            print("%s; refusing engineer session" % reason)
+            os.environ["PM_ROLE"] = "owner"
+            subprocess.run([sys.executable, os.path.join(board.root, "tools", "pm.py"),
+                            "escalate", ticket.id, reason], cwd=board.root, check=False)
+            return False
         try:
             pm.cmd_start(board, argparse.Namespace(id=ticket.id))
         except pm.Refused as refused:
