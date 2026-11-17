@@ -117,8 +117,8 @@ in these executables. The original IEEE aborts do not establish wrong code
 under the compiler's excess-precision mode.
 
 No new compiler defect is established by these six incorrectly configured
-tests, so there is no new defect ticket draft. Corrected native execution is
-required before claiming that these six pass.
+tests, so there is no new defect ticket draft. Corrected native execution
+passed all six, as recorded below.
 
 The corrected host subset covers all 69 IEEE inputs, `930529-1.c`,
 `builtins/abs-1.c` and `builtins/uabs-{1,2,3}.c`: 74 cases at each level.
@@ -152,11 +152,10 @@ Lead only, from the main checkout in an owner-approved window:
 python tools/card_run --threads 240 --timeout 7200 --file-list .work/_shared/S14-58/card/card-files.list .work/_shared/S14-58/card/claude-torture.mic -j 60 --limit-mb 128 claude-torture.list
 ```
 
-Window 17 results and outstanding corrected-harness native checks are above.
-The same 1,803-entry list includes the 68 replacement binaries; the lead must
-rerun it in an approved window before treating the original six aborts as closed.
-A timeout is unresolved, not evidence of wrong code. No zero-wrong-code
-acceptance claim is made from the original harness run.
+The lead's window 18 corrected-harness rerun (2026-11-17 20:18Z) passed all
+six previously failing programs, plus ieee/930529-1. Combined with window 17,
+the O3 execute set is 1,803/1,803 PASS with no compiler wrong code.
+Output: `.work/_shared/S14-58/card/out/execute-O3-rerun6.out`.
 
 ## Tool regression
 
