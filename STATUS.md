@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 277 of 306
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | Commit fe1f9683: all 7 source-export/SSH host tests PASS. Log: .work/_state/logs/S13_04_source_release_gree... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | (1) No frozen heads: both repos are public, so the exporter takes refs as arguments (default: the current t... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -332,19 +332,19 @@ Current tickets: `[##################--]` 277 of 306
 ## Recent activity
 
 - 2026-11-17 13:11 **S14-22** owner decide: sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the red test exists in the worktree but is uncommit...
+- 2026-11-17 13:11 **S13-04** lead answer: (1) No frozen heads: both repos are public, so the exporter takes refs as arguments (default: the current tips of knc and main) and writes the exac...
 - 2026-11-17 13:10 **S14-04** engineer ask: Submission blocked: pm.py submit waited 900 seconds and refused because .work/_state/board.lock is held by live Python PID 31832. Ticket work is co...
 - 2026-11-17 12:55 **S14-44** lead approve: Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and no M4 program shows a 5% whole-program ga...
 - 2026-11-17 12:41 **S12-38** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 12:40 **S14-58** lead note: CARD RESULT (window 17, 2026-11-17 17:33-17:34Z, claude-torture -j 60, -O3 execute set at the installed prefix): 1797 PASS, 6 FAIL (all raw status ...
 - 2026-11-17 12:37 **S14-04** lead answer: Main merged into s14/S14-04 (5c88a2de). Submit now; passing tests reused is fine.
 - 2026-11-17 12:36 **S14-56** lead changes: Red is right in shape (manifest, styles, held-out sealing, pass marker not overriding corrupt output; failures are the intended ones), but the corr...
-- 2026-11-17 12:34 **S14-58** lead answer: Committed for you by the lead (6e32b7a4, converted to LF) and main merged (96420e21). The board lock was held by a lead approve running t0. Submit ...
 
 ## Cost
 
 - From the script, engineer: 848 sessions, 1810.8M input tokens
 - From the script, lead: 579 sessions, 159.8M input tokens
-- Started by hand, Claude: 325 sessions, 4904.9M input tokens
+- Started by hand, Claude: 326 sessions, 4904.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
