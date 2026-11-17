@@ -11,6 +11,7 @@ Option directives with a target selector are skipped; other dg directives are ig
 import argparse
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+import fnmatch
 import os
 from pathlib import Path
 import re
@@ -51,6 +52,34 @@ def builtin_harness(source):
     return [source.with_name(source.stem + '-lib.c'), source.parent / 'lib/main.c'], [
         '-fno-tree-dse', '-fno-tree-loop-distribute-patterns', '-fno-tracer',
         '-fno-ipa-ra', '-fno-inline-functions']
+
+
+def source_options(source):
+    """Read simple dg options and the torture drivers' KNC harness inputs."""
+    options = []
+    for match in re.finditer(
+            r'\{\s*dg-(?:additional-)?options\s+(?:\{\s*"((?:\\.|[^"\\])*)"\s*\}|'
+            r'"((?:\\.|[^"\\])*)"|([^\s{}]+))(\s*\{\s*target\b)?',
+            source.read_text(encoding='utf8', errors='replace')):
+        if match[4] is None:
+            options.extend(shlex.split(next(value for value in match.groups()[:3]
+                                            if value is not None)))
+    harness = builtin_harness(source)[1]
+    if source.parent.name == 'ieee':
+        # ieee.exp's excess-precision controls, adapted to KNC's x87 scalar path.
+        harness = ['-fno-inline', '-ffloat-store']
+    driver = source.with_suffix('.x')
+    if driver.exists():
+        # Only unconditional, literal assignments; do not evaluate Tcl drivers.
+        for match in re.finditer(r'^set additional_flags\s+([^\n]+)$',
+                                 driver.read_text(), re.MULTILINE):
+            value = match[1].strip()
+            if value.startswith('"') and value.endswith('"'):
+                value = value[1:-1]
+            if '$' in value or '[' in value or '{' in value:
+                raise ValueError('unsupported additional_flags in ' + str(driver))
+            harness = shlex.split(value)
+    return options + harness
 
 
 def user_asm_rejection(asm, diagnostics):
@@ -115,6 +144,10 @@ def main():
     parser.add_argument('--cc', type=Path, help='installed compiler, without a build-tree -B')
     parser.add_argument('--source', type=Path, help='one reduced case instead of the corpus')
     parser.add_argument('--suite', action='append', choices=SUITES)
+    parser.add_argument('--case', action='append',
+                        help='filter suite-relative test names with a shell glob')
+    parser.add_argument('--keep-assembly', action='store_true',
+                        help='retain successful assembly for failure triage')
     parser.add_argument('--stage-execute', action='store_true',
                         help='link and lint successful O3 execute objects; never run them')
     parser.add_argument('--level', choices=tuple(LEVELS), action='append')
@@ -133,21 +166,14 @@ def main():
     entries = ([(args.source.resolve(), args.source.name)] if args.source else
                suite_sources(CORPUS.parents[1], args.suite) if args.suite else
                [(s, s.relative_to(CORPUS).as_posix()) for s in sorted(CORPUS.rglob('*.c'))])
+    if args.case:
+        entries = [(source, name) for source, name in entries
+                   if any(fnmatch.fnmatchcase(name, pattern) for pattern in args.case)]
     sources = [source for source, _ in entries]
     names = dict(entries)
     if not sources:
         raise RuntimeError('empty torture corpus')
-    options = {
-        source: [flag for match in re.finditer(
-            r'\{\s*dg-(?:additional-)?options\s+(?:"((?:\\.|[^"\\])*)"|([^\s{}]+))'
-            r'(\s*\{\s*target\b)?',
-            source.read_text(encoding='utf8', errors='replace'))
-                 if match[3] is None
-                 for flag in shlex.split(match[1] if match[1] is not None else match[2])]
-        for source in sources
-    }
-    for source in sources:
-        options[source].extend(builtin_harness(source)[1])
+    options = {source: source_options(source) for source in sources}
     levels = args.level or list(LEVELS)
     args.output.mkdir(parents=True, exist_ok=True)
 
@@ -266,6 +292,8 @@ def main():
         if kind != 'pass' or retried:
             log.write_text('\n'.join(diagnostic), encoding='utf8')
         for artifact in artifacts:
+            if args.keep_assembly and artifact.suffix == '.s':
+                continue
             if kind == 'pass' or (artifact.suffix == '.o' and kind != 'lint failure'):
                 artifact.unlink(missing_ok=True)
         return level, kind, name, seconds if retried else None

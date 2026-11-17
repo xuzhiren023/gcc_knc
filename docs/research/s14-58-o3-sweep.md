@@ -4,6 +4,8 @@ Compiler: `.work/_shared/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc.exe`.
 This records the installed prefix, without asserting its GCC source commit.
 No GCC change or build. Window 17: 1,797 native PASS, six FAIL, zero TIMEOUT;
 x86 not run. Corrected-harness native results are still pending.
+The affected harness subset has been rebuilt and linted at both O2 and O3;
+the staged list now contains the corrected O3 binaries.
 
 ## Scope and method
 
@@ -118,6 +120,22 @@ No new compiler defect is established by these six incorrectly configured
 tests, so there is no new defect ticket draft. Corrected native execution is
 required before claiming that these six pass.
 
+The corrected host subset covers all 69 IEEE inputs, `930529-1.c`,
+`builtins/abs-1.c` and `builtins/uabs-{1,2,3}.c`: 74 cases at each level.
+At O2 and O3, 68 pass compilation/assembly/lint (and O3 link/executable lint);
+the same six IEEE `fp-cmp-*.c` inputs retain ordinary compiler diagnostics.
+There are no ICEs, assembler errors, lint errors or link failures in this rerun.
+The `.x` assignments replace inherited builtins flags, including `-std=c2y`
+for uabs-2 and uabs-3, using the same function for host checks and staging.
+Full classifications: `.work/_shared/S14-58/corrected-summary.txt`.
+Log: `.work/_state/logs/S14_58_corrected_harness-20261117-144345.log`.
+
+Retained corrected O3 `.unit0.s` files under the per-case paths above show
+`call abs` and `call uabs`, no `ud2` in 930529-1, float stores and a separate
+`rintf` call in 20030331-1, a double store before the comparison in pr109008,
+and a float store/reload before the double conversion in pr67218. These address
+the observed mechanisms; they are host evidence, not native execution results.
+
 ## Card staging
 
 1,803 lint-clean O3 execute binaries (1,744 standalone plus 59 builtins) and
@@ -135,6 +153,8 @@ python tools/card_run --threads 240 --timeout 7200 --file-list .work/_shared/S14
 ```
 
 Window 17 results and outstanding corrected-harness native checks are above.
+The same 1,803-entry list includes the 68 replacement binaries; the lead must
+rerun it in an approved window before treating the original six aborts as closed.
 A timeout is unresolved, not evidence of wrong code. No zero-wrong-code
 acceptance claim is made from the original harness run.
 
@@ -146,3 +166,7 @@ Logs: `.work/_state/logs/S14_58_builtins_red-20261117-112647.log` and
 `.work/_state/logs/S14_58_builtins_harness-20261117-112852.log`.
 The earlier suite-path regression and option-parser correction are recorded
 in the original sweep log and the ticket's earlier commits.
+The native-options regression failed with `KeyError: source_options`, committed
+as `25f3e9c8`, and passed after the braced dg-options, `.x` flags and IEEE controls
+were implemented. Logs: `.work/_state/logs/S14_58_native_options_red-20261117-133902.log`
+and `.work/_state/logs/S14_58_native_options-20261117-144327.log`.
