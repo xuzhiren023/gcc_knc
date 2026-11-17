@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-17 18:10.
 
-**Waiting for you:** S13-04. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S13-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 282 of 308
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 282 of 308
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | **Waiting for you** | lead session ended without a decision (exit 0) |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | Recorded by the lead (owner 2026-11-17 OK): the interactive lead merged main into s13/S13-04 cleanly (49e27... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -335,12 +335,12 @@ Current tickets: `[##################--]` 282 of 308
 
 - 2026-11-17 18:10 **S14-56** lead note: WRF classic inputs are ready: .work/_shared/corpus-build/wrf-miami-classic/{wrfinput_d01,wrfinput_d02,wrfbdy_d01} (NETCDF3_64BIT_OFFSET, same data ...
 - 2026-11-17 18:10 **S14-50** lead defer: Interactive lead: merge main into s14/S14-50 (submit refused: branch lacks real changes from main), then approve directly; the review changes are a...
+- 2026-11-17 18:10 **S13-04** owner decide: Recorded by the lead (owner 2026-11-17 OK): the interactive lead merged main into s13/S13-04 cleanly (49e27821). Engineer: rerun tests/regress/test...
 - 2026-11-17 18:10 **S13-04** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 18:09 **S13-04** lead resume: Lead merged main into s13/S13-04 cleanly (49e27821).
 - 2026-11-17 18:08 **S14-50** engineer ask: submit refused: the branch lacks real changes from main: ask the lead to merge main into the ticket branch
 - 2026-11-17 18:08 **S13-04** lead defer: Merge current main into s13/S13-04 by hand: main gained real code after the 17:21 merge (tools/check.py, pm.py, dispatch.py, harness/policy.json, t...
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
-- 2026-11-17 18:03 **S14-24** owner decide: sessions 6 -> 8 (header updated), recorded by the lead (owner 2026-11-17 OK). Lead ran the harness tests on your branch (Cygwin, tests/tools): 58 r...
 
 ## Cost
 
