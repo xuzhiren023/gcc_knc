@@ -337,6 +337,18 @@ class SubmitChecks(Sandbox):
         self.assertEqual(done.returncode, 1, done.stdout)
         return done.stdout
 
+    def test_branch_behind_main_with_clean_merge_submits(self):
+        self.commit_file("src/ticket.py", "ticket = 1\n", "test(A-1): ticket [red]", self.wt)
+        self.commit_file("src/main.py", "main = 1\n", "main advances", self.root)
+        done = self.pm("submit", "A-1", "--note", "n", cwd=self.wt)
+        self.assertEqual(done.returncode, 0, done.stdout)
+
+    def test_branch_with_conflicting_main_change_refuses_and_names_path(self):
+        self.commit_file("src/shared.py", "ticket = 1\n", "test(A-1): ticket [red]", self.wt)
+        self.commit_file("src/shared.py", "main = 1\n", "main advances", self.root)
+        output = self.refused()
+        self.assertIn("src/shared.py", output)
+
     def test_needs_a_red_commit(self):
         self.commit_file("src/a.py", "x = 1\n", "feat(A-1): x", self.wt)
         self.assertIn("[red]", self.refused())
