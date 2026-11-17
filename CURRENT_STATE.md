@@ -97,6 +97,10 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Window 14 closed 05:10:41Z (2026-11-17). Twin T1-07 single smoke PASSED on the card (first generated native to
+  run: check ok, 0 mismatches, 437 ticks/unit); the ten-program batch is being restaged in calib-w14/batch/ for the
+  next window (owner's WRF-tests approval covers it). knc-boinc 16/16 jobs bit-identical: best card large 23.7 s (pool
+  tree) vs best x86 18.0 s and stock 1.96 23.1 s; S8-08 layout+hand prefetch slower (+58% force, not isolated).
 - Backlog pruned (owner-approved 2026-11-16 22:55 EST): knc-twin tickets off the board (knc-twin is a skill, own repo);
   S14-02, S12-27, S12-41 closed; S12-25 into S14-30, S12-40 into S12-30; S12-03/05/20, S14-05/07/09/46 deferred to M6
   (sprint s16); new S14-56 (corpus additions) and S14-58 (-O3 sweep). About 23 active M5 tickets. Dispatch waits for
