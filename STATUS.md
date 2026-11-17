@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 11:42.
+Updated automatically at every ticket change. Last update: 2026-11-17 11:45.
 
 **Waiting for you:** S14-50. Run `python tools/pm.py inbox`.
 
@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 276 of 306
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | In progress | Recorded by the lead (owner 2026-11-17: plenty of Codex usage; standing budget rule): the standard budget i... |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | Question for the tech lead | Complete at 85d26a25 (red c652530b): M5 protocol and triage extension, seven properties, bounds/gaps, four ... |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 276 of 306
 
 ## Recent activity
 
+- 2026-11-17 11:45 **S14-04** engineer ask: Complete at 85d26a25 (red c652530b): M5 protocol and triage extension, seven properties, bounds/gaps, four outcomes/levels, style and donor-margin ...
 - 2026-11-17 11:40 **S14-50** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 11:40 **S12-20** lead note: Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log and atan (exp easy, pow hard), so vector...
 - 2026-11-17 11:37 **S14-44** engineer ask: Submission after the lead merge and approve-as-is instruction was refused: the branch lacks real changes from main (checker asks to merge main into...
@@ -338,7 +339,6 @@ Current tickets: `[##################--]` 276 of 306
 - 2026-11-17 11:33 **S14-56** engineer red: Red commit 0704996e: one host-only run of test_corpus_m5*.py completed with 15 expected assertion failures across 5 tests: seven missing scored uni...
 - 2026-11-17 11:32 **S14-16** lead answer: Good progress (zlib kmov 14->0). (1) Do not weaken knc-loop-store-mask.c: a flat 6 is too blunt, because it also pushes genuine mask values out of ...
 - 2026-11-17 11:26 **S14-16** engineer ask: Reused completed runs: scalar T1 and T2 pass; 16 vector tests retain masked-vector counts; zlib kmov 14->0. Log .work/_state/logs/S14_16_T0_T2-2026...
-- 2026-11-17 11:19 **S14-04** owner decide: Recorded by the lead (owner 2026-11-17: plenty of Codex usage; standing budget rule): the standard budget is now 16M tokens and 5 sessions in harne...
 
 ## Cost
 
