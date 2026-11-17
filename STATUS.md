@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-16 18:51.
+Updated automatically at every ticket change. Last update: 2026-11-16 19:04.
 
-**Next: the tech lead, on S13-03.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-16.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[#################---]` 260 of 297
+Current tickets: `[#################---]` 261 of 299
 
 ## Milestones
 
@@ -14,8 +14,8 @@ Current tickets: `[#################---]` 260 of 297
 | M1 | Mixed native code | Done | 43 of 43 tickets |
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
-| M4 | Broad optimization | Done | 63 of 65 tickets |
-| M5 | Program corpus | In progress | 15 of 50 tickets |
+| M4 | Broad optimization | Done | 64 of 65 tickets |
+| M5 | Program corpus | In progress | 15 of 52 tickets |
 | M6 | Release | Not started | Not planned in detail yet |
 
 ## Tickets
@@ -125,7 +125,7 @@ Current tickets: `[#################---]` 260 of 297
 | S12-42 | Small sparse row loops are 1.5-3% slower than GCC 5.1.1, worse when two loop nests share one function (found by S12-30's window 8 gate) | Done | Card window 10 (post-S12-31 prefix b2ce6a9eebf, 1 thread, A-s12-42-small.out, all GUARDS failures=0): GCC-K... |
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Owner 2026-11-15 ("yes delay to M5"): deferred to M5 (sprint s14). The M4 primary score is serial -O2, so t... |
-| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Waiting for review | lead approves |
+| S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
 | S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | draft |  |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
@@ -150,7 +150,7 @@ Current tickets: `[#################---]` 260 of 297
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Not started |  |
-| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | lead | Engineer cannot run card_run tests: tools/run.py hangs (>8 min, no log) and the pre-tool hook blocks direct... |
+| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | lead | Window 12 finding for this ticket. To protect a non-card_run task (BOINC wrapper over SSH) past the 3 h que... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Not started |  |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Not started |  |
@@ -167,6 +167,8 @@ Current tickets: `[#################---]` 260 of 297
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Not started |  |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Not started |  |
 | S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Done | Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xe... |
+| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Not started |  |
+| S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -322,23 +324,23 @@ Current tickets: `[#################---]` 260 of 297
 
 ## Recent activity
 
+- 2026-11-16 19:05 **S14-22** lead note: Window 12 finding for this ticket. To protect a non-card_run task (BOINC wrapper over SSH) past the 3 h queued-row liveness, the window script turn...
+- 2026-11-16 19:04 **S13-03** lead approve: The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles all 19 practice-lesson rows, and propose...
 - 2026-11-16 18:51 **S14-16** lead resume: GCC built by the lead at 407f1c63cc7 (log .work/_state/logs/S14_16_gcc_build-20261116-184244.log, exit 0). Continue: T1 green (tests/t1/knc-scalar-...
 - 2026-11-16 18:50 **S13-03** lead resume: lead approves
 - 2026-11-16 18:49 **S14-26** lead approve: SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. Machine check: tools/check t0 passed.
 - 2026-11-16 18:32 **S14-26** lead resume: lead approves
 - 2026-11-16 18:31 **S14-42** lead approve: Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xeon Phi card step by step and gives each ...
 - 2026-11-16 18:03 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 407f1c63cc7 (branch s14/S14-16; one-hunk change, i386-knc.cc mask_to_integer/integer_to_mask 1->...
-- 2026-11-16 17:51 **S14-26** lead defer: Review passed; approve as is. Approve refused: tools/check t0 failed in tests/regress/test_knc_twin.py (selftest, trial_cases) because .work/knc-tw...
-- 2026-11-16 17:51 **S13-03** lead defer: Review passed, approve with the note: 'The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles a...
 
 ## Cost
 
 - From the script, engineer: 818 sessions, 1720.9M input tokens
 - From the script, lead: 564 sessions, 157.6M input tokens
-- Started by hand, Claude: 106 sessions, 4619.9M input tokens
+- Started by hand, Claude: 109 sessions, 4640.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.8 GiB of 100 GiB. 33 GiB free on the drive.
+The project uses 43.0 GiB of 100 GiB. 32 GiB free on the drive.
