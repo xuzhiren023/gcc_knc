@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-17 17:08.
 
-**Waiting for you:** S12-38, S14-22, S14-24. Run `python tools/pm.py inbox`.
+**Waiting for you:** S12-38, S14-22. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 281 of 308
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 281 of 308
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | **Waiting for you** | budget: 7592950 input tokens used; the budget is 6000000 |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | Recorded by the lead (owner 2026-11-17 OK): input_tokens 12M (re-applied after the main reset); finish gree... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -335,12 +335,12 @@ Current tickets: `[##################--]` 281 of 308
 
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:08 **S14-24** owner decide: Recorded by the lead (owner 2026-11-17 OK): input_tokens 12M (re-applied after the main reset); finish green and submit.
 - 2026-11-17 17:07 **S12-38** engineer escalate: This engineer session was dispatched after the successful 16:55 submission; ticket is already in review. submit refuses expected doing, and ask ref...
 - 2026-11-17 17:06 **S14-16** owner decide: Recorded by the lead (owner 2026-11-17 OK; budget sessions 11). Decision on the 17:02 ask: keep cost 4 as the default; preserve S6-14's reload cove...
 - 2026-11-17 17:05 **S14-04** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 17:04 **S14-16** engineer escalate: budget: 9 engineer sessions used; the budget is 8
 - 2026-11-17 17:03 **S14-24** engineer escalate: budget: 7592950 input tokens used; the budget is 6000000
-- 2026-11-17 17:02 **S14-16** engineer ask: Cost 4 at 43801df4e93: scalar-mask-cost PASS (0 k operands/kmov); loop-store-mask FAIL (0 k operands/kmov/kxor). Reproducer: -O2 -march=knc tests/t...
 
 ## Cost
 
@@ -352,4 +352,4 @@ Current tickets: `[##################--]` 281 of 308
 
 ## Disk
 
-The project uses 42.9 GiB of 100 GiB. 301 GiB free on the drive.
+The project uses 43.9 GiB of 100 GiB. 301 GiB free on the drive.
