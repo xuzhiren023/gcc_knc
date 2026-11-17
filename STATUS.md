@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:35.
+Updated automatically at every ticket change. Last update: 2026-11-17 10:36.
 
-**Waiting for you:** S14-04, S14-24. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-04, S14-16, S14-24. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 276 of 305
 
@@ -144,7 +144,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress | GCC built by the lead at 407f1c63cc7 (exit 0, log .work/_state/logs/S14_16_gcc_build-20261116-184244.log). ... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | **Waiting for you** | budget: 14669748 input tokens used; the budget is 12000000 |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 10:36 **S14-16** engineer escalate: budget: 14669748 input tokens used; the budget is 12000000
 - 2026-11-17 10:35 **S14-56** lead answer: See the lead resume note: MilkyWay facts posted; start Q1-Q6 and MilkyWay; WRF inputs follow.
 - 2026-11-17 10:34 **S14-44** lead defer: Needs the interactive lead: no-go report done at 0f79b069 (4 new files: docs/research/s14-44-lane0-scalar.md, tools/s14_44_lane0.asm, s14_44_mix.c,...
 - 2026-11-17 10:32 **S14-56** owner decide: Owner decision recorded by the lead (owner 2026-11-17: 'Yes, allow it' - the lead records routine owner decisions for stuck tickets). The escalatio...
@@ -337,12 +338,11 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 10:29 **S12-38** lead answer: Yes. Keep the original vect-pr123221.c shape (main, the local assignment, the return) as the T1 red test; an ICE-preserving reproducer is enough, i...
 - 2026-11-17 10:28 **S14-24** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-17 10:12 **S14-04** engineer escalate: budget: 7064106 input tokens used; the budget is 6000000
-- 2026-11-17 09:55 **S14-56** lead escalate: lead session ended without a decision (exit 0)
 
 ## Cost
 
 - From the script, engineer: 830 sessions, 1758.6M input tokens
-- From the script, lead: 569 sessions, 158.4M input tokens
+- From the script, lead: 570 sessions, 158.5M input tokens
 - Started by hand, Claude: 294 sessions, 4826.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
