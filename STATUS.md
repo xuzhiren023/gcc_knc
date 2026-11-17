@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 12:34.
+Updated automatically at every ticket change. Last update: 2026-11-17 12:36.
 
 **Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
@@ -173,8 +173,8 @@ Current tickets: `[##################--]` 276 of 306
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions 3 -> 4, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the work wa... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Tests waiting for review | Red commit 0704996e: one host-only run of test_corpus_m5*.py completed with 15 expected assertion failures ... |
-| S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | Committed for you by the lead (6e32b7a4, converted to LF) and main merged (96420e21). The board lock was he... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Changes requested | Red is right in shape (manifest, styles, held-out sealing, pass marker not overriding corrupt output; failu... |
+| S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | CARD RESULT (window 17, 2026-11-17 17:33-17:34Z, claude-torture -j 60, -O3 execute set at the installed pre... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Not started | Second cause of the contention, larger than the PermissionError: pm.py approve runs tools/check t0 (11-20 m... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -331,20 +331,20 @@ Current tickets: `[##################--]` 276 of 306
 
 ## Recent activity
 
+- 2026-11-17 12:40 **S14-58** lead note: CARD RESULT (window 17, 2026-11-17 17:33-17:34Z, claude-torture -j 60, -O3 execute set at the installed prefix): 1797 PASS, 6 FAIL (all raw status ...
+- 2026-11-17 12:36 **S14-56** lead changes: Red is right in shape (manifest, styles, held-out sealing, pass marker not overriding corrupt output; failures are the intended ones), but the corr...
 - 2026-11-17 12:34 **S14-58** lead answer: Committed for you by the lead (6e32b7a4, converted to LF) and main merged (96420e21). The board lock was held by a lead approve running t0. Submit ...
 - 2026-11-17 12:20 **S14-60** lead note: Second cause of the contention, larger than the PermissionError: pm.py approve runs tools/check t0 (11-20 min on a loaded host) while holding board...
 - 2026-11-17 12:08 **S14-58** engineer ask: Builtins complete: 59/59 pass at O2/O3; 1803 lint-clean O3 binaries in .work/_shared/S14-58/card/claude-torture.list; native NOT RUN. Report: 112 l...
 - 2026-11-17 12:05 **S13-04** engineer ask: Commit fe1f9683: all 7 source-export/SSH host tests PASS. Log: .work/_state/logs/S13_04_source_release_green-20261117-113152.log. Need frozen GCC k...
 - 2026-11-17 12:02 **S14-44** engineer submit: Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x, below the 1.5x bar, and no existing flag set beats the conservati...
 - 2026-11-17 11:56 **S14-50** owner decide: sessions 3 -> 4, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the work was complete but uncommitted; the lead com...
-- 2026-11-17 11:53 **S14-44** lead answer: Main merged into s14/S14-44 again (c6e88d7b; main had moved). Size: approved, submit with --override 'research report and model tools the ticket as...
-- 2026-11-17 11:49 **S14-22** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 
 ## Cost
 
 - From the script, engineer: 846 sessions, 1806.3M input tokens
 - From the script, lead: 574 sessions, 159.2M input tokens
-- Started by hand, Claude: 318 sessions, 4885.6M input tokens
+- Started by hand, Claude: 318 sessions, 4889.0M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
