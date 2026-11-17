@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:34.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:35.
 
 **Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 282 of 308
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | Submission after the 17:21 lead instruction is refused: 827 changed lines exceed the 800-line budget. All w... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | Approved: submit with --override 'source export tool, Linux recipe and their tests as the ticket asks; 827 ... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -336,11 +336,11 @@ Current tickets: `[##################--]` 282 of 308
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
+- 2026-11-17 17:35 **S13-04** lead answer: Approved: submit with --override 'source export tool, Linux recipe and their tests as the ticket asks; 827 lines vs 800, no split'. Same note as pl...
 - 2026-11-17 17:32 **S14-24** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-17 17:31 **S12-38** lead approve: The -O3 -march=knc vectorizer crash on SLP reduction chains (gcc.dg vect-pr123221.c) is fixed: GCC-KNC now compiles it, with zero crashes across 8,...
 - 2026-11-17 17:29 **S13-04** engineer ask: Submission after the 17:21 lead instruction is refused: 827 changed lines exceed the 800-line budget. All work and staged exports remain as reporte...
 - 2026-11-17 17:25 **S14-50** owner decide: sessions 7 -> 8, recorded by the lead (owner 2026-11-17 OK): the lead made the two review changes (value {threads_1: 7.076, threads_2: 13.106}, uni...
-- 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
 
 ## Cost
 
