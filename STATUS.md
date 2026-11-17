@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 14:43.
+Updated automatically at every ticket change. Last update: 2026-11-17 14:59.
 
-**Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S14-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 277 of 306
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | In progress | sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the red tes... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | **Waiting for you** | budget: 4 engineer sessions used; the budget is 4 |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | sessions 4 -> 6 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-1... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 14:59 **S14-24** owner decide: sessions 4 -> 6 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (red 9957076b, fix...
 - 2026-11-17 14:43 **S14-60** owner decide: sessions 3 -> 5 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (fix f92da326 rele...
 - 2026-11-17 14:43 **S14-16** lead resume: GCC built by the lead at 43801df4e93 (spill-level cost 4; gcc-build cc1 13:16 EST, log .work/_state/logs/S14_16_gcc_build_2-20261117-131420.log).
 - 2026-11-17 14:27 **S14-60** engineer escalate: budget: 3 engineer sessions used; the budget is 3
@@ -338,16 +339,15 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 14:11 **S14-04** engineer submit: Completed at 85d26a25 (red c652530b); main merged again at 5ec24581 per lead answer. Reused authorized passing host run: 15 tests including serial-...
 - 2026-11-17 14:10 **S14-56** lead approve-red: S14-56 red approved: the tests now require the seven new M5 scored units (Q1/Q2, Q3-Q6, MilkyWay N-body, WRF) in the corpus with pinned sources, st...
 - 2026-11-17 13:55 **S12-38** engineer ask: gcc2 41bc85cf422: T0-T2 PASS including SLP reproducer. Torture 8012 cases and vect 2001 sources: zero ICEs; classifications match S12-09 exactly. L...
-- 2026-11-17 13:54 **S14-24** engineer escalate: budget: 4 engineer sessions used; the budget is 4
 
 ## Cost
 
 - From the script, engineer: 858 sessions, 1840.8M input tokens
-- From the script, lead: 584 sessions, 160.7M input tokens
-- Started by hand, Claude: 344 sessions, 4956.3M input tokens
+- From the script, lead: 585 sessions, 160.8M input tokens
+- Started by hand, Claude: 347 sessions, 4960.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 308 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 307 GiB free on the drive.
