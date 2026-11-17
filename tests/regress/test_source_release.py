@@ -107,6 +107,24 @@ class SourceRelease(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         self.assertEqual(json.loads(result.stdout)["excluded"], [])
 
+    def test_export_from_worktree_with_native_gitdir_path(self):
+        worktree = self.directory / "linked worktree"
+        self.git("worktree", "add", "--detach", str(worktree), "main")
+        gitdir = self.git("rev-parse", "--absolute-git-dir", cwd=worktree).strip()
+        if sys.platform == "cygwin":
+            gitdir = subprocess.check_output(["cygpath", "-m", gitdir],
+                                             text=True).strip()
+        # Windows-created worktrees store a drive-qualified gitdir even when
+        # the exporter subsequently runs under Cygwin Python and Git.
+        (worktree / ".git").write_text("gitdir: " + gitdir + "\n", encoding="utf8")
+        self.repo = worktree
+        output = self.directory / "worktree-export"
+        result = self.release("export", "--output", str(output))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.git("bundle", "verify", output / "source.bundle")
+        self.assertIn(self.git("rev-parse", "main").strip(),
+                      (output / "README.txt").read_text())
+
     def test_exports_clean_tip_with_history_and_squashed_merge_diff(self):
         expected = {".gitignore", "src/example.c", "src/extra.c"}
         # Unchanged upstream artifacts remain in history and the tip, while the
