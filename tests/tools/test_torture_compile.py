@@ -14,6 +14,19 @@ SHARED = Path(storage.shared_area(storage.main_root(ROOT)))
 
 
 class TortureOptionsTest(unittest.TestCase):
+    def test_s14_58_all_suites_have_distinct_relative_names(self):
+        discover = runpy.run_path(str(ROOT / 'tools/torture_compile.py'))['suite_sources']
+        with tempfile.TemporaryDirectory(dir=SHARED) as temporary:
+            root = Path(temporary)
+            for suite in ('gcc.c-torture/compile', 'gcc.c-torture/execute', 'gcc.dg/vect'):
+                source = root / suite / 'same.c'
+                source.parent.mkdir(parents=True)
+                source.write_text('int x;\n')
+            rows = discover(root, ['compile', 'execute', 'vect'])
+            self.assertEqual(len(rows), 3)
+            self.assertEqual(len({name for _, name in rows}), 3)
+            self.assertIn('gcc.c-torture/execute/same.c', {name for _, name in rows})
+
     def test_both_option_directives(self):
         summary = SHARED / 'torture-options.txt'
         subprocess.run([sys.executable, str(ROOT / 'tools/torture_compile.py'),
