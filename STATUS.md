@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 283 of 309
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | lead | Review passed (both findings fixed in 3fef5f08), but pm.py approve hung for 10 minutes and was killed with ... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | Main merged into s14/S14-56 (ce9fb633). Size approved: submit now with --override 'M5 corpus units (Q1-Q6, ... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Waiting for review | Q1-Q6 and MilkyWay host/corruption checks passed and serial O2 donor/KNC pairs were linted and staged in _s... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
@@ -334,6 +334,7 @@ Current tickets: `[##################--]` 283 of 309
 
 ## Recent activity
 
+- 2026-11-17 18:30 **S14-56** engineer submit: Q1-Q6 and MilkyWay host/corruption checks passed and serial O2 donor/KNC pairs were linted and staged in _shared/{S14-56,m4-sealed/S14-56}/correctn...
 - 2026-11-17 18:30 **S14-50** lead defer: Review passed (both findings fixed in 3fef5f08), but pm.py approve hung for 10 minutes and was killed with no change; interactive lead: run approve...
 - 2026-11-17 18:30 **S13-04** lead note: Set to review by the lead: work complete, reruns PASS (source_release 9, portability 6, logs in the 18:25 ask), size override approved; submit kept...
 - 2026-11-17 18:29 **S14-24** engineer escalate: budget: 8 engineer sessions used; the budget is 8
@@ -341,13 +342,12 @@ Current tickets: `[##################--]` 283 of 309
 - 2026-11-17 18:25 **S13-04** engineer ask: After merge 49e27821, submission with approved 827-line override is refused again: branch lacks real changes from main. Please merge current main a...
 - 2026-11-17 18:23 **S14-24** lead answer: Yes. Add the two tests to the existing dispatcher test file (new_test_files: 0 is fine; that is a new test in an existing file, not a new file). Re...
 - 2026-11-17 18:21 **S14-56** lead answer: Main merged into s14/S14-56 (ce9fb633). Size approved: submit now with --override 'M5 corpus units (Q1-Q6, MilkyWay, WRF pin/case) with checkers an...
-- 2026-11-17 18:21 **S14-24** engineer ask: Two required tests are absent: the red commit 9957076b changes only tools/dispatch.py. Please allow adding/committing tests in the existing dispatc...
 
 ## Cost
 
 - From the script, engineer: 894 sessions, 1891.4M input tokens
-- From the script, lead: 600 sessions, 164.2M input tokens
-- Started by hand, Claude: 389 sessions, 5157.8M input tokens
+- From the script, lead: 601 sessions, 164.3M input tokens
+- Started by hand, Claude: 389 sessions, 5159.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
