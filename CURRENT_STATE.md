@@ -97,6 +97,9 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Owner 2026-11-17: knc-boinc books its own card windows. Until its S9-02 lands (own card_run copy, project
+  "knc-boinc", turn rows claude-turn-knc-boinc-*), its rows carry project "gcc-knc" and look like ours to card_run and
+  our window scripts; asked it not to book before S9-02. GCC-KNC windows no longer host knc-boinc jobs.
 - Window 16 (2026-11-17 05:42-05:45Z): all ten twin-generated programs PASS on the card (checks ok, 0 mismatches);
   knc-twin ranked all 8 WRF variants right (2 ctx within 1-4%; 1 ctx +19-24% is a real twin miss, 1 tick = 1 core cycle, twin defect ticket open; sixth +30%/+7%). Issue #32: at n=8,
   partial-vector-usage=2 is 5.7% (1 ctx) / 7.2% (2 ctx) faster than the shipped =1 on rk_update_scalar (S14-30 note);
