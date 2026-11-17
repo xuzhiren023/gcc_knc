@@ -14,6 +14,21 @@ SHARED = Path(storage.shared_area(storage.main_root(ROOT)))
 
 
 class TortureOptionsTest(unittest.TestCase):
+    def test_s14_58_builtins_harness(self):
+        tool = runpy.run_path(str(ROOT / 'tools/torture_compile.py'))
+        with tempfile.TemporaryDirectory(dir=SHARED) as temporary:
+            root = Path(temporary)
+            builtins = root / 'gcc.c-torture/execute/builtins'
+            (builtins / 'lib').mkdir(parents=True)
+            for name in ('abs.c', 'abs-lib.c', 'lib/main.c', 'lib/abs.c'):
+                (builtins / name).write_text('int x;\n')
+            self.assertEqual(tool['suite_sources'](root, ['builtins']),
+                             [(builtins / 'abs.c', 'gcc.c-torture/execute/builtins/abs.c')])
+            sources, flags = tool['builtin_harness'](builtins / 'abs.c')
+            self.assertEqual(sources, [builtins / 'abs-lib.c', builtins / 'lib/main.c'])
+            self.assertEqual(flags, ['-fno-tree-dse', '-fno-tree-loop-distribute-patterns',
+                                    '-fno-tracer', '-fno-ipa-ra', '-fno-inline-functions'])
+
     def test_s14_58_all_suites_have_distinct_relative_names(self):
         discover = runpy.run_path(str(ROOT / 'tools/torture_compile.py'))['suite_sources']
         with tempfile.TemporaryDirectory(dir=SHARED) as temporary:
