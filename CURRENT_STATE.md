@@ -97,6 +97,10 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Backlog pruned (owner-approved 2026-11-16 22:55 EST): knc-twin tickets off the board (knc-twin is a skill, own repo);
+  S14-02, S12-27, S12-41 closed; S12-25 into S14-30, S12-40 into S12-30; S12-03/05/20, S14-05/07/09/46 deferred to M6
+  (sprint s16); new S14-56 (corpus additions) and S14-58 (-O3 sweep). About 23 active M5 tickets. Dispatch waits for
+  the owner to free the laptop and for disk above 30 GB.
 - Window 14 approved by the owner 2026-11-16 22:05 EST: knc-boinc's N-body check batch (~25-30 min), queued 03:04Z
   behind PhiWeather's warm twin (ends ~05:21Z); script .work/_shared/tmp/claude-s14-w14.sh, log window14.out; lead
   sends knc-boinc "go" on "card free" and touches .work/_state/w14-boinc-done on "boinc done"; cap card-free + 40 min.
