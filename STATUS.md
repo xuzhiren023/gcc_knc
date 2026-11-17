@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:49.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:50.
 
 **Waiting for you:** S14-24, S14-50, S14-56. Run `python tools/pm.py inbox`.
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 282 of 308
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | Approved: submit with --override 'source export tool, Linux recipe and their tests as the ticket asks; 827 ... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | Submit with the approved 827-line override now refuses: the branch lacks real changes from main. Please mer... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -334,19 +334,19 @@ Current tickets: `[##################--]` 282 of 308
 ## Recent activity
 
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
+- 2026-11-17 17:50 **S13-04** engineer ask: Submit with the approved 827-line override now refuses: the branch lacks real changes from main. Please merge current main into s13/S13-04 and resu...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:49 **S14-56** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 17:48 **S14-56** lead answer: No host nccopy exists; the lead asked PhiWeather to write classic copies into .work/_shared/corpus-build/wrf-miami-classic/ (wrfinput_d01, wrfinput...
 - 2026-11-17 17:44 **S14-50** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 17:43 **S14-16** engineer ask: GCC build needed at d2ab3509a1e (lane gcc). Replaced the invalid const-member cost_table assignments with a static const processor_costs[8][2], all...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
-- 2026-11-17 17:38 **S14-56** engineer ask: 4109c403: MilkyWay host/corruption PASS; donor/KNC serial O2 pair linted and staged in _shared/S14-56/correctness-jobs.json; no card runs. Logs: _s...
 
 ## Cost
 
 - From the script, engineer: 887 sessions, 1885.5M input tokens
 - From the script, lead: 592 sessions, 162.0M input tokens
-- Started by hand, Claude: 381 sessions, 5103.4M input tokens
+- Started by hand, Claude: 381 sessions, 5104.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
