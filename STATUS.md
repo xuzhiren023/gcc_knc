@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 16:54.
+Updated automatically at every ticket change. Last update: 2026-11-17 16:55.
 
-**Waiting for you:** S14-16, S14-22, S14-24. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-22, S14-24. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 280 of 307
 
@@ -144,7 +144,7 @@ Current tickets: `[##################--]` 280 of 307
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | **Waiting for you** | budget: 8 engineer sessions used; the budget is 8 |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress | sessions 8 -> 11 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -332,6 +332,7 @@ Current tickets: `[##################--]` 280 of 307
 
 ## Recent activity
 
+- 2026-11-17 16:55 **S14-16** owner decide: sessions 8 -> 11 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the sessions since 15:01 were los...
 - 2026-11-17 16:54 **S14-22** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 16:54 **S12-38** lead answer: Main merged into s12/S12-38 (1abf4e92, includes S14-62). Submit now with the 13:55 results, no reruns; note under 600 characters.
 - 2026-11-17 16:53 **S14-24** engineer escalate: budget: 7389102 input tokens used; the budget is 6000000
@@ -339,13 +340,12 @@ Current tickets: `[##################--]` 280 of 307
 - 2026-11-17 16:51 **S14-16** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 16:50 **S12-38** lead note: x86 identity PASS for s12/S12-38 (41bc85cf422) against releases/gcc-16.2.0: -O2 identical=1962 different=0 both-failed=41 errors=0; -O2 -mavx512f i...
 - 2026-11-17 16:45 **S14-62** lead approve: A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals release the lock during their long checks, s...
-- 2026-11-17 16:34 **S14-62** engineer submit: Approved as is after lead merged main (66d22771); Cygwin test_harness + test_pm_integration on CPUs 0-9 passed 58/61 including all three regression...
 
 ## Cost
 
 - From the script, engineer: 868 sessions, 1859.9M input tokens
 - From the script, lead: 587 sessions, 161.2M input tokens
-- Started by hand, Claude: 370 sessions, 5040.3M input tokens
+- Started by hand, Claude: 370 sessions, 5041.9M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
