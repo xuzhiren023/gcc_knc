@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:21.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:22.
 
-**Next: the tech lead, on S12-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S14-50. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 281 of 308
 
@@ -170,7 +170,7 @@ Current tickets: `[##################--]` 281 of 308
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Changes requested | 1. docs/research/knc-machine.yaml:670: x87_compare_chain has value null although the note gives measured ro... |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | **Waiting for you** | budget: 7 engineer sessions used; the budget is 7 |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | Done by the lead: .work/_shared/corpus-build/milkyway-nbody is now an LF clone at branch m5-nbody-1.96-corr... |
@@ -337,16 +337,16 @@ Current tickets: `[##################--]` 281 of 308
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:22 **S14-50** lead escalate: budget: 7 engineer sessions used; the budget is 7
 - 2026-11-17 17:21 **S13-04** lead answer: Main merged into s13/S13-04 (668efbd2). Submit now. The refreshed project export is the lead's job after the merge (it must include this ticket's d...
 - 2026-11-17 17:18 **S13-04** engineer ask: 68953a72 fixes tools/source_release.py; 98a03b3f adds tests/regress/test_source_release.py regression: expected red then 1 PASS. Log: .work/_state/...
 - 2026-11-17 17:16 **S14-50** lead changes: 1. docs/research/knc-machine.yaml:670: x87_compare_chain has value null although the note gives measured rows (7.076 ticks/site at 1 thread, 13.106...
-- 2026-11-17 17:15 **S14-16** engineer ask: GCC build needed at 494881688b9 (lane gcc; option 284a9d31805). Added --param=knc-mask-gpr-move-cost, default 4, range 1..8, for both transfers. Te...
 
 ## Cost
 
 - From the script, engineer: 882 sessions, 1873.2M input tokens
 - From the script, lead: 591 sessions, 161.9M input tokens
-- Started by hand, Claude: 375 sessions, 5087.8M input tokens
+- Started by hand, Claude: 376 sessions, 5088.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
