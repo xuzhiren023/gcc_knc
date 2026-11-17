@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:59.
+Updated automatically at every ticket change. Last update: 2026-11-17 18:01.
 
 **Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
@@ -144,7 +144,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Question for the tech lead | GCC build needed at d2ab3509a1e (lane gcc). Replaced the invalid const-member cost_table assignments with a... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | lead | GCC build needed: build gcc16 at .work/_shared/gcc d2ab3509a1e (s14/S14-16). Reviewed: static const table[8... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -334,13 +334,13 @@ Current tickets: `[##################--]` 282 of 308
 ## Recent activity
 
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
+- 2026-11-17 18:01 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc d2ab3509a1e (s14/S14-16). Reviewed: static const table[8][2] fixes the const-member error; index...
 - 2026-11-17 17:59 **S14-64** lead defer: Review passed; ready to approve. My approve was killed at the 10-minute tool limit during T0, so nothing merged and the ticket is still in review. ...
 - 2026-11-17 17:54 **S14-50** owner decide: sessions 8 -> 9, recorded by the lead (owner 2026-11-17 OK). The review changes are already committed by the lead (3fef5f08) with main merged (0936...
 - 2026-11-17 17:52 **S14-56** owner decide: sessions 8 -> 12 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (Q1-Q6 built, lin...
 - 2026-11-17 17:50 **S13-04** engineer ask: Submit with the approved 827-line override now refuses: the branch lacks real changes from main. Please merge current main into s13/S13-04 and resu...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:49 **S14-56** engineer escalate: budget: 8 engineer sessions used; the budget is 8
-- 2026-11-17 17:48 **S14-56** lead answer: No host nccopy exists; the lead asked PhiWeather to write classic copies into .work/_shared/corpus-build/wrf-miami-classic/ (wrfinput_d01, wrfinput...
 
 ## Cost
 
