@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:42.
+Updated automatically at every ticket change. Last update: 2026-11-17 10:43.
 
 **Waiting for you:** S14-04. Run `python tools/pm.py inbox`.
 
@@ -118,7 +118,7 @@ Current tickets: `[##################--]` 276 of 305
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Done | T1 and T2 checks now write every generated file into the run's own output folder, so a file left by another... |
-| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Tests waiting for review | Red commit 32a04338: original main/local-assignment/return reproducer plus --slp-pr123221 T1 selection. Ins... |
+| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | In progress | A T1 test now reproduces the -O3 -march=knc -fno-tree-pre SLP reduction segfault (tree-vect-slp.cc:4275, ve... |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Folded into S12-30 (sparse indexed reductions),... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: M4 harness item; the M5 donor-margin ch... |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 10:43 **S12-38** lead approve-red: A T1 test now reproduces the -O3 -march=knc -fno-tree-pre SLP reduction segfault (tree-vect-slp.cc:4275, vect_analyze_slp_reduc_chain) on the insta...
 - 2026-11-17 10:42 **S14-44** lead answer: Merge done by the lead (main merged into s14/S14-44; diff vs main is the four new files only). Lead review: approve as is. Submit now with note: Sc...
 - 2026-11-17 10:41 **S14-44** lead resume: lead merged main into s14/S14-44 and reviewed: approve as is
 - 2026-11-17 10:41 **S12-38** engineer red: Red commit 32a04338: original main/local-assignment/return reproducer plus --slp-pr123221 T1 selection. Installed gcc-knc-16.2.0-2 passes -O3 -marc...
@@ -337,13 +338,12 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 10:38 **S14-24** owner decide: sessions 2 -> 4, recorded by the lead under the owner's standing budget rule (2026-11-09/10: raise on steady progress) and the owner's 2026-11-17 O...
 - 2026-11-17 10:36 **S14-16** engineer escalate: budget: 14669748 input tokens used; the budget is 12000000
 - 2026-11-17 10:35 **S14-56** lead answer: See the lead resume note: MilkyWay facts posted; start Q1-Q6 and MilkyWay; WRF inputs follow.
-- 2026-11-17 10:34 **S14-44** lead defer: Needs the interactive lead: no-go report done at 0f79b069 (4 new files: docs/research/s14-44-lane0-scalar.md, tools/s14_44_lane0.asm, s14_44_mix.c,...
 
 ## Cost
 
 - From the script, engineer: 831 sessions, 1759.4M input tokens
 - From the script, lead: 570 sessions, 158.5M input tokens
-- Started by hand, Claude: 296 sessions, 4832.3M input tokens
+- Started by hand, Claude: 296 sessions, 4835.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
