@@ -568,3 +568,12 @@ Apply these when S11-17 and Sprint 12 put PGO on whole programs.
   keeping every valid result (ADR-0010, ADR-0015).
 - **Numerics:** a PGO image is not bitwise identical (x87 rounding can change through spills); validate with a
   calibrated tolerance gate that is shown to reject a faulty result.
+
+## 2026-11-17: knc-boinc PGO on GCC-KNC 16.2 (MilkyWay N-body, their report)
+
+Instrumented training on the card with `-fprofile-generate -fprofile-update=atomic` at 240 threads took 458 s
+(core-small) and 254 s (large), about 10x a normal run, from atomic counters. The profile-use build stayed
+bit-identical. Gain: large 23.99 to 23.94 s (none); core-small 62.37 to 59.73 s (-4.2%, all in the serial
+mixed-dwarf generation). Lesson for one-flag PGO (M6): train at a low thread count, or with per-thread counters
+merged at exit, because atomic counters at 240 threads make training of long programs impractical; the gain sits in
+branchy serial code, as WRF and S9-18 found.
