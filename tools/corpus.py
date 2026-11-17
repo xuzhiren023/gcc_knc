@@ -427,6 +427,9 @@ def stage_runtimes(binary, compiler, directory, log):
 
 def build_program(program, compiler, flags, source, out, log, setparams, variant='openmp',
                   runtime_stager=None):
+    if program in M5_Q_UNITS:
+        from corpus_m5 import build_q
+        return build_q(program, compiler, flags, out, log, runtime_stager)
     if runtime_stager is None:
         runtime_stager = stage_runtimes
     cc = compiler_path(compiler)
@@ -1008,8 +1011,13 @@ def lead(args):
                 cores = {'full': metadata[0]['cores'], '3100': 56, '5100': 59}[job['profile']]
                 density = 'serial' if job['threads'] == 1 else 'full' if job['threads'] == 4 * cores else 'two' if job['threads'] == 2 * cores else 'one'
                 if ready:
+                    if job['program'] in M5_Q_UNITS:
+                        from corpus_m5 import reference_path
+                        job['reference'] = reference_path(stage_dir, job['program']).read_text()
                     rc = card_call(stage_dir, files, job['program'], density, out, err, job['profile'], args.timeout)
                     row = output_result(job, out.read_text(errors='replace'), err.read_text(errors='replace'), rc)
+                    row.pop('reference', None)
+                    job.pop('reference', None)
                     row.update(stdout=str(out), stderr=str(err))
                     row['runtime_prefix'] = next((windows_path(f) for f in build['files'] if f.endswith('runtime-prefix.json')), None)
                 else:
