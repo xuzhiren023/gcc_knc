@@ -60,6 +60,8 @@ M5_SOURCES = {
         source_url='https://github.com/Milkyway-at-home/milkywayathome_client',
         version='nbody_1.96', tag='nbody_1.96',
         commit='1e640779f1cabf88aaa49e4db569cfe7e09016c4',
+        patched_branch='m5-nbody-1.96-correctness',
+        patched_commit='064e2d7f40e6702fea444d539ad666be6f148983',
         patches=['crlibm-config-path.patch', 'nbody-king-const.patch',
                  'nbody-result-contract.patch'],
         host_patches=['popt-cygwin.patch']),
@@ -811,6 +813,9 @@ def output_result(job, stdout, stderr, returncode):
         if program in M5_Q_UNITS or program in ('MilkyWay-Nbody', 'WRF'):
             import genset
             payload = genset.payload(stdout, stderr)
+            if program == 'MilkyWay-Nbody':
+                from corpus_milkyway import normalize
+                payload = normalize(stdout + '\n' + stderr)
             if not check_m5_output(program, job['reference'], payload):
                 raise ValueError('M5 complete-output check failed')
             if program == 'WRF':
@@ -1020,7 +1025,7 @@ def lead(args):
                 cores = {'full': metadata[0]['cores'], '3100': 56, '5100': 59}[job['profile']]
                 density = 'serial' if job['threads'] == 1 else 'full' if job['threads'] == 4 * cores else 'two' if job['threads'] == 2 * cores else 'one'
                 if ready:
-                    if job['program'] in M5_Q_UNITS:
+                    if job['program'] in M5_STYLES:
                         from corpus_m5 import reference_path
                         job['reference'] = reference_path(stage_dir, job['program']).read_text()
                     rc = card_call(stage_dir, files, job['program'], density, out, err, job['profile'], args.timeout)

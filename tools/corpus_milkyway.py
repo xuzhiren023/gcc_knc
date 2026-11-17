@@ -29,21 +29,13 @@ def prepare(log):
     git = ['git', '-c', 'safe.directory=' + str(SOURCE), '-C', str(SOURCE)]
     head = subprocess.check_output([*git, 'rev-parse', 'HEAD'], text=True).strip()
     pin = corpus.M5_SOURCES['MilkyWay-Nbody']
-    if head != pin['commit']:
+    if head != pin['patched_commit']:
         raise ValueError('MilkyWay checkout is not the authorized pin')
-    # The Cygwin guard is inert for k1om/glibc; both builds share one checkout.
-    for name in pin['patches'] + pin['host_patches']:
-        patch = SUPPORT / 'patches' / name
-        # The supplied Windows checkout has CRLF; patches use upstream LF.
-        for target in re.findall(r'^\+\+\+ b/(.+)$', patch.read_text(), re.M):
-            path = SOURCE / target
-            contents = path.read_bytes()
-            if b'\r\n' in contents:
-                path.write_bytes(contents.replace(b'\r\n', b'\n'))
-        applied = subprocess.run([*git, 'apply', '--reverse', '--check', str(patch)],
-                                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        if applied.returncode:
-            corpus.execute([*git, 'apply', str(patch)], SOURCE, log)
+    dirty = subprocess.check_output([*git, 'status', '--porcelain',
+                                     '--untracked-files=no'], text=True)
+    if dirty.strip():
+        raise ValueError('MilkyWay pinned source has tracked changes')
+    log.write('Read-only MilkyWay source: ' + head + '\n')
 
 
 def source_list(component, variable):
@@ -73,7 +65,7 @@ def build(out, cc, cxx, flags, log, native=False):
         for variable in variables:
             sources.extend(source_list(component, variable))
     sources.extend(SOURCE / name for name in
-                   ('nbody/src/main.c', 'dSFMT/dSFMT.c', 'lua/src/loadlib_rel.c'))
+                   ('nbody/src/main.c', 'dSFMT/dSFMT.c', 'lua/src/loadlib.c'))
     common = [*flags, '-ffp-contract=off', '-fno-strict-aliasing',
               '-DDOUBLEPREC=1', '-DDSFMT_MEXP=19937', '-DHAVE_CONFIG_H',
               '-D_GNU_SOURCE', *('-I' + str(p) for p in includes)]
@@ -84,6 +76,14 @@ def build(out, cc, cxx, flags, log, native=False):
         cpp = source.suffix == '.cc'
         definitions = (['-DNBODY_LUA_TYPES_COMPILATION']
                        if source.name.startswith('nbody_lua') else [])
+        # Target definitions from the pinned component CMakeLists.txt files.
+        component = source.relative_to(SOURCE).parts[0]
+        if component == 'milkyway':
+            definitions.append('-DMILKYWAY_LUA_COMPILATION' if
+                               source.name.startswith('milkyway_lua') else
+                               '-DMILKYWAY_MATH_COMPILATION')
+        elif component == 'crlibm':
+            definitions.extend(['-DSCS_NB_WORDS=8', '-DSCS_NB_BITS=30'])
         command = [cxx if cpp else cc, *common, *definitions,
                    '-std=gnu++11' if cpp else '-std=gnu99', '-c', source, '-o', obj]
         with diagnostic.open('w') as output:
@@ -153,5 +153,21 @@ def build_card(compiler, flags, out, log):
     prepare(log)
     binary = build(out, corpus.compiler_path(compiler),
                    corpus.compiler_path(compiler, 'g++'), flags, log)
-    corpus.execute([sys.executable, corpus.ROOT / 'tools/knc_lint', binary], out, log)
-    return [binary, *inputs(out), *genset.runtimes(binary, compiler, out, log)]
+    application = out / 'milkyway-nbody'
+    binary.rename(application)
+    # The corpus launcher always executes ./workload without arguments.
+    # Keep the pinned argument vector here and discard prior checkpoints so
+    # every launch performs the same complete work.
+    driver = out / 'driver.c'
+    argv = ', '.join(json.dumps(s) for s in ['./milkyway-nbody', *ARGS])
+    driver.write_text('#include <unistd.h>\n#include <errno.h>\n'
+                      'int main(void) {\n'
+                      '  char *args[] = {' + argv + ', 0};\n'
+                      '  if (unlink("nbody_checkpoint") && errno != ENOENT) return 2;\n'
+                      '  execv(args[0], args);\n  return 127;\n}\n')
+    corpus.execute([corpus.compiler_path(compiler), *flags, driver,
+                    *corpus.link_paths(), '-o', binary], out, log)
+    for executable in (binary, application):
+        corpus.execute([sys.executable, corpus.ROOT / 'tools/knc_lint', executable], out, log)
+    return [binary, application, *inputs(out),
+            *genset.runtimes(application, compiler, out, log)]

@@ -128,15 +128,47 @@ def stage_q(stage, oracles, only=None):
         raise RuntimeError('Q staging failed; inspect partitioned builds.json')
 
 
+def stage_milkyway(stage):
+    stage = stage.resolve()
+    program = 'MilkyWay-Nbody'
+    reference = reference_path(stage, program)
+    if not reference.is_file() or not (stage / 'launch').is_file():
+        raise ValueError('requires the passed host reference and linted launcher')
+    records = [r for r in corpus.read_partition(stage, 'builds.json')
+               if r['program'] != program]
+    jobs = [r for r in corpus.read_partition(stage, 'correctness-jobs.json')
+            if r['program'] != program]
+    for compiler, variants in corpus.flag_sets().items():
+        record = corpus.stage_build(program, compiler, variants[0], 'serial',
+                                    0, None, stage)
+        record.update(style=corpus.M5_STYLES[program], source=corpus.M5_SOURCES[program])
+        records.append(record)
+        corpus.write_partition(stage, 'builds.json', records)
+        if record['check'] != 'pass':
+            raise RuntimeError(record['cause'])
+        jobs.append(dict(program=program, compiler=compiler, flags=record['flags'],
+                         input=corpus.INPUTS[program], style=corpus.M5_STYLES[program],
+                         held_out=False, threads=1, variant='serial', check='pass',
+                         files=record['files'], reference=corpus.windows_path(reference),
+                         launcher=corpus.windows_path(stage / 'launch'),
+                         args=['serial', program], normalizer='corpus_milkyway.normalize',
+                         checker='corpus.check_m5_output'))
+        corpus.write_partition(stage, 'correctness-jobs.json', jobs)
+    print('MilkyWay serial O2 pair staged and linted; no card jobs run')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=['stage-q'])
+    parser.add_argument('action', choices=['stage-q', 'stage-milkyway'])
     parser.add_argument('--stage', type=Path, default=corpus.SHARED / 'S14-56')
     parser.add_argument('--only', nargs='+', choices=corpus.M5_Q_UNITS)
     parser.add_argument('--oracles', type=Path,
                         default=corpus.sealed_dir(corpus.SHARED / 'S14-56') / 'q-host/oracles')
     args = parser.parse_args()
-    stage_q(args.stage, args.oracles, args.only)
+    if args.action == 'stage-milkyway':
+        stage_milkyway(args.stage)
+    else:
+        stage_q(args.stage, args.oracles, args.only)
 
 
 if __name__ == '__main__':
