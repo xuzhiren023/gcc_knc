@@ -98,6 +98,11 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Sprint 14 started 2026-11-17 09:20 EST (owner approved Sprints 14-15; plan docs/sprints/SPRINT-14.md). Dispatchers
+  (Codex per policy) on lanes gcc (S14-16, then S12-34), gcc2 (S12-38; gcc-2 checkout moved from s12/S12-30 to knc,
+  S12-30 branch pushed to the fork), torture (S14-58), corpus (S14-56), method (S14-04), tools (S13-04), calib
+  (S14-50), research (S14-44), dispatch (S14-24); harness (S14-22) after the lead's diagnosis: its red test waits out
+  card_run's admission timeout instead of failing. Codex cannot build GCC: the lead builds on "GCC build needed".
 - Owner 2026-11-17: Sprints 14-15 refocused on general-purpose compiler work. S14-30 closed (PhiWeather's question);
   S14-48, S14-08, S14-28 deferred to M6; S14-44, S14-52, S14-54 recast to judge on corpus and generic code; S14-22
   scoped to our own windows. Open question to the owner: keep MilkyWay N-body and WRF as M5 corpus units (ADR-0016)?
