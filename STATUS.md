@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 11:32.
+Updated automatically at every ticket change. Last update: 2026-11-17 11:33.
 
-**Next: GPT-6.1, on S12-38 (ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep)).** Run `python tools/dispatch.py`, or ask the tech lead to.
+**Next: the tech lead, on S14-56.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 276 of 306
 
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 276 of 306
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress |  |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | See the lead resume note: MilkyWay facts posted; start Q1-Q6 and MilkyWay; WRF inputs follow. |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Tests waiting for review | Red commit 0704996e: one host-only run of test_corpus_m5*.py completed with 15 expected assertion failures ... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | input_tokens 6M -> 16M, sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and th... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -332,22 +332,22 @@ Current tickets: `[##################--]` 276 of 306
 ## Recent activity
 
 - 2026-11-17 11:40 **S12-20** lead note: Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log and atan (exp easy, pow hard), so vector...
+- 2026-11-17 11:33 **S14-56** engineer red: Red commit 0704996e: one host-only run of test_corpus_m5*.py completed with 15 expected assertion failures across 5 tests: seven missing scored uni...
 - 2026-11-17 11:32 **S14-16** lead answer: Good progress (zlib kmov 14->0). (1) Do not weaken knc-loop-store-mask.c: a flat 6 is too blunt, because it also pushes genuine mask values out of ...
 - 2026-11-17 11:26 **S14-16** engineer ask: Reused completed runs: scalar T1 and T2 pass; 16 vector tests retain masked-vector counts; zlib kmov 14->0. Log .work/_state/logs/S14_16_T0_T2-2026...
 - 2026-11-17 11:19 **S14-04** owner decide: Recorded by the lead (owner 2026-11-17: plenty of Codex usage; standing budget rule): the standard budget is now 16M tokens and 5 sessions in harne...
 - 2026-11-17 10:47 **S14-58** owner decide: input_tokens 6M -> 16M, sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and the owner's 2026-11-17 OK for stuck ticket...
 - 2026-11-17 10:47 **S14-58** lead escalate: budget: 12208740 input tokens used; the budget is 6000000
 - 2026-11-17 10:46 **S13-04** lead approve-red: The failing tests for the source release are approved: they check that a release audit reports and rejects ignored, .work, build-artifact, oversize...
-- 2026-11-17 10:45 **S14-58** lead answer: (1) builtins: those 144 are not failures; gcc.c-torture/execute/builtins/*.c only link with their harness. Apply builtins.exp's rules in the tool (...
 
 ## Cost
 
 - From the script, engineer: 835 sessions, 1773.5M input tokens
 - From the script, lead: 573 sessions, 159.1M input tokens
-- Started by hand, Claude: 306 sessions, 4852.1M input tokens
+- Started by hand, Claude: 306 sessions, 4852.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 315 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 316 GiB free on the drive.
