@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | Question for the tech lead | Submission blocked: pm.py submit waited 900 seconds and refused because .work/_state/board.lock is held by ... |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | In progress | The lock holder was a lead approve running t0 (it has finished). Retry pm.py submit now; if it waits again,... |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 13:12 **S14-04** lead answer: The lock holder was a lead approve running t0 (it has finished). Retry pm.py submit now; if it waits again, retry once more later. S14-60 (board lo...
 - 2026-11-17 13:12 **S12-38** owner decide: Recorded by the lead (owner 2026-11-17 OK for stuck tickets): GCC built by the lead in slot 2 at 41bc85cf422 (gcc-build-2, cc1 12:32 EST, log .work...
 - 2026-11-17 13:11 **S14-22** owner decide: sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the red test exists in the worktree but is uncommit...
 - 2026-11-17 13:11 **S13-04** lead answer: (1) No frozen heads: both repos are public, so the exporter takes refs as arguments (default: the current tips of knc and main) and writes the exac...
@@ -338,13 +339,12 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 12:55 **S14-44** lead approve: Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and no M4 program shows a 5% whole-program ga...
 - 2026-11-17 12:41 **S12-38** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 12:40 **S14-58** lead note: CARD RESULT (window 17, 2026-11-17 17:33-17:34Z, claude-torture -j 60, -O3 execute set at the installed prefix): 1797 PASS, 6 FAIL (all raw status ...
-- 2026-11-17 12:37 **S14-04** lead answer: Main merged into s14/S14-04 (5c88a2de). Submit now; passing tests reused is fine.
 
 ## Cost
 
 - From the script, engineer: 848 sessions, 1810.8M input tokens
 - From the script, lead: 579 sessions, 159.8M input tokens
-- Started by hand, Claude: 326 sessions, 4906.6M input tokens
+- Started by hand, Claude: 326 sessions, 4907.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
