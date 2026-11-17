@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:14.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:15.
 
 **Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
@@ -144,7 +144,7 @@ Current tickets: `[##################--]` 281 of 308
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress | Recorded by the lead (owner 2026-11-17 OK; budget sessions 11). Decision on the 17:02 ask: keep cost 4 as t... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Question for the tech lead | GCC build needed at 494881688b9 (lane gcc; option 284a9d31805). Added --param=knc-mask-gpr-move-cost, defau... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -336,11 +336,11 @@ Current tickets: `[##################--]` 281 of 308
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:15 **S14-16** engineer ask: GCC build needed at 494881688b9 (lane gcc; option 284a9d31805). Added --param=knc-mask-gpr-move-cost, default 4, range 1..8, for both transfers. Te...
 - 2026-11-17 17:14 **S14-64** engineer submit: Host CPUs 0-9: empty-folder and done-ticket checks passed in .work/_state/logs/S14_64_green-20261117-171308.log, and cleanup failure records done a...
 - 2026-11-17 17:13 **S14-50** engineer submit: knc-machine.yaml now carries the measured scatter cost and the x87 compare-chain cost from the card, and says where it still disagrees with knc-twin.
 - 2026-11-17 17:12 **S14-56** lead answer: Done by the lead: .work/_shared/corpus-build/milkyway-nbody is now an LF clone at branch m5-nbody-1.96-correctness (commit 064e2d7 = nbody_1.96 1e6...
 - 2026-11-17 17:11 **S14-50** owner decide: sessions 6 -> 7, recorded by the lead under the owner's 2026-11-17 OK. The work is committed and main is merged into s14/S14-50 now. This session r...
-- 2026-11-17 17:10 **S14-50** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 
 ## Cost
 
