@@ -11,6 +11,7 @@ Option directives with a target selector are skipped; other dg directives are ig
 import argparse
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+import fnmatch
 import os
 from pathlib import Path
 import re
@@ -32,7 +33,53 @@ CORPUS = Path(storage.gcc_tree(PROJECT)) / 'gcc/testsuite/gcc.c-torture/compile'
 LEVELS = {'O0': ['-O0'], 'O2': ['-O2'], 'O2-g': ['-O2', '-g'], 'O3': ['-O3']}
 CLASSES = ('pass', 'slow', 'hang', 'ICE', 'compiler error', 'float/double ABI error',
            'assembler rejection', 'lint failure', 'infrastructure failure',
-           'user inline asm rejected')
+           'user inline asm rejected', 'link failure')
+SUITES = {'compile': 'gcc.c-torture/compile', 'execute': 'gcc.c-torture/execute',
+          'vect': 'gcc.dg/vect', 'builtins': 'gcc.c-torture/execute/builtins'}
+
+
+def suite_sources(testsuite, suites):
+    return [(source, source.relative_to(testsuite).as_posix())
+            for suite in suites for source in sorted((testsuite / SUITES[suite]).rglob('*.c'))
+            if 'builtins' not in source.relative_to(testsuite).parts or
+            (source.parent.name == 'builtins' and not source.stem.endswith('-lib'))]
+
+
+def builtin_harness(source):
+    """Model builtins.exp; companions include their required lib/*.c support."""
+    if source.parent.name != 'builtins':
+        return [], []
+    return [source.with_name(source.stem + '-lib.c'), source.parent / 'lib/main.c'], [
+        '-fno-tree-dse', '-fno-tree-loop-distribute-patterns', '-fno-tracer',
+        '-fno-ipa-ra', '-fno-inline-functions']
+
+
+def source_options(source):
+    """Read simple dg options and the torture drivers' KNC harness inputs."""
+    options = []
+    for match in re.finditer(
+            r'\{\s*dg-(?:additional-)?options\s+(?:\{\s*"((?:\\.|[^"\\])*)"\s*\}|'
+            r'"((?:\\.|[^"\\])*)"|([^\s{}]+))(\s*\{\s*target\b)?',
+            source.read_text(encoding='utf8', errors='replace')):
+        if match[4] is None:
+            options.extend(shlex.split(next(value for value in match.groups()[:3]
+                                            if value is not None)))
+    harness = builtin_harness(source)[1]
+    if source.parent.name == 'ieee':
+        # ieee.exp's excess-precision controls, adapted to KNC's x87 scalar path.
+        harness = ['-fno-inline', '-ffloat-store']
+    driver = source.with_suffix('.x')
+    if driver.exists():
+        # Only unconditional, literal assignments; do not evaluate Tcl drivers.
+        for match in re.finditer(r'^set additional_flags\s+([^\n]+)$',
+                                 driver.read_text(), re.MULTILINE):
+            value = match[1].strip()
+            if value.startswith('"') and value.endswith('"'):
+                value = value[1:-1]
+            if '$' in value or '[' in value or '{' in value:
+                raise ValueError('unsupported additional_flags in ' + str(driver))
+            harness = shlex.split(value)
+    return options + harness
 
 
 def user_asm_rejection(asm, diagnostics):
@@ -96,6 +143,13 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--cc', type=Path, help='installed compiler, without a build-tree -B')
     parser.add_argument('--source', type=Path, help='one reduced case instead of the corpus')
+    parser.add_argument('--suite', action='append', choices=SUITES)
+    parser.add_argument('--case', action='append',
+                        help='filter suite-relative test names with a shell glob')
+    parser.add_argument('--keep-assembly', action='store_true',
+                        help='retain successful assembly for failure triage')
+    parser.add_argument('--stage-execute', action='store_true',
+                        help='link and lint successful O3 execute objects; never run them')
     parser.add_argument('--level', choices=tuple(LEVELS), action='append')
     parser.add_argument('--jobs', type=int, default=8, choices=range(1, 9))
     parser.add_argument('--timeout', type=float, default=60)
@@ -109,18 +163,17 @@ def main():
     env['TMPDIR'] = str(SHARED / 'tmp')
     env['LC_ALL'] = 'C'
     lint = runpy.run_path(str(ROOT / 'tools/knc_lint'))
-    sources = [args.source.resolve()] if args.source else sorted(CORPUS.rglob('*.c'))
+    entries = ([(args.source.resolve(), args.source.name)] if args.source else
+               suite_sources(CORPUS.parents[1], args.suite) if args.suite else
+               [(s, s.relative_to(CORPUS).as_posix()) for s in sorted(CORPUS.rglob('*.c'))])
+    if args.case:
+        entries = [(source, name) for source, name in entries
+                   if any(fnmatch.fnmatchcase(name, pattern) for pattern in args.case)]
+    sources = [source for source, _ in entries]
+    names = dict(entries)
     if not sources:
         raise RuntimeError('empty torture corpus')
-    options = {
-        source: [flag for match in re.finditer(
-            r'\{\s*dg-(?:additional-)?options\s+(?:"([^"\n]*)"|([^\s{}]+))'
-            r'(\s*\{\s*target\b)?',
-            source.read_text(encoding='utf8', errors='replace'))
-                 if match[3] is None
-                 for flag in shlex.split(match[1] if match[1] is not None else match[2])]
-        for source in sources
-    }
+    options = {source: source_options(source) for source in sources}
     levels = args.level or list(LEVELS)
     args.output.mkdir(parents=True, exist_ok=True)
 
@@ -140,10 +193,16 @@ def main():
 
     def measure(job):
         source, level = job
-        name = source.name if args.source else source.relative_to(CORPUS).as_posix()
+        name = names[source]
         base = args.output / level / name
         base.parent.mkdir(parents=True, exist_ok=True)
         asm, obj, log = [Path(str(base) + suffix) for suffix in ('.s', '.o', '.log')]
+        binary = args.output / 'card' / ('claude-t-' + name.replace('/', '__') + '.mic')
+        stage = (args.stage_execute and level == 'O3' and
+                 name.startswith('gcc.c-torture/execute/'))
+        if stage:
+            binary.parent.mkdir(parents=True, exist_ok=True)
+            binary.unlink(missing_ok=True)
         for path in (asm, obj, log):
             path.unlink(missing_ok=True)
         diagnostic = []
@@ -170,35 +229,57 @@ def main():
             return result
 
         kind = 'infrastructure failure'
+        artifacts = []
+        violations = []
         try:
             cc = [args.cc] if args.cc else [BUILD / 'xgcc', '-B' + str(BUILD) + '/']
-            result = invoke([*cc, '-march=knc',
-                             *LEVELS[level], *options[source], '-S', source, '-o', asm],
-                            compiler=True)
-            if result.returncode:
-                if 'internal compiler error:' in result.stdout:
-                    kind = 'ICE'
+            objects = []
+            artifacts = []
+            for index, unit in enumerate([source, *builtin_harness(source)[0]]):
+                asm, obj = [Path(str(base) + '.unit%d' % index + suffix)
+                            for suffix in ('.s', '.o')]
+                artifacts.extend([asm, obj])
+                result = invoke([*cc, *options[source], '-march=knc',
+                                 *LEVELS[level], '-S', unit, '-o', asm],
+                                compiler=True)
+                if result.returncode:
+                    if 'internal compiler error:' in result.stdout:
+                        kind = 'ICE'
+                    else:
+                        errors = re.findall(r'\berror: ([^\n]+)', result.stdout)
+                        fp_abi = r'SSE register (?:return|argument) with SSE disabled'
+                        kind = ('float/double ABI error' if errors and
+                                all(re.fullmatch(fp_abi, e.strip()) for e in errors)
+                                else 'compiler error')
                 else:
-                    errors = re.findall(r'\berror: ([^\n]+)', result.stdout)
-                    fp_abi = r'SSE register (?:return|argument) with SSE disabled'
-                    kind = ('float/double ABI error' if errors and
-                            all(re.fullmatch(fp_abi, e.strip()) for e in errors)
-                            else 'compiler error')
-            else:
-                violations = list(lint['source_violations'](asm))
-                assembled = invoke([TC / 'cross/bin/k1om-mpss-linux-as',
-                                    '--march=k1om', asm, '-o', obj])
-                if assembled.returncode:
-                    kind = ('user inline asm rejected' if user_asm_rejection(asm, assembled.stdout)
-                            else 'assembler rejection')
+                    violations = list(lint['source_violations'](asm))
+                    assembled = invoke([TC / 'cross/bin/k1om-mpss-linux-as',
+                                        '--march=k1om', asm, '-o', obj])
+                    if assembled.returncode:
+                        kind = ('user inline asm rejected' if user_asm_rejection(asm, assembled.stdout)
+                                else 'assembler rejection')
+                        if violations:
+                            kind = 'lint failure'
+                    else:
+                        violations.extend(lint['decoded_violations'](
+                            obj, TC / 'cross/bin/k1om-mpss-linux-objdump', env))
+                        kind = 'lint failure' if violations else 'pass'
+                if kind != 'pass':
+                    break
+                objects.append(obj)
+            if kind == 'pass' and stage:
+                linked = invoke([*cc, '-march=knc', *LEVELS[level], *objects,
+                                 '-lm', '-o', binary])
+                if linked.returncode:
+                    kind = 'link failure'
+                else:
+                    violations.extend(lint['lint'](binary, TC, env))
                     if violations:
                         kind = 'lint failure'
-                else:
-                    violations.extend(lint['decoded_violations'](
-                        obj, TC / 'cross/bin/k1om-mpss-linux-objdump', env))
-                    kind = 'lint failure' if violations else 'pass'
-                for violation in violations:
-                    diagnostic.append('%s:%s:%s: forbidden: %s' % violation)
+                if kind != 'pass':
+                    binary.unlink(missing_ok=True)
+            for violation in violations:
+                diagnostic.append('%s:%s:%s: forbidden: %s' % violation)
         except CompilerHang as error:
             diagnostic.append('hang: ' + str(error))
             kind = 'hang'
@@ -210,10 +291,11 @@ def main():
             diagnostic.append('elapsed including initial timeout and retry: %.3fs' % seconds)
         if kind != 'pass' or retried:
             log.write_text('\n'.join(diagnostic), encoding='utf8')
-        if kind not in ('assembler rejection', 'user inline asm rejected', 'lint failure', 'ICE'):
-            asm.unlink(missing_ok=True)
-        if kind != 'lint failure':
-            obj.unlink(missing_ok=True)
+        for artifact in artifacts:
+            if args.keep_assembly and artifact.suffix == '.s':
+                continue
+            if kind == 'pass' or (artifact.suffix == '.o' and kind != 'lint failure'):
+                artifact.unlink(missing_ok=True)
         return level, kind, name, seconds if retried else None
 
     start = time.monotonic()
@@ -224,11 +306,28 @@ def main():
             if number % 250 == 0:
                 print('measured %d/%d' % (number, len(sources) * len(levels)), flush=True)
     elapsed = time.monotonic() - start
+    if args.stage_execute:
+        card = args.output / 'card'
+        card.mkdir(parents=True, exist_ok=True)
+        binaries = sorted(card.glob('claude-t-*.mic'))
+        listing = card / 'claude-torture.list'
+        listing.write_text(''.join(p.name + ' ' + p.name[9:-4] + '\n' for p in binaries))
+        driver = card / 'claude-torture.mic'
+        cc = [args.cc] if args.cc else [BUILD / 'xgcc', '-B' + str(BUILD) + '/']
+        if not driver.exists():
+            result = run([*cc, '-march=knc', '-O2', ROOT / 'tools/claude-torture.c',
+                          '-o', driver], args.timeout)
+            (card / 'driver.log').write_text(result.stdout)
+            if result.returncode or list(lint['lint'](driver, TC, env)):
+                raise RuntimeError('driver build/lint failed; see ' + str(card / 'driver.log'))
+        (card / 'card-files.list').write_text(''.join(
+            p.relative_to(PROJECT).as_posix() + '\n' for p in [listing, *binaries]))
+        print('Staged %d execute binaries; native execution NOT RUN.' % len(binaries), flush=True)
     counts = Counter((level, kind) for level, kind, _, _ in results)
     counts.update((level, 'slow') for level, kind, _, seconds in results
                   if seconds is not None and kind not in ('hang', 'infrastructure failure'))
     lines = ['GCC 16 KNC C torture compile corpus (S1-05)',
-             'Scope: ' + (str(args.source) if args.source else 'gcc/testsuite/gcc.c-torture/compile/**/*.c'),
+             'Scope: ' + (str(args.source) if args.source else ', '.join(args.suite or ['compile'])),
              'dg-options and dg-additional-options without target selectors are appended; selected directives are skipped.',
              'Flags: -march=knc -S, plus each level below.',
              'Assembler: binutils 2.22, --march=k1om.',
@@ -262,7 +361,7 @@ def main():
     print('Summary: ' + str(args.summary), flush=True)
     print('Detailed failures: ' + str(args.output), flush=True)
     return int(any(counts[level, kind] for level in levels for kind in
-                   ('hang', 'ICE', 'assembler rejection', 'lint failure', 'infrastructure failure')))
+                   ('hang', 'ICE', 'assembler rejection', 'lint failure', 'infrastructure failure', 'link failure')))
 
 
 if __name__ == '__main__':

@@ -17,6 +17,7 @@ import os
 import shutil
 import subprocess
 import sys
+import time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import pm  # noqa: E402
@@ -186,10 +187,27 @@ def over_budget(board, ticket):
     return None
 
 
+def retry_busy(step, *args, **kwargs):
+    for attempt in range(11):
+        try:
+            return step(*args, **kwargs)
+        except pm.Refused as refused:
+            if not str(refused).startswith("the board is busy:") or attempt == 10:
+                raise
+            time.sleep(60)
+
+
+@contextlib.contextmanager
+def board_lock(board):
+    with contextlib.ExitStack() as locks:
+        retry_busy(lambda: locks.enter_context(pm.board_lock(board.root)))
+        yield
+
+
 def refresh_status(board):
     """The session's last ticket change came before its tokens were recorded, so show them now."""
     try:
-        with pm.board_lock(board.root):
+        with board_lock(board):
             path = status.write(board, pm.next_action(board))
             pm.run_git("add", "--", path, cwd=board.root)
             pm.run_git("commit", "-q", "-m", "pm: status after session", "--", path, cwd=board.root)
@@ -227,7 +245,7 @@ def run_session(board, ticket, role, dry_run):
         if reason:
             print("%s: over budget (%s), sending to the owner" % (ticket.id, reason))
             ticket.fields.update(state="owner", resume=ticket.state)
-            ticket.save("escalate", "budget: " + reason)
+            retry_busy(ticket.save, "escalate", "budget: " + reason)
             return True
     # A GCC ticket's approval rests on the lead's own card run, so a scripted review could only escalate it
     # to the owner (S8-07, 2026-11-09). Red reviews stay scripted.
@@ -240,7 +258,7 @@ def run_session(board, ticket, role, dry_run):
     os.environ["PM_ROLE"] = role
     if role == "engineer":
         try:
-            pm.cmd_start(board, argparse.Namespace(id=ticket.id))
+            retry_busy(pm.cmd_start, board, argparse.Namespace(id=ticket.id))
         except pm.Refused as refused:
             print("  %s could not start, so no session ran: %s" % (ticket.id, refused))
             return False
@@ -286,13 +304,13 @@ def run_session(board, ticket, role, dry_run):
         if worktree_gib > board.budget(after)["disk_gib"]:
             print("  worktree over its disk budget, sending to the owner")
             after.fields.update(state="owner", resume=after.state)
-            after.save("escalate", "worktree uses %.1f GiB; the budget is %d GiB"
+            retry_busy(after.save, "escalate", "worktree uses %.1f GiB; the budget is %d GiB"
                        % (worktree_gib, board.budget(after)["disk_gib"]))
             return True
     if (after.state, after.fields.get("head")) == before and role == "lead":
         print("  the lead did not change the ticket, sending to the owner")
         after.fields.update(state="owner", resume=after.state)
-        after.save("escalate", "lead session ended without a decision (exit %s)" % code)
+        retry_busy(after.save, "escalate", "lead session ended without a decision (exit %s)" % code)
     return True
 
 
@@ -306,7 +324,7 @@ def lane_lock(board, lane):
     try:
         # Serialize create/reclaim/release so two contenders cannot both remove a
         # dead holder's file and accidentally replace a newly acquired lock.
-        with pm.board_lock(board.root):
+        with board_lock(board):
             candidates = (glob.glob(os.path.join(state, 'dispatch-*.lock')) if lane is None
                           else [path, os.path.join(state, 'dispatch-all.lock')])
             for candidate in candidates:
@@ -329,7 +347,7 @@ def lane_lock(board, lane):
         yield
     finally:
         if acquired:
-            with pm.board_lock(board.root):
+            with board_lock(board):
                 os.remove(path)
 
 
