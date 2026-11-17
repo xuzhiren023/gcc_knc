@@ -98,6 +98,8 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Scripted lead sessions cannot finish pm.py approve (their tool calls stop at 10 min; approve checks take ~20 min);
+  they review and defer to the interactive lead, who approves. Do approvals from the interactive session (background).
 - x86 identity for S12-38 (generic tree-vect-slp.cc fix) restarted 2026-11-17 20:27Z, ~4 h, pinned, --shared .work/_shared/portability-lead (live worktrees are in portability-lead/portability/x86-a|b; portability-lead/x86-a|b are stale), was home
   .work/_shared/portability-lead (log .work/_state/logs/x86-S12-38-launch.log). .work/_shared/portability/x86-a/source
   was a broken non-worktree remnant from Nov 5; moved aside to source.broken-20261117 (use portability-lead).
