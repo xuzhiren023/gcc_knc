@@ -109,7 +109,7 @@ def engineer_command(board, ticket, worktree):
 
 
 def codex_sandbox_command(board, ticket, worktree, command, *args):
-    """Run a command in the engineer's workspace-write sandbox with its writable roots."""
+    """Run a command in the engineer's sandbox with its writable roots."""
     if (ticket.fields.get("backend") or board.policy.get("engineer_backend", "codex")) == "claude":
         raise ValueError("Claude has no non-interactive sandbox probe command")
     codex = newest(r"%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe") or "codex"
@@ -232,11 +232,11 @@ def preflight_engineer(board, ticket, worktree):
     except ValueError as error:
         return str(error) + ": " + worktree
     if result.returncode:
-        failed_path = next((line.strip() for line in result.stdout.splitlines()
-                            if line.strip().startswith((git_dir.stdout.strip(),
-                                                        os.path.join(worktree, "work", "tickets")))),
-                           git_dir.stdout.strip())
-        return "sandbox cannot write %s" % failed_path
+        details = result.stdout.splitlines()
+        candidates = (git_dir.stdout.strip(), os.path.join(worktree, "work", "tickets"))
+        failed_path = next((path for path in candidates
+                            if any(line.strip() == path for line in details)), None)
+        return "sandbox cannot write %s" % (failed_path or git_dir.stdout.strip())
     return None
 
 
@@ -291,7 +291,6 @@ def run_session(board, ticket, role, dry_run):
     print("%s %s: %s session" % (ticket.id, ticket.state, role))
     if dry_run:
         return False
-    os.environ["PM_ROLE"] = role
     if role == "engineer":
         worktree = board.worktree(ticket)
         reason = preflight_engineer(board, ticket, worktree)
@@ -301,6 +300,7 @@ def run_session(board, ticket, role, dry_run):
             subprocess.run([sys.executable, os.path.join(board.root, "tools", "pm.py"),
                             "escalate", ticket.id, reason], cwd=board.root, check=False)
             return False
+        os.environ["PM_ROLE"] = role
         try:
             pm.cmd_start(board, argparse.Namespace(id=ticket.id))
         except pm.Refused as refused:
@@ -309,6 +309,7 @@ def run_session(board, ticket, role, dry_run):
         ticket = board.load(ticket.id)
         command, cwd = engineer_command(board, ticket, board.worktree(ticket)), board.worktree(ticket)
     else:
+        os.environ["PM_ROLE"] = role
         command, cwd = lead_command(board, ticket), board.root
     timeout = board.policy["session_timeout_minutes"] * 60
     project_before = storage.project_bytes(board.root)
