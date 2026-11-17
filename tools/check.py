@@ -30,6 +30,8 @@ PACKED = re.compile(r'\bv(?:addn?|subr?|mul|div|max|min|sqrt|rcp(?:23)?|rsqrt(?:
 # Each entry supplies its CLI help and handlers for the tiers it selects.
 # Imports stay lazy so T0 and source-only selections need no probe modules.
 SELECTIONS = {
+    'slp_pr123221': ('S12-38 SLP reduction compile regression', {
+        't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-slp-pr123221.c'])}),
     'neg_induction': ('S12-24 sign-alternating induction with a vector epilogue', {
         't1': lambda runner: runner.t1_sources([runner.source_dir / 'knc-vec-neg-induction.c'])}),
     'imul_cost': ('S12-21 scalar constant multiply strength reduction', {
