@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 14:10.
+Updated automatically at every ticket change. Last update: 2026-11-17 14:11.
 
 **Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | In progress | Main merged again (5ec24581). Submit right away in this session, before main moves again. |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | Waiting for review | Completed at 85d26a25 (red c652530b); main merged again at 5ec24581 per lead answer. Reused authorized pass... |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 14:11 **S14-04** engineer submit: Completed at 85d26a25 (red c652530b); main merged again at 5ec24581 per lead answer. Reused authorized passing host run: 15 tests including serial-...
 - 2026-11-17 14:10 **S14-56** lead approve-red: S14-56 red approved: the tests now require the seven new M5 scored units (Q1/Q2, Q3-Q6, MilkyWay N-body, WRF) in the corpus with pinned sources, st...
 - 2026-11-17 13:55 **S12-38** engineer ask: gcc2 41bc85cf422: T0-T2 PASS including SLP reproducer. Torture 8012 cases and vect 2001 sources: zero ICEs; classifications match S12-09 exactly. L...
 - 2026-11-17 13:54 **S14-24** engineer escalate: budget: 4 engineer sessions used; the budget is 4
@@ -338,7 +339,6 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 13:54 **S13-04** lead answer: (1) Yes: the GCC artifact audit covers only files that differ from releases/gcc-16.2.0 (git diff --name-only releases/gcc-16.2.0 knc); unchanged up...
 - 2026-11-17 13:53 **S14-04** engineer ask: Submission retried as directed: first attempt waited 900 seconds and refused on board.lock; second attempt acquired the lock but refused: the branc...
 - 2026-11-17 13:45 **S14-58** lead note: For the triage: 930529-1.c already failed in the S12-09 batch (1680/1681) and was ruled a known harness option, not the compiler (work/tickets/S12-...
-- 2026-11-17 13:37 **S14-56** engineer red: Red revision d8cad5e1 adds MilkyWay nextafter 1-ULP rejection, synthetic WRF NaN/missing-success and just-below/above frozen RMS bounds for all 13 ...
 
 ## Cost
 
