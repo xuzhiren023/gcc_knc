@@ -26,6 +26,13 @@ on what users write, faster on code styles M4 did not score, and buildable by an
    Input: knc-boinc's core-small case from workunit 117676 (mixed dwarf, 4,000 bodies, 32 steps). Check: the
    likelihood is bit-identical to the x86-64 build of the same source. Scored serial like every unit; the OpenMP
    build is a labelled side track.
+   **Amendment 2 (owner, 2026-11-17): every one of the six code styles of S11-20 (`docs/research/code-style-coverage.md`
+   section 1) has at least one scored unit**, so M5 measures general-purpose code, not one kind:
+   H tuned HPC/numerical libraries - Q4 reference BLAS dgemm, STREAM, HPCG, FFTW; S domain-expert science - NPB CG/EP/
+   MG/IS, PolyBench, WRF, MilkyWay N-body; N educational/amateur - Q3 MD, Q5 smallpt; C abstraction-heavy C++ - Q1/Q2
+   ray tracer; G generated code - Q6 re2c lexer; B branch/call-heavy - SQLite, zlib, bzip2 (MilkyWay's tree walk also
+   carries B's pointer chasing). A style left without a working unit at measurement time is reported as a coverage
+   miss, not silently dropped.
 3. **Speed.** Strict matched `-O2`, serial against serial, as ADR-0015 rules 1 and 5 (the SQLite donor exception
    stays and stays labelled). Median speedup over GCC 5.1.1, one-sided 95% lower bound, at least 1.25x on the 7120
    full profile.
