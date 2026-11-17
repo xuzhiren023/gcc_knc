@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 09:32.
+Updated automatically at every ticket change. Last update: 2026-11-17 09:33.
 
-**Next: the tech lead, on S14-56.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-44.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 276 of 305
 
@@ -167,7 +167,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Done | Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xe... |
-| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | In progress | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
+| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Question for the tech lead | Completed no-go report at 0f79b069: neither gain gate established, conservative general flags retained, mix... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress |  |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 09:33 **S14-44** engineer ask: Completed no-go report at 0f79b069: neither gain gate established, conservative general flags retained, mix analytical bound and corpus gaps record...
 - 2026-11-17 09:28 **S14-56** engineer ask: Ticket-required acquisition question: please supply MilkyWay N-body 1.96 upstream URL/pin, correctness-only patches and locations, and core-small w...
 - 2026-11-17 09:20 **S14-04** lead note: Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json (model and effort by depth). Lane method...
 - 2026-11-17 09:20 **S13-04** lead note: Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json (model and effort by depth). M4 is decid...
@@ -337,13 +338,12 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 09:20 **S12-34** lead note: Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json (model and effort by depth). Lane gcc, a...
 - 2026-11-17 09:00 **S14-56** lead note: ADR-0016 amendment 2 (owner): each of the six S11-20 styles (H, S, N, C, G, B) needs at least one scored unit. This ticket supplies N (Q3, Q5), C (...
 - 2026-11-17 08:30 **S14-54** lead note: Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projects. Make it general: any loop whose trip...
-- 2026-11-17 08:30 **S14-52** lead note: Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projects. Make it general: the repro is a redu...
 
 ## Cost
 
 - From the script, engineer: 823 sessions, 1730.1M input tokens
 - From the script, lead: 566 sessions, 158.1M input tokens
-- Started by hand, Claude: 283 sessions, 5018.6M input tokens
+- Started by hand, Claude: 283 sessions, 5022.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
