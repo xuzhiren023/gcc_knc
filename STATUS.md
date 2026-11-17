@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 12:05.
+Updated automatically at every ticket change. Last update: 2026-11-17 12:08.
 
 **Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
@@ -174,7 +174,7 @@ Current tickets: `[##################--]` 276 of 306
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Tests waiting for review | Red commit 0704996e: one host-only run of test_corpus_m5*.py completed with 15 expected assertion failures ... |
-| S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | input_tokens 6M -> 16M, sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and th... |
+| S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Question for the tech lead | Builtins complete: 59/59 pass at O2/O3; 1803 lint-clean O3 binaries in .work/_shared/S14-58/card/claude-tor... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 276 of 306
 
 ## Recent activity
 
+- 2026-11-17 12:08 **S14-58** engineer ask: Builtins complete: 59/59 pass at O2/O3; 1803 lint-clean O3 binaries in .work/_shared/S14-58/card/claude-torture.list; native NOT RUN. Report: 112 l...
 - 2026-11-17 12:05 **S13-04** engineer ask: Commit fe1f9683: all 7 source-export/SSH host tests PASS. Log: .work/_state/logs/S13_04_source_release_green-20261117-113152.log. Need frozen GCC k...
 - 2026-11-17 12:02 **S14-44** engineer submit: Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x, below the 1.5x bar, and no existing flag set beats the conservati...
 - 2026-11-17 11:56 **S14-50** owner decide: sessions 3 -> 4, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the work was complete but uncommitted; the lead com...
@@ -338,13 +339,12 @@ Current tickets: `[##################--]` 276 of 306
 - 2026-11-17 11:49 **S14-22** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 11:45 **S14-04** engineer ask: Complete at 85d26a25 (red c652530b): M5 protocol and triage extension, seven properties, bounds/gaps, four outcomes/levels, style and donor-margin ...
 - 2026-11-17 11:40 **S14-50** engineer escalate: budget: 3 engineer sessions used; the budget is 3
-- 2026-11-17 11:40 **S12-20** lead note: Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log and atan (exp easy, pow hard), so vector...
 
 ## Cost
 
-- From the script, engineer: 842 sessions, 1786.1M input tokens
+- From the script, engineer: 844 sessions, 1792.9M input tokens
 - From the script, lead: 573 sessions, 159.1M input tokens
-- Started by hand, Claude: 312 sessions, 4863.5M input tokens
+- Started by hand, Claude: 313 sessions, 4865.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
