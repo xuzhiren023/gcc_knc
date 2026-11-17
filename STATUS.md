@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:46.
+Updated automatically at every ticket change. Last update: 2026-11-17 10:47.
 
-**Waiting for you:** S14-04. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-04, S14-58. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 276 of 305
 
@@ -174,7 +174,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | See the lead resume note: MilkyWay facts posted; start Q1-Q6 and MilkyWay; WRF inputs follow. |
-| S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | (1) builtins: those 144 are not failures; gcc.c-torture/execute/builtins/*.c only link with their harness. ... |
+| S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | **Waiting for you** | budget: 12208740 input tokens used; the budget is 6000000 |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -331,19 +331,19 @@ Current tickets: `[##################--]` 276 of 305
 ## Recent activity
 
 - 2026-11-17 11:40 **S12-20** lead note: Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log and atan (exp easy, pow hard), so vector...
+- 2026-11-17 10:47 **S14-58** lead escalate: budget: 12208740 input tokens used; the budget is 6000000
 - 2026-11-17 10:46 **S13-04** lead approve-red: The failing tests for the source release are approved: they check that a release audit reports and rejects ignored, .work, build-artifact, oversize...
 - 2026-11-17 10:45 **S14-58** lead answer: (1) builtins: those 144 are not failures; gcc.c-torture/execute/builtins/*.c only link with their harness. Apply builtins.exp's rules in the tool (...
 - 2026-11-17 10:44 **S14-58** engineer ask: Two attempts: parser abort fixed; sweep at 0dad19ba completed 12518 cases (one S12-38 ICE), but 144 builtins links fail. Repro: $CC -O3 -march=knc ...
 - 2026-11-17 10:44 **S13-04** engineer red: Red commit 77865d3c. Added 3 tests in the existing file for tools/source_release.py: tagged dirty fixture audit rejects ignored, .work, .o, oversiz...
 - 2026-11-17 10:43 **S12-38** lead approve-red: A T1 test now reproduces the -O3 -march=knc -fno-tree-pre SLP reduction segfault (tree-vect-slp.cc:4275, vect_analyze_slp_reduc_chain) on the insta...
 - 2026-11-17 10:42 **S14-44** lead answer: Merge done by the lead (main merged into s14/S14-44; diff vs main is the four new files only). Lead review: approve as is. Submit now with note: Sc...
-- 2026-11-17 10:41 **S14-44** lead resume: lead merged main into s14/S14-44 and reviewed: approve as is
 
 ## Cost
 
 - From the script, engineer: 833 sessions, 1772.2M input tokens
 - From the script, lead: 573 sessions, 159.1M input tokens
-- Started by hand, Claude: 296 sessions, 4839.1M input tokens
+- Started by hand, Claude: 297 sessions, 4839.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
