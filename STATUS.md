@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:47.
+Updated automatically at every ticket change. Last update: 2026-11-17 11:19.
 
-**Waiting for you:** S14-04. Run `python tools/pm.py inbox`.
+**Next: GPT-6.1, on S12-38 (ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
-Current tickets: `[##################--]` 276 of 305
+Current tickets: `[##################--]` 276 of 306
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 276 of 305
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
-| M5 | Program corpus | In progress | 30 of 49 tickets |
+| M5 | Program corpus | In progress | 30 of 50 tickets |
 | M6 | Release | In progress | 0 of 10 tickets |
 
 ## Tickets
@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | **Waiting for you** | budget: 7064106 input tokens used; the budget is 6000000 |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | In progress | Recorded by the lead (owner 2026-11-17: plenty of Codex usage; standing budget rule): the standard budget i... |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -175,6 +175,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | See the lead resume note: MilkyWay facts posted; start Q1-Q6 and MilkyWay; WRF inputs follow. |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | input_tokens 6M -> 16M, sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and th... |
+| S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Not started |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -331,22 +332,22 @@ Current tickets: `[##################--]` 276 of 305
 ## Recent activity
 
 - 2026-11-17 11:40 **S12-20** lead note: Candidate scope for this ticket in M6 (knc-boinc request, 2026-11-17): correctly rounded 8-lane double log and atan (exp easy, pow hard), so vector...
+- 2026-11-17 11:19 **S14-04** owner decide: Recorded by the lead (owner 2026-11-17: plenty of Codex usage; standing budget rule): the standard budget is now 16M tokens and 5 sessions in harne...
 - 2026-11-17 10:47 **S14-58** owner decide: input_tokens 6M -> 16M, sessions 3 -> 5, recorded by the lead under the owner's standing budget rule and the owner's 2026-11-17 OK for stuck ticket...
 - 2026-11-17 10:47 **S14-58** lead escalate: budget: 12208740 input tokens used; the budget is 6000000
 - 2026-11-17 10:46 **S13-04** lead approve-red: The failing tests for the source release are approved: they check that a release audit reports and rejects ignored, .work, build-artifact, oversize...
 - 2026-11-17 10:45 **S14-58** lead answer: (1) builtins: those 144 are not failures; gcc.c-torture/execute/builtins/*.c only link with their harness. Apply builtins.exp's rules in the tool (...
 - 2026-11-17 10:44 **S14-58** engineer ask: Two attempts: parser abort fixed; sweep at 0dad19ba completed 12518 cases (one S12-38 ICE), but 144 builtins links fail. Repro: $CC -O3 -march=knc ...
 - 2026-11-17 10:44 **S13-04** engineer red: Red commit 77865d3c. Added 3 tests in the existing file for tools/source_release.py: tagged dirty fixture audit rejects ignored, .work, .o, oversiz...
-- 2026-11-17 10:43 **S12-38** lead approve-red: A T1 test now reproduces the -O3 -march=knc -fno-tree-pre SLP reduction segfault (tree-vect-slp.cc:4275, vect_analyze_slp_reduc_chain) on the insta...
 
 ## Cost
 
 - From the script, engineer: 833 sessions, 1772.2M input tokens
 - From the script, lead: 573 sessions, 159.1M input tokens
-- Started by hand, Claude: 297 sessions, 4840.6M input tokens
+- Started by hand, Claude: 303 sessions, 4846.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 321 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 319 GiB free on the drive.
