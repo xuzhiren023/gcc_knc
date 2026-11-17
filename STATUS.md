@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-17 18:17.
 
-**Next: the tech lead, on S14-50.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S13-04. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 283 of 308
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 283 of 308
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | Main is merged. Rerun tests/regress/test_source_release.py and the portability tests on CPUs 0-9, then subm... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | **Waiting for you** | budget: 8 engineer sessions used; the budget is 8 |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -334,19 +334,19 @@ Current tickets: `[##################--]` 283 of 308
 ## Recent activity
 
 - 2026-11-17 18:25 **S14-56** lead note: Donor OpenMP runtime ready: .work/_shared/donor-libgomp/lib64/{libgomp.a,libgomp.spec} (static GCC 5.1.1 libgomp that PhiWeather plain-GCC-5.1.1 WR...
+- 2026-11-17 18:17 **S13-04** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 18:16 **S14-64** lead approve: The board tools now refuse to run git in a ticket folder unless it really is that ticket's worktree, never touch a finished ticket again, and recor...
 - 2026-11-17 18:15 **S14-56** lead answer: The donor toolchain has no libgomp; the lead asked PhiWeather where their GCC 5.1.1 OpenMP runtime comes from and will copy it into the donor area....
 - 2026-11-17 18:15 **S14-50** lead note: Set to review by the lead per the 18:10 scripted review (review changes done in 3fef5f08, main merged); the lead approves.
 - 2026-11-17 18:13 **S14-56** engineer ask: eda3c1e3: WRF classic pin test and 30-file fixed-step case staging PASS; _shared/S14-56/wrf-case.json. Two preflights failed: donor gcc and gfortra...
 - 2026-11-17 18:13 **S14-24** lead changes: 1. No tests: the [red] commit 9957076b only touches tools/dispatch.py; the diff has no dispatcher test. Add the two required tests (unwritable git ...
 - 2026-11-17 18:12 **S14-24** engineer submit: Preflight and diagnosis implemented; targeted PM integration test passes (including main-conflict path).
-- 2026-11-17 18:11 **S13-04** lead answer: Main is merged. Rerun tests/regress/test_source_release.py and the portability tests on CPUs 0-9, then submit with the approved --override (recount...
 
 ## Cost
 
 - From the script, engineer: 891 sessions, 1888.5M input tokens
 - From the script, lead: 598 sessions, 163.8M input tokens
-- Started by hand, Claude: 387 sessions, 5140.7M input tokens
+- Started by hand, Claude: 387 sessions, 5141.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
