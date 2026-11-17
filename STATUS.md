@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:30.
+Updated automatically at every ticket change. Last update: 2026-11-17 10:31.
 
 **Waiting for you:** S14-04, S14-24, S14-56. Run `python tools/pm.py inbox`.
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 276 of 305
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Tests waiting for review | Red commit fce7a6fb. Via tools/run.py, Cygwin python3.12 ran tests/regress/test_source_release.py: 4 tests,... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Changes requested | Transport red is good: the 2 POSIX failures are the hardcoded ssh.exe/NUL and claude-transfer.exe in tools/... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 10:31 **S13-04** lead changes: Transport red is good: the 2 POSIX failures are the hardcoded ssh.exe/NUL and claude-transfer.exe in tools/card_run connect(), and the Windows and ...
 - 2026-11-17 10:29 **S12-38** lead answer: Yes. Keep the original vect-pr123221.c shape (main, the local assignment, the return) as the T1 red test; an ICE-preserving reproducer is enough, i...
 - 2026-11-17 10:28 **S14-24** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-17 10:12 **S14-04** engineer escalate: budget: 7064106 input tokens used; the budget is 6000000
@@ -337,13 +338,12 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 09:52 **S12-38** engineer ask: Installed gcc-knc-16.2.0-2 reproduces vect-pr123221.c ICE at tree-vect-slp.cc:4275 with -O3 -march=knc -fno-tree-pre, no S12-30 switch. Revision 7a...
 - 2026-11-17 09:48 **S14-56** lead resume: Lead answer (2026-11-17). (1) MilkyWay N-body: upstream https://github.com/Milkyway-at-home/milkywayathome_client, tag nbody_1.96, commit 1e640779f...
 - 2026-11-17 09:45 **S14-22** lead answer: See the lead resume note above: the hang is your red test waiting out card_run's admission timeout; give wait-path tests a short timeout, commit th...
-- 2026-11-17 09:43 **S14-56** lead defer: Needs interactive lead (this session cannot read knc-boinc or PhiWeather). Post on the ticket: (1) MilkyWay 1.96 upstream URL, tag/commit, hash as ...
 
 ## Cost
 
 - From the script, engineer: 830 sessions, 1758.6M input tokens
-- From the script, lead: 567 sessions, 158.2M input tokens
-- Started by hand, Claude: 293 sessions, 4826.0M input tokens
+- From the script, lead: 568 sessions, 158.3M input tokens
+- Started by hand, Claude: 293 sessions, 4826.6M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
