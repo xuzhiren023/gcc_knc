@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 18:20.
+Updated automatically at every ticket change. Last update: 2026-11-17 18:21.
 
-**Next: the tech lead, on S14-50.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-24.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 283 of 308
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 283 of 308
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft | Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our windo... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | 1. No tests: the [red] commit 9957076b only touches tools/dispatch.py; the diff has no dispatcher test. Add... |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | Question for the tech lead | Two required tests are absent: the red commit 9957076b changes only tools/dispatch.py. Please allow adding/... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 283 of 308
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Waiting for review | Set to review by the lead per the 18:10 scripted review (review changes done in 3fef5f08, main merged); the... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | Submission refused: branch lacks real changes from main (pm requests lead merge main into ticket branch); 9... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | Main merged into s14/S14-56 (ce9fb633). Size approved: submit now with --override 'M5 corpus units (Q1-Q6, ... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
@@ -334,19 +334,19 @@ Current tickets: `[##################--]` 283 of 308
 ## Recent activity
 
 - 2026-11-17 18:25 **S14-56** lead note: Donor OpenMP runtime ready: .work/_shared/donor-libgomp/lib64/{libgomp.a,libgomp.spec} (static GCC 5.1.1 libgomp that PhiWeather plain-GCC-5.1.1 WR...
+- 2026-11-17 18:21 **S14-56** lead answer: Main merged into s14/S14-56 (ce9fb633). Size approved: submit now with --override 'M5 corpus units (Q1-Q6, MilkyWay, WRF pin/case) with checkers an...
+- 2026-11-17 18:21 **S14-24** engineer ask: Two required tests are absent: the red commit 9957076b changes only tools/dispatch.py. Please allow adding/committing tests in the existing dispatc...
 - 2026-11-17 18:20 **S14-56** engineer ask: Submission refused: branch lacks real changes from main (pm requests lead merge main into ticket branch); 961 changed lines exceed 800-line budget....
 - 2026-11-17 18:18 **S13-04** owner decide: sessions 8 -> 10 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (GCC and project ...
 - 2026-11-17 18:17 **S13-04** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 18:16 **S14-64** lead approve: The board tools now refuse to run git in a ticket folder unless it really is that ticket's worktree, never touch a finished ticket again, and recor...
 - 2026-11-17 18:15 **S14-56** lead answer: The donor toolchain has no libgomp; the lead asked PhiWeather where their GCC 5.1.1 OpenMP runtime comes from and will copy it into the donor area....
-- 2026-11-17 18:15 **S14-50** lead note: Set to review by the lead per the 18:10 scripted review (review changes done in 3fef5f08, main merged); the lead approves.
-- 2026-11-17 18:13 **S14-56** engineer ask: eda3c1e3: WRF classic pin test and 30-file fixed-step case staging PASS; _shared/S14-56/wrf-case.json. Two preflights failed: donor gcc and gfortra...
 
 ## Cost
 
 - From the script, engineer: 892 sessions, 1889.0M input tokens
 - From the script, lead: 598 sessions, 163.8M input tokens
-- Started by hand, Claude: 387 sessions, 5144.5M input tokens
+- Started by hand, Claude: 387 sessions, 5146.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
