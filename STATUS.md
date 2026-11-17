@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:43.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:44.
 
-**Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-24, S14-50. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 282 of 308
 
@@ -170,7 +170,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions 7 -> 8, recorded by the lead (owner 2026-11-17 OK): the lead made the two review changes (value {t... |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | **Waiting for you** | budget: 8 engineer sessions used; the budget is 8 |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | 4109c403: MilkyWay host/corruption PASS; donor/KNC serial O2 pair linted and staged in _shared/S14-56/corre... |
@@ -335,12 +335,12 @@ Current tickets: `[##################--]` 282 of 308
 
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
+- 2026-11-17 17:44 **S14-50** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 17:43 **S14-16** engineer ask: GCC build needed at d2ab3509a1e (lane gcc). Replaced the invalid const-member cost_table assignments with a static const processor_costs[8][2], all...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:38 **S14-56** engineer ask: 4109c403: MilkyWay host/corruption PASS; donor/KNC serial O2 pair linted and staged in _shared/S14-56/correctness-jobs.json; no card runs. Logs: _s...
 - 2026-11-17 17:35 **S13-04** lead answer: Approved: submit with --override 'source export tool, Linux recipe and their tests as the ticket asks; 827 lines vs 800, no split'. Same note as pl...
 - 2026-11-17 17:32 **S14-24** engineer escalate: budget: 6 engineer sessions used; the budget is 6
-- 2026-11-17 17:31 **S12-38** lead approve: The -O3 -march=knc vectorizer crash on SLP reduction chains (gcc.dg vect-pr123221.c) is fixed: GCC-KNC now compiles it, with zero crashes across 8,...
 
 ## Cost
 
