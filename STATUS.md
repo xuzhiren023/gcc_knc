@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | In progress | Main merged into s14/S14-04 (5c88a2de). Submit now; passing tests reused is fine. |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | Question for the tech lead | Submission blocked: pm.py submit waited 900 seconds and refused because .work/_state/board.lock is held by ... |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 13:10 **S14-04** engineer ask: Submission blocked: pm.py submit waited 900 seconds and refused because .work/_state/board.lock is held by live Python PID 31832. Ticket work is co...
 - 2026-11-17 12:55 **S14-44** lead approve: Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and no M4 program shows a 5% whole-program ga...
 - 2026-11-17 12:41 **S12-38** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 12:40 **S14-58** lead note: CARD RESULT (window 17, 2026-11-17 17:33-17:34Z, claude-torture -j 60, -O3 execute set at the installed prefix): 1797 PASS, 6 FAIL (all raw status ...
@@ -338,7 +339,6 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 12:36 **S14-56** lead changes: Red is right in shape (manifest, styles, held-out sealing, pass marker not overriding corrupt output; failures are the intended ones), but the corr...
 - 2026-11-17 12:34 **S14-58** lead answer: Committed for you by the lead (6e32b7a4, converted to LF) and main merged (96420e21). The board lock was held by a lead approve running t0. Submit ...
 - 2026-11-17 12:20 **S14-60** lead note: Second cause of the contention, larger than the PermissionError: pm.py approve runs tools/check t0 (11-20 min on a loaded host) while holding board...
-- 2026-11-17 12:08 **S14-58** engineer ask: Builtins complete: 59/59 pass at O2/O3; 1803 lint-clean O3 binaries in .work/_shared/S14-58/card/claude-torture.list; native NOT RUN. Report: 112 l...
 
 ## Cost
 
