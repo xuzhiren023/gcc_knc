@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:50.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:52.
 
-**Waiting for you:** S14-24, S14-50, S14-56. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-24, S14-50. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 282 of 308
 
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | **Waiting for you** | budget: 8 engineer sessions used; the budget is 8 |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | **Waiting for you** | budget: 8 engineer sessions used; the budget is 8 |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | sessions 8 -> 12 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
@@ -334,22 +334,22 @@ Current tickets: `[##################--]` 282 of 308
 ## Recent activity
 
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
+- 2026-11-17 17:52 **S14-56** owner decide: sessions 8 -> 12 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (Q1-Q6 built, lin...
 - 2026-11-17 17:50 **S13-04** engineer ask: Submit with the approved 827-line override now refuses: the branch lacks real changes from main. Please merge current main into s13/S13-04 and resu...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:49 **S14-56** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 17:48 **S14-56** lead answer: No host nccopy exists; the lead asked PhiWeather to write classic copies into .work/_shared/corpus-build/wrf-miami-classic/ (wrfinput_d01, wrfinput...
 - 2026-11-17 17:44 **S14-50** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 17:43 **S14-16** engineer ask: GCC build needed at d2ab3509a1e (lane gcc). Replaced the invalid const-member cost_table assignments with a static const processor_costs[8][2], all...
-- 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 
 ## Cost
 
 - From the script, engineer: 887 sessions, 1885.5M input tokens
 - From the script, lead: 592 sessions, 162.0M input tokens
-- Started by hand, Claude: 381 sessions, 5104.3M input tokens
+- Started by hand, Claude: 382 sessions, 5105.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 44.0 GiB of 100 GiB. 301 GiB free on the drive.
+The project uses 44.0 GiB of 100 GiB. 300 GiB free on the drive.
