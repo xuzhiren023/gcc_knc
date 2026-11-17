@@ -97,6 +97,10 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Window 15 (2026-11-17 05:32-05:35Z): twin batch faulted (body pushes below the captured rsp, unmapped since the
+  generator maps only initialized pages; fixed on knc-twin main); job 9/10 lost because the twin restaged the folder
+  mid-window. Rules: no restage of a staged folder until the window closes (new folder calib-w16/batch/); next window
+  runs job 1 alone and the rest only on exit 0 or 6.
 - Owner 2026-11-17 00:30 EST: knc-boinc's next plan (after the laptop is freed) is to port MilkyWay 1.96's unshipped
   OpenCL N-body algorithm (nbody_kernels.cl, Burtscher GPU Barnes-Hut: parallel tree build, tree-order sort, group
   walks -> IMCI, 8 bodies per vector in FP64, 16 only if the tolerance allows FP32) to OpenMP+IMCI (knc-boinc Sprint 9), gated first on MilkyWay's validator tolerance (not bit-identical by design).
