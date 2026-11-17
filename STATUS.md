@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 13:53.
+Updated automatically at every ticket change. Last update: 2026-11-17 13:54.
 
-**Next: the tech lead, on S13-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S14-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 277 of 306
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 277 of 306
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | 83fd20c7: release/transport 8 PASS, portability 6 PASS; Linux recipe unrun. Logs: .work/_state/logs/S13_04_... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | (1) Yes: the GCC artifact audit covers only files that differ from releases/gcc-16.2.0 (git diff --name-onl... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 13:54 **S13-04** lead answer: (1) Yes: the GCC artifact audit covers only files that differ from releases/gcc-16.2.0 (git diff --name-only releases/gcc-16.2.0 knc); unchanged up...
 - 2026-11-17 13:53 **S14-04** engineer ask: Submission retried as directed: first attempt waited 900 seconds and refused on board.lock; second attempt acquired the lock but refused: the branc...
 - 2026-11-17 13:37 **S14-56** engineer red: Red revision d8cad5e1 adds MilkyWay nextafter 1-ULP rejection, synthetic WRF NaN/missing-success and just-below/above frozen RMS bounds for all 13 ...
 - 2026-11-17 13:37 **S14-50** owner decide: sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed on s14/S14-50 with main merged; this se...
@@ -338,13 +339,12 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 13:36 **S14-58** owner decide: input_tokens 16M -> 30M, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (card execute run 1797/1803...
 - 2026-11-17 13:21 **S14-50** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 13:21 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 43801df4e93 (s14/S14-16; one hunk in i386-knc.cc, GPR/mask transfer costs 1 to 4, equal to a spi...
-- 2026-11-17 13:20 **S14-58** engineer escalate: budget: 19034927 input tokens used; the budget is 16000000
 
 ## Cost
 
-- From the script, engineer: 853 sessions, 1824.0M input tokens
+- From the script, engineer: 854 sessions, 1827.6M input tokens
 - From the script, lead: 581 sessions, 160.3M input tokens
-- Started by hand, Claude: 334 sessions, 4926.5M input tokens
+- Started by hand, Claude: 334 sessions, 4927.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
