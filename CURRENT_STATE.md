@@ -22,6 +22,7 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 | Claim | Evidence | Rerun with |
 |---|---|---|
+| GCC-KNC libgomp defaults (DELAY 128, 200 ms spin, spread one per core, flat barrier, 240 threads) are at least as good as the alternatives on a real OpenMP app; passive wait is 19% slower | knc-boinc window 2026-11-17 10:46-10:54Z, MilkyWay N-body large case, single runs, bit-identical (their report; DELAY 512/32, 30 ms spin, close binding, 180 threads all within ~4%) | knc-boinc S9-01 card jobs |
 | Small 32-row sparse kernels are no longer slower than GCC 5.1.1 (S12-42 closed): donor/knc 1.08-1.12x on CSR and HPCG-pointers n=13/27, two-nests too | Card window 10, `.work/_shared/calib-w10/out/A-s12-42-small.out` (prefix b2ce6a9eebf with S12-31, 1 thread, GUARDS failures=0) | `.work/_shared/calib-w10/README.md` section A |
 | GCC-KNC wrf.exe relinked with an HDF5-enabled netCDF-C 4.9.2 (built by GCC-KNC, PhiWeather's k1om HDF5 1.10.10/zlib) reads netCDF-4 inputs on the card: `.work/_shared/wrf-trial/dmsm/wrf.exe-nc4` (137fa0f9) and `patched/wrf.exe-nc4` (23e710be), 65 clean steps each | PhiWeather smokes PGKSMOKE-NC4-01 and S1126SMOKE-NC4-01, 2026-11-16 (reported by PhiWeather); build logs `.work/_shared/wrf-trial/nc4-*.log` | `.work/_shared/wrf-trial/netcdf-c-nc4.sh`, `nc4-link-*.py` |
 | GCC-KNC-built WRF 4.8 (S11-26 dm+sm 57be063f, patched 16.2 890f58f8) runs a 65-step Miami 2024-01-06 case cleanly: all values finite, no CFL; about 21% slower per step than PhiWeather's production build (ratio 1.209/1.211, their limit 1.25) | PhiWeather card smokes PGKSMOKE-02 and S1126SMOKE-02, 2026-11-16 13:14-13:32Z, classic netCDF inputs (reported by PhiWeather) | PhiWeather trial queue |
@@ -97,6 +98,17 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Sprint 14 started 2026-11-17 09:20 EST (owner approved Sprints 14-15; plan docs/sprints/SPRINT-14.md). Dispatchers
+  (Codex per policy) on lanes gcc (S14-16, then S12-34), gcc2 (S12-38; gcc-2 checkout moved from s12/S12-30 to knc,
+  S12-30 branch pushed to the fork), torture (S14-58), corpus (S14-56), method (S14-04), tools (S13-04), calib
+  (S14-50), research (S14-44), dispatch (S14-24); harness (S14-22) after the lead's diagnosis: its red test waits out
+  card_run's admission timeout instead of failing. Codex cannot build GCC: the lead builds on "GCC build needed".
+- Owner 2026-11-17: Sprints 14-15 refocused on general-purpose compiler work. S14-30 closed (PhiWeather's question);
+  S14-48, S14-08, S14-28 deferred to M6; S14-44, S14-52, S14-54 recast to judge on corpus and generic code; S14-22
+  scoped to our own windows. Open question to the owner: keep MilkyWay N-body and WRF as M5 corpus units (ADR-0016)?
+- Owner 2026-11-17: knc-boinc books its own card windows. Until its S9-02 lands (own card_run copy, project
+  "knc-boinc", turn rows claude-turn-knc-boinc-*), its rows carry project "gcc-knc" and look like ours to card_run and
+  our window scripts; asked it not to book before S9-02. GCC-KNC windows no longer host knc-boinc jobs.
 - Window 16 (2026-11-17 05:42-05:45Z): all ten twin-generated programs PASS on the card (checks ok, 0 mismatches);
   knc-twin ranked all 8 WRF variants right (2 ctx within 1-4%; 1 ctx +19-24% is a real twin miss, 1 tick = 1 core cycle, twin defect ticket open; sixth +30%/+7%). Issue #32: at n=8,
   partial-vector-usage=2 is 5.7% (1 ctx) / 7.2% (2 ctx) faster than the shipped =1 on rk_update_scalar (S14-30 note);
