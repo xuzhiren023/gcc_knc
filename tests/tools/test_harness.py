@@ -322,7 +322,7 @@ class ApprovalWorktrees(Sandbox):
         self.assertEqual(self.state("A-1"), "done")
         self.assertTrue(os.path.exists(os.path.join(self.root, "src", "a.py")))
         self.assertTrue(os.path.isdir(wt))
-        self.assertIn(wt, str(output.call_args_list))
+        self.assertIn(wt, "\n".join(str(call.args[0]) for call in output.call_args_list))
         self.assertIn("leftover", self.pm("show", "A-1").stdout)
 
 
