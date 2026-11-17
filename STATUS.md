@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 13:37.
+Updated automatically at every ticket change. Last update: 2026-11-17 13:53.
 
 **Next: the tech lead, on S13-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | In progress | The lock holder was a lead approve running t0 (it has finished). Retry pm.py submit now; if it waits again,... |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | Question for the tech lead | Submission retried as directed: first attempt waited 900 seconds and refused on board.lock; second attempt ... |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 13:53 **S14-04** engineer ask: Submission retried as directed: first attempt waited 900 seconds and refused on board.lock; second attempt acquired the lock but refused: the branc...
 - 2026-11-17 13:37 **S14-56** engineer red: Red revision d8cad5e1 adds MilkyWay nextafter 1-ULP rejection, synthetic WRF NaN/missing-success and just-below/above frozen RMS bounds for all 13 ...
 - 2026-11-17 13:37 **S14-50** owner decide: sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed on s14/S14-50 with main merged; this se...
 - 2026-11-17 13:37 **S13-04** engineer ask: 83fd20c7: release/transport 8 PASS, portability 6 PASS; Linux recipe unrun. Logs: .work/_state/logs/S13_04_source_release_revision-20261117-131720....
@@ -338,13 +339,12 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 13:21 **S14-50** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 13:21 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc 43801df4e93 (s14/S14-16; one hunk in i386-knc.cc, GPR/mask transfer costs 1 to 4, equal to a spi...
 - 2026-11-17 13:20 **S14-58** engineer escalate: budget: 19034927 input tokens used; the budget is 16000000
-- 2026-11-17 13:14 **S12-38** lead answer: GCC is built in slot 2 at 41bc85cf422 (see the 13:12 note). Continue: T1 green, T0-T2, baseline ICE sweeps on that build; submit.
 
 ## Cost
 
-- From the script, engineer: 850 sessions, 1814.1M input tokens
+- From the script, engineer: 853 sessions, 1824.0M input tokens
 - From the script, lead: 581 sessions, 160.3M input tokens
-- Started by hand, Claude: 331 sessions, 4922.1M input tokens
+- Started by hand, Claude: 334 sessions, 4926.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
