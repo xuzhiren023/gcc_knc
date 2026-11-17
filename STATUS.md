@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 16:32.
+Updated automatically at every ticket change. Last update: 2026-11-17 16:33.
 
 **Next: the tech lead, on S14-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -176,7 +176,7 @@ Current tickets: `[##################--]` 279 of 307
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | No download needed: the lead cloned the pinned source locally from knc-boinc's checkout into .work/_shared/... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
-| S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Question for the tech lead | Fixes committed at 9a11df09 (red ff970c8a); Cygwin tests/tools test_harness + test_pm_integration on CPUs 0... |
+| S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | In progress | Main merged into s14/S14-62 (66d22771). Lead review: approve as is. Submit now. Two follow-ups for the note... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -332,6 +332,7 @@ Current tickets: `[##################--]` 279 of 307
 
 ## Recent activity
 
+- 2026-11-17 16:33 **S14-62** lead answer: Main merged into s14/S14-62 (66d22771). Lead review: approve as is. Submit now. Two follow-ups for the note, not for this ticket: the lock release ...
 - 2026-11-17 16:32 **S14-62** engineer ask: Fixes committed at 9a11df09 (red ff970c8a); Cygwin tests/tools test_harness + test_pm_integration on CPUs 0-9: 58/61 pass, including all 3 new regr...
 - 2026-11-17 16:20 **S14-60** lead close: Abandoned (owner); not merged. Replaced by S14-62.
 - 2026-11-17 16:17 **S14-60** owner decide: Abandoned by the owner (2026-11-17: start from scratch). Closed without merge; branch s14/S14-60 kept for reference only. Replaced by S14-62 (minim...
@@ -339,13 +340,12 @@ Current tickets: `[##################--]` 279 of 307
 - 2026-11-17 15:53 **S14-58** lead approve: The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known S12-38 ICE, and all 1,803 -O3 execute t...
 - 2026-11-17 15:26 **S14-58** engineer submit: O2/O3 compile sweeps complete with the known S12-38 ICE and no new compiler defect; corrected harness native O3 execute set passed 1803/1803 in lea...
 - 2026-11-17 15:25 **S14-56** lead answer: No download needed: the lead cloned the pinned source locally from knc-boinc's checkout into .work/_shared/corpus-build/milkyway-nbody at 1e640779f...
-- 2026-11-17 15:23 **S14-56** engineer ask: Hook blocked git clone --depth 1 --branch nbody_1.96 https://github.com/Milkyway-at-home/milkywayathome_client ../_shared/corpus-build/milkyway-nbo...
 
 ## Cost
 
 - From the script, engineer: 866 sessions, 1859.6M input tokens
 - From the script, lead: 587 sessions, 161.2M input tokens
-- Started by hand, Claude: 366 sessions, 5023.0M input tokens
+- Started by hand, Claude: 366 sessions, 5026.2M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
