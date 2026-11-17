@@ -46,6 +46,7 @@ PHIWEATHER_STATE = 'C:/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/'
 WRF_CASE = PHIWEATHER_STATE + 'accuracy-downloads-20261112/cases/miami-20240106/hn12rlh/inputs/'
 WRF_PLAN = (PHIWEATHER_STATE + 'claude-mentor-performance-20261105/'
             'bt-20240106-MIA-HN12RLH-S1126-04/')
+WRF_CLASSIC = '.work/_shared/corpus-build/wrf-miami-classic/'
 M5_SOURCES = {
     'Q1/Q2': dict(source_url='https://github.com/RayTracing/raytracing.github.io',
                   version='v4.0.2', tag='v4.0.2'),
@@ -66,9 +67,14 @@ M5_SOURCES = {
                  'nbody-result-contract.patch'],
         host_patches=['popt-cygwin.patch']),
     'WRF': dict(source_url='https://github.com/wrf-model/WRF', version='4.8.0', tag='v4.8.0',
-                inputs={name: dict(source=WRF_CASE + name,
-                                   conversion='nccopy -k 64-bit-offset <in> <out>')
+                commit='06d4240ae989cc3e50af412bb472df3d9048783c',
+                inputs={name: dict(source=WRF_CLASSIC + name,
+                                   original_source=WRF_CASE + name,
+                                   conversion=dict(tool='netCDF4 Python 1.7.4',
+                                                   script=WRF_CLASSIC + 'to_classic.py',
+                                                   note=WRF_CLASSIC + 'README.md'))
                         for name in ('wrfinput_d01', 'wrfinput_d02', 'wrfbdy_d01')},
+                static_inputs_plan=WRF_PLAN + 'plan.json',
                 layout=dict(ranks=8, threads_per_rank=15, nproc_x=2, nproc_y=4,
                             tiles_x=5, tiles_y=3),
                 time_step=60, steps=dict(d01=60, d02=180)),

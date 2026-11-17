@@ -25,7 +25,8 @@ class M5Pins(unittest.TestCase):
     """Proposed manifest API: M5_SOURCES[unit], also embedded in plan rows.
 
     Each source has source_url and a release/edition or commit pin. WRF inputs
-    retain the original source paths and the authorized conversion command.
+    retain the original source paths and the lead-supplied classic copies
+    with their conversion script and note (lead answer 2026-11-17 18:10).
     S14-56 lead correction 2026-11-17: no content digests.
     """
 
@@ -73,11 +74,16 @@ class M5Pins(unittest.TestCase):
         for name, source in expected.items():
             with self.subTest(input=name):
                 record = pin['inputs'][name]
-                self.assertEqual(record['source'].replace('\\', '/'), source)
                 self.assertNotIn('hash', record)
-                if name != 'namelist.input':
-                    self.assertEqual(record['conversion'],
-                                     'nccopy -k 64-bit-offset <in> <out>')
+                if name == 'namelist.input':
+                    self.assertEqual(record['source'].replace('\\', '/'), source)
+                else:
+                    classic = '.work/_shared/corpus-build/wrf-miami-classic/'
+                    self.assertEqual(record['source'], classic + name)
+                    self.assertEqual(record['original_source'], source)
+                    self.assertEqual(record['conversion'], dict(
+                        tool='netCDF4 Python 1.7.4', script=classic + 'to_classic.py',
+                        note=classic + 'README.md'))
 
 
 class M5Manifest(unittest.TestCase):

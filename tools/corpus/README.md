@@ -192,3 +192,20 @@ python tools/run.py --name S11-18-green --inputs tests/tools/test_corpus_v2.py t
 
 Large outputs remain in fixed shared directories, overwriting prior versions.
 Package licence notices remain intact. Host tests and staging claim no native pass.
+
+S14-56 adds seven M5 votes: Q1/Q2 (one vote), Q3, Q4, Q5, Q6,
+MilkyWay-Nbody and WRF. Their source pins, styles and fixed work are in
+`corpus.M5_SOURCES` and `corpus.INPUTS`. Q3/Q5 artifacts remain sealed.
+The Q and MilkyWay serial O2 pairs and host references are staged under
+`.work/_shared/S14-56` and `.work/_shared/m4-sealed/S14-56` in
+`correctness-jobs.json`; the lead launches the card checks.
+
+For WRF, run `corpus_wrf.py prepare-case` through `tools/run.py` to stage
+the one-hour Miami namelist and static tables. The input pin uses the
+lead-supplied classic files in `corpus-build/wrf-miami-classic` and their
+conversion README/script, retaining the original input paths. Its
+`wrf-case.json` lists deployable filenames without duplicating the large
+classic inputs. It is marked `pending-build`, not included in the runnable
+correctness jobs. Both O2 dm+sm builds, host output integration, and the
+donor unperturbed/THM-1-ULP card references remain outstanding. Existing
+synthetic WRF checker tests do not establish a real-case or native pass.
