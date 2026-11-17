@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 281 of 308
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions 5 -> 6 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committ... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | Drop nbody-wrapper-files.patch: it implements the BOINC wrapper's checkpoint/progress/graphics file protoco... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | Two host attempts failed: git apply rejects CRLF scs.h; LF normalization then raises PermissionError on _sh... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
@@ -335,12 +335,12 @@ Current tickets: `[##################--]` 281 of 308
 
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:09 **S14-56** engineer ask: Two host attempts failed: git apply rejects CRLF scs.h; LF normalization then raises PermissionError on _shared/corpus-build/milkyway-nbody/crlibm/...
 - 2026-11-17 17:09 **S13-04** engineer ask: 0e78d2f1: 8 host tests PASS; log .work/_state/logs/S13_04_source_release_history-20261117-170448.log. GCC b2ce6a9eebf exported to .work/_shared/S13...
 - 2026-11-17 17:08 **S14-24** owner decide: Recorded by the lead (owner 2026-11-17 OK): input_tokens 12M (re-applied after the main reset); finish green and submit.
 - 2026-11-17 17:07 **S12-38** engineer escalate: This engineer session was dispatched after the successful 16:55 submission; ticket is already in review. submit refuses expected doing, and ask ref...
 - 2026-11-17 17:06 **S14-16** owner decide: Recorded by the lead (owner 2026-11-17 OK; budget sessions 11). Decision on the 17:02 ask: keep cost 4 as the default; preserve S6-14's reload cove...
 - 2026-11-17 17:05 **S14-04** lead escalate: lead session ended without a decision (exit 0)
-- 2026-11-17 17:04 **S14-16** engineer escalate: budget: 9 engineer sessions used; the budget is 8
 
 ## Cost
 
