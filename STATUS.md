@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-17 17:11.
 
-**Waiting for you:** S12-38, S14-22, S14-50. Run `python tools/pm.py inbox`.
+**Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 281 of 308
 
@@ -118,7 +118,7 @@ Current tickets: `[##################--]` 281 of 308
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Done | T1 and T2 checks now write every generated file into the run's own output folder, so a file left by another... |
-| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | **Waiting for you** | This engineer session was dispatched after the successful 16:55 submission; ticket is already in review. su... |
+| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Waiting for review | State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatche... |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Folded into S12-30 (sparse indexed reductions),... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: M4 harness item; the M5 donor-margin ch... |
@@ -170,7 +170,7 @@ Current tickets: `[##################--]` 281 of 308
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | **Waiting for you** | budget: 6 engineer sessions used; the budget is 6 |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions 6 -> 7, recorded by the lead under the owner's 2026-11-17 OK. The work is committed and main is me... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | Two host attempts failed: git apply rejects CRLF scs.h; LF normalization then raises PermissionError on _sh... |
@@ -333,20 +333,20 @@ Current tickets: `[##################--]` 281 of 308
 
 ## Recent activity
 
+- 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:11 **S14-50** owner decide: sessions 6 -> 7, recorded by the lead under the owner's 2026-11-17 OK. The work is committed and main is merged into s14/S14-50 now. This session r...
 - 2026-11-17 17:10 **S14-50** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-17 17:10 **S13-04** lead answer: Main merged into s13/S13-04 (23e078f8). Continue: fix the export's path handling so a Windows path from 'git rev-parse --git-common-dir' or objects...
 - 2026-11-17 17:09 **S14-56** engineer ask: Two host attempts failed: git apply rejects CRLF scs.h; LF normalization then raises PermissionError on _shared/corpus-build/milkyway-nbody/crlibm/...
 - 2026-11-17 17:09 **S13-04** engineer ask: 0e78d2f1: 8 host tests PASS; log .work/_state/logs/S13_04_source_release_history-20261117-170448.log. GCC b2ce6a9eebf exported to .work/_shared/S13...
-- 2026-11-17 17:08 **S14-24** owner decide: Recorded by the lead (owner 2026-11-17 OK): input_tokens 12M (re-applied after the main reset); finish green and submit.
-- 2026-11-17 17:07 **S12-38** engineer escalate: This engineer session was dispatched after the successful 16:55 submission; ticket is already in review. submit refuses expected doing, and ask ref...
 
 ## Cost
 
 - From the script, engineer: 878 sessions, 1869.2M input tokens
 - From the script, lead: 589 sessions, 161.4M input tokens
-- Started by hand, Claude: 373 sessions, 5069.3M input tokens
+- Started by hand, Claude: 374 sessions, 5072.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
