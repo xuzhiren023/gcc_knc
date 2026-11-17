@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:12.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:13.
 
 **Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
@@ -170,7 +170,7 @@ Current tickets: `[##################--]` 281 of 308
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions 6 -> 7, recorded by the lead under the owner's 2026-11-17 OK. The work is committed and main is me... |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Waiting for review | knc-machine.yaml now carries the measured scatter cost and the x87 compare-chain cost from the card, and sa... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | Done by the lead: .work/_shared/corpus-build/milkyway-nbody is now an LF clone at branch m5-nbody-1.96-corr... |
@@ -336,15 +336,15 @@ Current tickets: `[##################--]` 281 of 308
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:13 **S14-50** engineer submit: knc-machine.yaml now carries the measured scatter cost and the x87 compare-chain cost from the card, and says where it still disagrees with knc-twin.
 - 2026-11-17 17:12 **S14-56** lead answer: Done by the lead: .work/_shared/corpus-build/milkyway-nbody is now an LF clone at branch m5-nbody-1.96-correctness (commit 064e2d7 = nbody_1.96 1e6...
 - 2026-11-17 17:11 **S14-50** owner decide: sessions 6 -> 7, recorded by the lead under the owner's 2026-11-17 OK. The work is committed and main is merged into s14/S14-50 now. This session r...
 - 2026-11-17 17:10 **S14-50** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-17 17:10 **S13-04** lead answer: Main merged into s13/S13-04 (23e078f8). Continue: fix the export's path handling so a Windows path from 'git rev-parse --git-common-dir' or objects...
-- 2026-11-17 17:09 **S14-56** engineer ask: Two host attempts failed: git apply rejects CRLF scs.h; LF normalization then raises PermissionError on _shared/corpus-build/milkyway-nbody/crlibm/...
 
 ## Cost
 
-- From the script, engineer: 878 sessions, 1869.2M input tokens
+- From the script, engineer: 879 sessions, 1869.3M input tokens
 - From the script, lead: 590 sessions, 161.7M input tokens
 - Started by hand, Claude: 374 sessions, 5073.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
