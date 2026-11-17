@@ -270,6 +270,62 @@ class Flow(Sandbox):
         self.assertEqual(self.state("A-1"), "owner")
 
 
+class ApprovalWorktrees(Sandbox):
+    def submitted(self):
+        self.assertEqual(self.pm("start", "A-1").returncode, 0)
+        wt = self.worktree("A-1")
+        self.commit_file("src/a.py", "x = 1\n", "test(A-1): approval safety [red]", wt)
+        done = self.pm("submit", "A-1", "--note", "n", cwd=wt)
+        self.assertEqual(done.returncode, 0, done.stdout)
+        return wt
+
+    def head(self):
+        return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=self.root)
+
+    def test_empty_worktree_refuses_without_changing_main(self):
+        wt = self.submitted()
+        self.git("worktree", "remove", "--force", wt)
+        os.makedirs(wt)
+        before = self.head()
+        done = self.pm("approve", "A-1", role="lead")
+        self.assertEqual(done.returncode, 1, done.stdout)
+        self.assertEqual(self.head(), before)
+        self.assertIn("registered worktree", done.stdout)
+        self.assertEqual(self.state("A-1"), "review")
+
+    def test_done_ticket_is_not_approved_again(self):
+        self.submitted()
+        done = self.pm("approve", "A-1", role="lead")
+        self.assertEqual(done.returncode, 0, done.stdout)
+        before = self.head()
+        done = self.pm("approve", "A-1", role="lead")
+        self.assertEqual(done.returncode, 1, done.stdout)
+        self.assertEqual(self.head(), before)
+        self.assertEqual(self.state("A-1"), "done")
+
+    def test_removal_failure_after_merge_still_records_done(self):
+        import argparse
+        import pm
+        wt = self.submitted()
+        real_git = pm.run_git
+
+        def fail_removal(*args, **kwargs):
+            if args[:2] == ("worktree", "remove"):
+                raise pm.Refused("Permission denied")
+            return real_git(*args, **kwargs)
+
+        with mock.patch.object(pm, "main_checkout", return_value=self.root), \
+                mock.patch.dict(os.environ, PM_ROLE="lead"), \
+                mock.patch.object(pm, "run_git", side_effect=fail_removal), \
+                mock.patch("builtins.print") as output:
+            pm.cmd_approve(pm.Board(), argparse.Namespace(id="A-1", note="merged"))
+        self.assertEqual(self.state("A-1"), "done")
+        self.assertTrue(os.path.exists(os.path.join(self.root, "src", "a.py")))
+        self.assertTrue(os.path.isdir(wt))
+        self.assertIn(wt, str(output.call_args_list))
+        self.assertIn("leftover", self.pm("show", "A-1").stdout)
+
+
 class SubmitChecks(Sandbox):
     def setUp(self):
         super().setUp()
