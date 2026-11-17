@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 01:07.
+Updated automatically at every ticket change. Last update: 2026-11-17 01:09.
 
-**Next: the tech lead, on S14-44.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: GPT-6.1, on S14-16 (bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix)).** Run `python tools/dispatch.py`, or ask the tech lead to.
 
 Current tickets: `[##################--]` 275 of 305
 
@@ -167,7 +167,7 @@ Current tickets: `[##################--]` 275 of 305
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Done | Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xe... |
-| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Question for the tech lead | Input review: b4886f50, docs/research/s14-44-lane0-scalar.md. Supplied probes lack nbMakeTree; s8_df_node h... |
+| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | In progress | Lead 2026-11-17. (1) Do not wait on the knc-boinc session; everything is already readable (read-only) in C:... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | Not started | knc-boinc window 14 (large case, 240 threads, bit-identical): reference force walk 12.98 s scalar / 12.79 v... |
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Not started |  |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 275 of 305
 
 ## Recent activity
 
+- 2026-11-17 01:09 **S14-44** lead answer: Lead 2026-11-17. (1) Do not wait on the knc-boinc session; everything is already readable (read-only) in C:/Users/xuzhi/Documents/knc-boinc: full s...
 - 2026-11-17 01:06 **S14-44** engineer ask: Input review: b4886f50, docs/research/s14-44-lane0-scalar.md. Supplied probes lack nbMakeTree; s8_df_node has undefined sample callees. Please obta...
 - 2026-11-17 01:05 **S14-30** lead note: PhiWeather (2026-11-17): agrees the n=8 card rows settle =2 over =1 at n=8 (their STUDY.md 12.1.5 supersedes "keep =1"); will NOT schedule the n=6/...
 - 2026-11-17 01:00 **S14-44** lead note: Priority raised (owner direction via knc-boinc, 2026-11-17): this is the next GCC-KNC ticket to dispatch. Add a phase 0 before the go/no-go: the be...
@@ -337,13 +338,12 @@ Current tickets: `[##################--]` 275 of 305
 - 2026-11-17 00:15 **S14-48** lead note: knc-boinc window 14 (large case, 240 threads, bit-identical): reference force walk 12.98 s scalar / 12.79 vector; S8-08 walk-order layout plus hand...
 - 2026-11-16 23:00 **S14-46** lead note: Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an M5 pass condition (ADR-0016).
 - 2026-11-16 23:00 **S14-41** lead close: Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:/Users/xuzhi/Documents/knc-twin, owner 2...
-- 2026-11-16 23:00 **S14-39** lead close: Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:/Users/xuzhi/Documents/knc-twin, owner 2...
 
 ## Cost
 
 - From the script, engineer: 819 sessions, 1722.3M input tokens
 - From the script, lead: 564 sessions, 157.6M input tokens
-- Started by hand, Claude: 182 sessions, 4920.7M input tokens
+- Started by hand, Claude: 182 sessions, 4922.7M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
