@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 18:39.
+Updated automatically at every ticket change. Last update: 2026-11-17 18:55.
 
 **Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
-Current tickets: `[##################--]` 283 of 309
+Current tickets: `[##################--]` 284 of 309
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 283 of 309
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
-| M5 | Program corpus | In progress | 37 of 52 tickets |
+| M5 | Program corpus | In progress | 38 of 52 tickets |
 | M6 | Release | In progress | 0 of 11 tickets |
 
 ## Tickets
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 283 of 309
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | lead | Review passed and I ran approve, but its machine check ran past the 10-minute tool limit and was killed. Th... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Done | Anyone can rebuild GCC-KNC from source: the GCC fork exports as a git bundle plus one diff against GCC 16.2... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -334,6 +334,7 @@ Current tickets: `[##################--]` 283 of 309
 
 ## Recent activity
 
+- 2026-11-17 18:55 **S13-04** lead approve: Anyone can rebuild GCC-KNC from source: the GCC fork exports as a git bundle plus one diff against GCC 16.2, the project exports cleanly, and docs/...
 - 2026-11-17 18:39 **S13-04** lead defer: Review passed and I ran approve, but its machine check ran past the 10-minute tool limit and was killed. The killed run left the main-merge commit ...
 - 2026-11-17 18:32 **S14-50** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 18:30 **S14-56** engineer submit: Q1-Q6 and MilkyWay host/corruption checks passed and serial O2 donor/KNC pairs were linted and staged in _shared/{S14-56,m4-sealed/S14-56}/correctn...
@@ -341,13 +342,12 @@ Current tickets: `[##################--]` 283 of 309
 - 2026-11-17 18:30 **S13-04** lead note: Set to review by the lead: work complete, reruns PASS (source_release 9, portability 6, logs in the 18:25 ask), size override approved; submit kept...
 - 2026-11-17 18:29 **S14-24** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 18:25 **S14-56** lead note: Donor OpenMP runtime ready: .work/_shared/donor-libgomp/lib64/{libgomp.a,libgomp.spec} (static GCC 5.1.1 libgomp that PhiWeather plain-GCC-5.1.1 WR...
-- 2026-11-17 18:25 **S13-04** engineer ask: After merge 49e27821, submission with approved 827-line override is refused again: branch lacks real changes from main. Please merge current main a...
 
 ## Cost
 
 - From the script, engineer: 895 sessions, 1891.8M input tokens
 - From the script, lead: 601 sessions, 164.3M input tokens
-- Started by hand, Claude: 391 sessions, 5175.1M input tokens
+- Started by hand, Claude: 394 sessions, 5188.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
