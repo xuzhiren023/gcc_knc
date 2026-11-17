@@ -97,6 +97,9 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Owner 2026-11-17 00:30 EST: knc-boinc's next plan (after the laptop is freed) is to port MilkyWay 1.96's unshipped
+  OpenCL N-body algorithm (nbody_kernels.cl, Burtscher GPU Barnes-Hut: parallel tree build, tree-order sort, group
+  walks -> 16-lane IMCI) to OpenMP+IMCI, gated first on MilkyWay's validator tolerance (not bit-identical by design).
 - Window 14 closed 05:10:41Z (2026-11-17). Twin T1-07 single smoke PASSED on the card (first generated native to
   run: check ok, 0 mismatches, 437 ticks/unit); the ten-program batch is being restaged in calib-w14/batch/ for the
   next window (owner's WRF-tests approval covers it). knc-boinc 16/16 jobs bit-identical: best card large 23.7 s (pool
