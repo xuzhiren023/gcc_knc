@@ -404,6 +404,7 @@ class BoardLockRaces(Sandbox):
         import dispatch
         import pm
         board = mock.Mock()
+        board.policy = {"session_timeout_minutes": 1}
         ticket = mock.Mock()
         args = mock.Mock(max_sessions=1, lane="tools", dry_run=False)
         board.tickets.return_value = []
