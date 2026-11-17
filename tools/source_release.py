@@ -221,6 +221,14 @@ def export(repo, ref, revision, base, output):
     # object store. No refs are changed in the source repository, and a branch
     # advancing during export cannot change the already audited revision.
     objects = git(repo, 'rev-parse', '--git-path', 'objects').decode().strip()
+    if sys.platform == 'cygwin':
+        # A Windows-created linked worktree can make Git return C:/... here.
+        # Convert before pathlib decides whether this is an absolute path.
+        converted = subprocess.run(['cygpath', '-u', objects],
+                                   capture_output=True, text=True)
+        if converted.returncode:
+            raise RuntimeError(converted.stderr.strip())
+        objects = converted.stdout.strip()
     objects = (repo / objects).resolve() if not Path(objects).is_absolute() else Path(objects)
     output.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(prefix='source-export-') as temporary:
