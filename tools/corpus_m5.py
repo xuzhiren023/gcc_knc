@@ -4,9 +4,42 @@ import argparse
 from pathlib import Path
 import shutil
 import sys
+from unittest.mock import patch
 
 import corpus
 import genset
+
+
+def host_check(stage, programs):
+    """Build frozen host fixtures, preserving the already validated Q captures.
+
+    Q input and source pins have not changed since the approved red run. Their
+    sealed captures can be consumed without rebuilding or rerunning them.
+    """
+    checked = {}
+    q_programs = [p for p in programs if p in corpus.M5_Q_UNITS]
+    if q_programs:
+        q_stage = corpus.sealed_dir(stage) / 'q-host'
+        required = [q for p in q_programs for q in members(p)]
+        if any(not (q_stage / 'oracles' / (q + '.txt')).is_file()
+               or not (q_stage / 'host' / q / 'O2/stdout').is_file() for q in required):
+            with patch.object(genset, 'STAGE', q_stage):
+                genset.host_check()
+        for program in q_programs:
+            references, actuals = [], []
+            for q in members(program):
+                references.append((q_stage / 'oracles' / (q + '.txt')).read_text())
+                directory = q_stage / 'host' / q / 'O2'
+                actuals.append(genset.payload((directory / 'stdout').read_text(),
+                                              (directory / 'stderr').read_text()))
+            checked[program] = '\n'.join(references), '\n'.join(actuals)
+    for program in programs:
+        if program == 'MilkyWay-Nbody':
+            from corpus_milkyway import host_check as milkyway_host
+            checked[program] = milkyway_host(stage)
+        elif program not in corpus.M5_Q_UNITS:
+            raise ValueError('host build not implemented: ' + program)
+    return checked
 
 
 def members(program):

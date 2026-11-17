@@ -61,7 +61,8 @@ M5_SOURCES = {
         version='nbody_1.96', tag='nbody_1.96',
         commit='1e640779f1cabf88aaa49e4db569cfe7e09016c4',
         patches=['crlibm-config-path.patch', 'nbody-king-const.patch',
-                 'nbody-result-contract.patch', 'nbody-wrapper-files.patch', 'popt-cygwin.patch']),
+                 'nbody-result-contract.patch'],
+        host_patches=['popt-cygwin.patch']),
     'WRF': dict(source_url='https://github.com/wrf-model/WRF', version='4.8.0', tag='v4.8.0',
                 inputs={name: dict(source=WRF_CASE + name,
                                    conversion='nccopy -k 64-bit-offset <in> <out>')
@@ -430,6 +431,9 @@ def build_program(program, compiler, flags, source, out, log, setparams, variant
     if program in M5_Q_UNITS:
         from corpus_m5 import build_q
         return build_q(program, compiler, flags, out, log, runtime_stager)
+    if program == 'MilkyWay-Nbody':
+        from corpus_milkyway import build_card
+        return build_card(compiler, flags, out, log)
     if runtime_stager is None:
         runtime_stager = stage_runtimes
     cc = compiler_path(compiler)
@@ -743,6 +747,11 @@ def wrf_field_differences(reference, actual):
         differences[name] = dict(max_abs=maximum, rms=rms, rms_bound=bound,
                                  passed=rms <= bound)
     return differences
+
+
+def host_check_m5(stage, programs):
+    from corpus_m5 import host_check
+    return host_check(stage, programs)
 
 
 def check_m5_output(program, reference_text, actual_text):

@@ -57,10 +57,10 @@ class M5Pins(unittest.TestCase):
         self.assertEqual(pin['commit'], '1e640779f1cabf88aaa49e4db569cfe7e09016c4')
         patches = pin['patches']
         expected = {'crlibm-config-path.patch', 'nbody-king-const.patch',
-                    'nbody-result-contract.patch', 'nbody-wrapper-files.patch',
-                    'popt-cygwin.patch'}
+                    'nbody-result-contract.patch'}
         self.assertEqual(set(patches), expected)
         self.assertEqual(len(patches), len(expected))
+        self.assertEqual(pin['host_patches'], ['popt-cygwin.patch'])
 
     def test_wrf_input_sources_and_conversion_are_frozen(self):
         pin = self.sources()['WRF']
