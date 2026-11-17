@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 10:28.
+Updated automatically at every ticket change. Last update: 2026-11-17 10:29.
 
 **Waiting for you:** S14-04, S14-24, S14-56. Run `python tools/pm.py inbox`.
 
@@ -118,7 +118,7 @@ Current tickets: `[##################--]` 276 of 305
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Done | T1 and T2 checks now write every generated file into the run's own output folder, so a file left by another... |
-| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Question for the tech lead | Installed gcc-knc-16.2.0-2 reproduces vect-pr123221.c ICE at tree-vect-slp.cc:4275 with -O3 -march=knc -fno... |
+| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | In progress | Yes. Keep the original vect-pr123221.c shape (main, the local assignment, the return) as the T1 red test; a... |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Folded into S12-30 (sparse indexed reductions),... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: M4 harness item; the M5 donor-margin ch... |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 10:29 **S12-38** lead answer: Yes. Keep the original vect-pr123221.c shape (main, the local assignment, the return) as the T1 red test; an ICE-preserving reproducer is enough, i...
 - 2026-11-17 10:28 **S14-24** engineer escalate: budget: 2 engineer sessions used; the budget is 2
 - 2026-11-17 10:12 **S14-04** engineer escalate: budget: 7064106 input tokens used; the budget is 6000000
 - 2026-11-17 09:55 **S14-56** lead escalate: lead session ended without a decision (exit 0)
@@ -337,7 +338,6 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 09:48 **S14-56** lead resume: Lead answer (2026-11-17). (1) MilkyWay N-body: upstream https://github.com/Milkyway-at-home/milkywayathome_client, tag nbody_1.96, commit 1e640779f...
 - 2026-11-17 09:45 **S14-22** lead answer: See the lead resume note above: the hang is your red test waiting out card_run's admission timeout; give wait-path tests a short timeout, commit th...
 - 2026-11-17 09:43 **S14-56** lead defer: Needs interactive lead (this session cannot read knc-boinc or PhiWeather). Post on the ticket: (1) MilkyWay 1.96 upstream URL, tag/commit, hash as ...
-- 2026-11-17 09:37 **S14-22** lead resume: Lead diagnosis (2026-11-17): tools/run.py does not hang. Your new red test test_open_own_turn_admits_nonbenchmark_and_preserves_original_queue_posi...
 
 ## Cost
 
