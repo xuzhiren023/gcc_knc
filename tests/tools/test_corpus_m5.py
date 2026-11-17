@@ -21,6 +21,65 @@ M4 = {'PB-gemm', 'PB-atax', 'PB-cholesky', 'PB-ludcmp', 'PB-jacobi-2d',
       'NPB-MG', 'NPB-IS', 'HPCG', 'zlib', 'SQLite', 'bzip2'}
 
 
+class M5Pins(unittest.TestCase):
+    """Proposed manifest API: M5_SOURCES[unit], also embedded in plan rows.
+
+    Each source has source_url, version and hash; WRF inputs have source and
+    hash. These assert recorded pins only; tests never compute file hashes.
+    """
+
+    def sources(self):
+        sources = getattr(corpus, 'M5_SOURCES', None)
+        self.assertIsInstance(sources, dict, 'missing pinned M5 source manifest')
+        return sources
+
+    def assert_hash(self, value):
+        self.assertIsInstance(value, str)
+        self.assertRegex(value, r'\A(?:[0-9a-f]{40}|[0-9a-f]{64})\Z')
+        self.assertNotEqual(set(value), {'0'})
+
+    def test_every_new_unit_records_source_version_and_hash(self):
+        sources = self.sources()
+        for unit in UNITS:
+            with self.subTest(unit=unit):
+                self.assertIn(unit, sources)
+                pin = sources[unit]
+                self.assertRegex(pin['source_url'], r'\Ahttps?://\S+\Z')
+                self.assertIsInstance(pin['version'], str)
+                self.assertTrue(pin['version'].strip())
+                self.assert_hash(pin['hash'])
+        for row in corpus.make_plan(core_count=60):
+            if row['program'] in UNITS:
+                self.assertEqual(row['source'], sources[row['program']])
+
+    def test_milkyway_exact_release_and_correctness_only_patches(self):
+        pin = self.sources()['MilkyWay-Nbody']
+        self.assertEqual(pin['source_url'],
+                         'https://github.com/Milkyway-at-home/milkywayathome_client')
+        self.assertEqual(pin['version'], 'nbody_1.96')
+        self.assertEqual(pin['hash'], '1e640779f1cabf88aaa49e4db569cfe7e09016c4')
+        patches = pin['patches']
+        expected = {'crlibm-config-path.patch', 'nbody-king-const.patch',
+                    'nbody-result-contract.patch', 'nbody-wrapper-files.patch',
+                    'popt-cygwin.patch'}
+        self.assertEqual(set(patches), expected)
+        self.assertEqual(len(patches), len(expected))
+
+    def test_wrf_input_and_namelist_sources_have_frozen_hashes(self):
+        pin = self.sources()['WRF']
+        base = 'C:/Users/xuzhi/Documents/PhiWeather/artifacts/test-state/'
+        case = base + 'accuracy-downloads-20261112/cases/miami-20240106/hn12rlh/inputs/'
+        expected = {name: case + name for name in
+                    ('wrfinput_d01', 'wrfinput_d02', 'wrfbdy_d01')}
+        expected['namelist.input'] = (base + 'claude-mentor-performance-20261105/'
+                                     'bt-20240106-MIA-HN12RLH-S1126-04/namelist.input')
+        for name, source in expected.items():
+            with self.subTest(input=name):
+                record = pin['inputs'][name]
+                self.assertEqual(record['source'].replace('\\', '/'), source)
+                self.assert_hash(record['hash'])
+
+
 class M5Manifest(unittest.TestCase):
     def test_seven_additions_preserve_m4_and_q1_q2_have_one_vote(self):
         self.assertEqual(set(corpus.PROGRAMS), M4 | set(UNITS))
