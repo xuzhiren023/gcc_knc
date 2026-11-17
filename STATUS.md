@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:19.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:21.
 
 **Next: the tech lead, on S12-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 281 of 308
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | 68953a72 fixes tools/source_release.py; 98a03b3f adds tests/regress/test_source_release.py regression: expe... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | Main merged into s13/S13-04 (668efbd2). Submit now. The refreshed project export is the lead's job after th... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -337,16 +337,16 @@ Current tickets: `[##################--]` 281 of 308
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:21 **S13-04** lead answer: Main merged into s13/S13-04 (668efbd2). Submit now. The refreshed project export is the lead's job after the merge (it must include this ticket's d...
 - 2026-11-17 17:18 **S13-04** engineer ask: 68953a72 fixes tools/source_release.py; 98a03b3f adds tests/regress/test_source_release.py regression: expected red then 1 PASS. Log: .work/_state/...
 - 2026-11-17 17:16 **S14-50** lead changes: 1. docs/research/knc-machine.yaml:670: x87_compare_chain has value null although the note gives measured rows (7.076 ticks/site at 1 thread, 13.106...
 - 2026-11-17 17:15 **S14-16** engineer ask: GCC build needed at 494881688b9 (lane gcc; option 284a9d31805). Added --param=knc-mask-gpr-move-cost, default 4, range 1..8, for both transfers. Te...
-- 2026-11-17 17:14 **S14-64** engineer submit: Host CPUs 0-9: empty-folder and done-ticket checks passed in .work/_state/logs/S14_64_green-20261117-171308.log, and cleanup failure records done a...
 
 ## Cost
 
 - From the script, engineer: 882 sessions, 1873.2M input tokens
 - From the script, lead: 591 sessions, 161.9M input tokens
-- Started by hand, Claude: 375 sessions, 5086.1M input tokens
+- Started by hand, Claude: 375 sessions, 5087.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
