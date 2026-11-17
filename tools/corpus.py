@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import tarfile
@@ -641,6 +642,89 @@ def write_lead_script(stage_dir):
     shutil.copyfile(SUPPORT / 'README.md', stage_dir / 'README.md')
 
 
+M5_Q_UNITS = ('Q1/Q2', 'Q3', 'Q4', 'Q5', 'Q6')
+WRF_FIELDS = ('T', 'QVAPOR', 'U', 'V', 'W', 'PH', 'MU', 'PSFC',
+              'T2', 'Q2', 'U10', 'V10', 'RAINNC')
+
+
+def m5_json(text):
+    """Decode one complete normalized result, rejecting ambiguous duplicate keys."""
+    def unique(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError('duplicate output key: ' + key)
+            result[key] = value
+        return result
+    return json.loads(text, object_pairs_hook=unique)
+
+
+def m5_finite(value):
+    return type(value) in (int, float) and math.isfinite(value)
+
+
+def wrf_field_differences(reference, actual):
+    """Report max-abs/RMS against the frozen donor and THM-1-ULP bounds.
+
+    Inputs are normalized complete fields, not summaries from the candidate.
+    A normalizer must only emit completion after checking the WRF run logs.
+    """
+    expected = {domain + '/' + field for domain in ('d01', 'd02') for field in WRF_FIELDS}
+    for output in (reference, actual):
+        if (not isinstance(output, dict) or set(output) != {'completion', 'fields'}
+                or output['completion'] != 'SUCCESS COMPLETE WRF'
+                or not isinstance(output['fields'], dict) or set(output['fields']) != expected):
+            raise ValueError('incomplete WRF result')
+    differences = {}
+    for name in sorted(expected):
+        frozen, candidate = reference['fields'][name], actual['fields'][name]
+        if (not isinstance(frozen, dict) or set(frozen) != {'values', 'rms_bound'}
+                or not isinstance(candidate, dict) or set(candidate) != {'values'}):
+            raise ValueError('invalid WRF field: ' + name)
+        left, right, bound = frozen['values'], candidate['values'], frozen['rms_bound']
+        if (not m5_finite(bound) or bound < 0 or not isinstance(left, list)
+                or not isinstance(right, list) or not left or len(left) != len(right)
+                or not all(m5_finite(v) for v in itertools.chain(left, right))):
+            raise ValueError('invalid WRF field values or bound: ' + name)
+        deltas = [abs(a - b) for a, b in zip(left, right)]
+        maximum = max(deltas)
+        if not math.isfinite(maximum):
+            raise ValueError('nonfinite WRF difference: ' + name)
+        # Scale before squaring to avoid overflow/underflow at small ULP bounds.
+        rms = (maximum * math.sqrt(math.fsum((d / maximum) ** 2 for d in deltas)
+                                   / len(deltas))) if maximum else 0.0
+        differences[name] = dict(max_abs=maximum, rms=rms, rms_bound=bound,
+                                 passed=rms <= bound)
+    return differences
+
+
+def check_m5_output(program, reference_text, actual_text):
+    """Check complete payloads; workload pass markers never replace the oracle."""
+    try:
+        if program in M5_Q_UNITS:
+            import genset
+            if program != 'Q1/Q2':
+                return genset.matches(program, reference_text, actual_text)
+            # One vote retains Q1's finite FP tolerance and Q2's exact tokens.
+            reference, actual = reference_text.split(), actual_text.split()
+            split = reference.index('Q2')
+            actual_split = actual.index('Q2')
+            return (split == actual_split
+                    and genset.matches('Q1', ' '.join(reference[:split]), ' '.join(actual[:split]))
+                    and genset.matches('Q2', ' '.join(reference[split:]), ' '.join(actual[split:])))
+        reference, actual = m5_json(reference_text), m5_json(actual_text)
+        if program == 'MilkyWay-Nbody':
+            if any(not isinstance(v, dict) or set(v) != {'likelihood'}
+                   or not m5_finite(v['likelihood']) for v in (reference, actual)):
+                return False
+            return struct.pack('!d', reference['likelihood']) == struct.pack('!d', actual['likelihood'])
+        if program == 'WRF':
+            return all(field['passed'] for field in wrf_field_differences(reference, actual).values())
+    except (ValueError, TypeError, KeyError, OverflowError, struct.error):
+        return False
+    return False
+
+
 def output_result(job, stdout, stderr, returncode):
     row = dict(job, check='error', time_seconds=None)
     try:
@@ -668,7 +752,14 @@ def output_result(job, stdout, stderr, returncode):
             raise ValueError('card_run exit %d' % returncode)
         text = stdout + '\n' + stderr
         program = job['program']
-        if program.startswith('PB-') or program == 'STREAM':
+        if program in M5_Q_UNITS or program in ('MilkyWay-Nbody', 'WRF'):
+            import genset
+            payload = genset.payload(stdout, stderr)
+            if not check_m5_output(program, job['reference'], payload):
+                raise ValueError('M5 complete-output check failed')
+            if program == 'WRF':
+                row['field_differences'] = wrf_field_differences(m5_json(job['reference']), m5_json(payload))
+        elif program.startswith('PB-') or program == 'STREAM':
             checks = [json.loads(line[len('CORPUS_ARRAY '):]) for line in stdout.splitlines() if line.startswith('CORPUS_ARRAY ')]
             if not (stream_matches(checks) if program == 'STREAM' else arrays_match(checks, checks)):
                 raise ValueError('missing or nonfinite complete PolyBench output')
