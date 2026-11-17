@@ -4,8 +4,11 @@ Exercise the real transport setup with only the SSH session replaced. A POSIX
 host is simulated on Windows, so this is not a native Linux validation.
 """
 import os
+import json
 from pathlib import Path
 import runpy
+import subprocess
+import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
@@ -13,6 +16,125 @@ from unittest import mock
 
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+class SourceRelease(unittest.TestCase):
+    """CLI contract for tools/source_release.py, using disposable repositories.
+
+    audit --repo REPO --ref REF --json emits {"excluded": [{"path": ...,
+    "reason": ...}]} and fails if a tracked path is unsuitable for release.
+    export adds --base TAG --output DIR and writes source.bundle plus
+    patches/0001-*.patch, etc. It exports committed source, not workspace files.
+    """
+
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.directory = Path(temporary.name)
+        self.repo = self.directory / "repo"
+        self.repo.mkdir()
+        self.git("init", "-q")
+        self.git("config", "user.name", "Source release fixture")
+        self.git("config", "user.email", "fixture@example.invalid")
+        self.git("config", "core.autocrlf", "false")
+        self.git("config", "commit.gpgsign", "false")
+        self.git("checkout", "-q", "-b", "main")
+        self.write(".gitignore", "ignored/\n.work/\n*.o\n*.exe\n")
+        self.write("src/example.c", "int example(void) { return 0; }\n")
+        self.commit("fixture upstream")
+        self.base = "releases/gcc-16.2.0"
+        self.git("tag", self.base)
+        self.write("src/example.c", "int example(void) { return 1; }\n")
+        self.commit("fixture source change")
+        self.write("src/extra.c", "int extra(void) { return 2; }\n")
+        self.commit("fixture additional source")
+
+    def git(self, *args, cwd=None):
+        result = subprocess.run(["git", *map(str, args)], cwd=cwd or self.repo,
+                                text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return result.stdout
+
+    def write(self, name, contents):
+        path = self.repo / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(contents, encoding="utf8")
+
+    def commit(self, message):
+        self.git("add", "-f", ".")
+        self.git("-c", "core.hooksPath=/dev/null", "commit", "-qm", message)
+
+    def release(self, action, *args):
+        tool = ROOT / "tools/source_release.py"
+        self.assertTrue(tool.is_file(), "missing source export/audit CLI: " + str(tool))
+        return subprocess.run([sys.executable, str(tool), action,
+                               "--repo", str(self.repo), "--ref", "main", *args],
+                              text=True, capture_output=True)
+
+    def test_audit_rejects_each_tracked_exclusion_with_reason(self):
+        forbidden = {
+            "ignored/forced.txt": ("ignored fixture\n", r"ignor"),
+            ".work/card-output.txt": ("workspace fixture\n", r"work|workspace"),
+            "obj/example.o": ("object fixture\n", r"artifact|object|binary"),
+            "large.txt": ("x" * (1024 * 1024 + 1), r"size|large|limit|1.?m"),
+            "vendor/intel-manual.pdf": ("synthetic document fixture\n", r"vendor|document|pdf"),
+            "vendor/intrinsics-guide.xml": ("<synthetic-fixture/>\n", r"vendor|intrinsics|xml"),
+        }
+        for path, (contents, _) in forbidden.items():
+            self.write(path, contents)
+        self.commit("fixture forbidden tracked files")
+        result = self.release("audit", "--json")
+        self.assertNotEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        reasons = {}
+        for entry in report["excluded"]:
+            reasons.setdefault(entry["path"], []).append(entry["reason"])
+        for path, (_, reason) in forbidden.items():
+            with self.subTest(path=path):
+                self.assertIn(path, reasons)
+                self.assertRegex(" ".join(reasons[path]).lower(), reason)
+
+    def test_clean_tracked_tree_passes_audit(self):
+        result = self.release("audit", "--json")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)["excluded"], [])
+
+    def test_exports_only_committed_source_as_bundle_and_numbered_patches(self):
+        expected = {".gitignore", "src/example.c", "src/extra.c"}
+        # These exist on disk but must never enter either export.
+        for path in ("ignored/local.txt", ".work/card-output.txt", "obj/local.o",
+                     "tool.exe", "vendor/intel-manual.pdf", "untracked.txt"):
+            self.write(path, "synthetic local fixture\n")
+        self.write("large.txt", "x" * (1024 * 1024 + 1))
+        output = self.directory / "export"
+        result = self.release("export", "--base", self.base, "--output", str(output))
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        bundle = output / "source.bundle"
+        self.git("bundle", "verify", bundle)
+        clone = self.directory / "clone"
+        self.git("clone", "-q", "--branch", "main", bundle, clone)
+        # A source bundle must preserve history and the upstream tag.
+        self.assertEqual(self.git("rev-parse", "main", cwd=clone),
+                         self.git("rev-parse", "main"))
+        self.assertEqual(self.git("rev-parse", self.base, cwd=clone),
+                         self.git("rev-parse", self.base))
+        for revision in self.git("rev-list", "main", cwd=clone).splitlines():
+            paths = set(self.git("ls-tree", "-r", "--name-only", revision,
+                                 cwd=clone).splitlines())
+            self.assertTrue(paths <= expected, paths - expected)
+        self.assertEqual(set(self.git("ls-tree", "-r", "--name-only", "main",
+                                      cwd=clone).splitlines()), expected)
+        patches = sorted((output / "patches").glob("*.patch"))
+        self.assertEqual(len(patches), 2)
+        self.git("checkout", "-q", self.base, cwd=clone)
+        for number, patch in enumerate(patches, 1):
+            self.assertRegex(patch.name, rf"^{number:04d}-.+\.patch$")
+            self.git("apply", "--check", "--index", patch, cwd=clone)
+            self.git("apply", "--index", patch, cwd=clone)
+            paths = set(self.git("ls-files", cwd=clone).splitlines())
+            self.assertTrue(paths <= expected, paths - expected)
+        self.assertEqual(set(self.git("ls-files", cwd=clone).splitlines()), expected)
+        self.git("diff", "--exit-code", "main", "--", cwd=clone)
 
 
 class LinuxCardTransport(unittest.TestCase):
