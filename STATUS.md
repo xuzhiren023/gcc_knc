@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 15:02.
+Updated automatically at every ticket change. Last update: 2026-11-17 15:03.
 
-**Next: the tech lead, on S12-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Waiting for you:** S14-04. Run `python tools/pm.py inbox`.
 
 Current tickets: `[##################--]` 277 of 306
 
@@ -132,7 +132,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
 | S14-02 | Software pipelining on KNC - probe whether SMS can run (a KNC counted-loop pattern) and whether it speeds up in-order loops | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: S14-26 bounded software pipelining as n... |
 | S14-03 | KNC scheduler model completeness - bypasses, folded memory operand cost, pairing by encoding, checked on post-RA schedules | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin measured pairing/bypass rules on... |
-| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | Waiting for review | Completed at 85d26a25 (red c652530b); main merged again at 5ec24581 per lead answer. Reused authorized pass... |
+| S14-04 | M5 measurement method - per-hot-region properties, a lower bound per region, four separately reported outcomes, four measurement levels | **Waiting for you** | lead session ended without a decision (exit 0) |
 | S14-05 | Paired source-form generality cases for N, C and G code (one algorithm written several ways), unscored, for M5 | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-06 | Branch cost and if-conversion thresholds for KNC from measured branch loss (C10 plus S12-12 G07), judged by cycles | draft | Cross-project review (docs/research/s14-cross-project-review.md): knc-twin: fixed-direction branch 6.2 tick... |
 | S14-07 | C++ abstraction removal on KNC - does LTO work for k1om, and do devirtualization and indirect-call promotion fire at -O2 -march=knc | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 15:03 **S14-04** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 15:02 **S12-38** engineer ask: Submission blocked: pm.py submit waited 15 minutes and refused because .work/_state/board.lock is held by another pm or dispatcher process (observe...
 - 2026-11-17 15:01 **S14-16** lead answer: Build ready (43801df4e93, cost 4). Check: knc-scalar-mask-cost.c green AND knc-loop-store-mask.c still emits kxor, vector_checks.py after-run (16 t...
 - 2026-11-17 14:59 **S14-24** owner decide: sessions 4 -> 6 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (red 9957076b, fix...
@@ -338,7 +339,6 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 14:43 **S14-16** lead resume: GCC built by the lead at 43801df4e93 (spill-level cost 4; gcc-build cc1 13:16 EST, log .work/_state/logs/S14_16_gcc_build_2-20261117-131420.log).
 - 2026-11-17 14:27 **S14-60** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 14:26 **S12-38** lead answer: Main is already merged into s12/S12-38 (ca37b628, 13:56); the branch now lacks only work/ and STATUS.md changes, which submit allows. Submit now wi...
-- 2026-11-17 14:11 **S14-04** engineer submit: Completed at 85d26a25 (red c652530b); main merged again at 5ec24581 per lead answer. Reused authorized passing host run: 15 tests including serial-...
 
 ## Cost
 
