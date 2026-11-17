@@ -2,7 +2,8 @@
 
 Compiler: `.work/_shared/gcc-knc-16.2.0/bin/k1om-mpss-linux-gcc.exe`.
 This records the installed prefix, without asserting its GCC source commit.
-No GCC change or build. Native execution **NOT RUN**; x86 not run.
+No GCC change or build. Window 17: 1,797 native PASS, six FAIL, zero TIMEOUT;
+x86 not run. Corrected-harness native results are still pending.
 
 ## Scope and method
 
@@ -78,9 +79,44 @@ For the assembler rows, follow with
 
 Every assembler error in the four input-asm rows resolves inside `#APP/#NO_APP`;
 source lint was clean. No generated assembler rejection or lint failure occurred.
-S12-34 was not observed. No new ICE, assembler/lint defect or wrong-code failure
-is established, so there is no new defect ticket draft. Native wrong-code
-triage remains dependent on the lead's card run.
+S12-34 was not observed. The six native failures are triaged below.
+
+## Window 17 native failure triage
+
+The lead ran the installed-prefix O3 execute set with 60 workers in window 17
+(2026-11-17 17:33-17:34Z): 1,797 PASS, six FAIL, zero TIMEOUT.
+Raw results: `.work/_shared/S14-58/card/out/execute-O3.{out,err}`.
+The raw stderr records status **4** for `930529-1.c`, rather than the status 6
+reported for all six in the ticket; the other five have status 6.
+Original failing-function disassembly is retained in
+`.work/_shared/S14-58/native-triage.txt`.
+
+All rows use `-march=knc -O3`. Paths are relative to
+`$TS/gcc.c-torture/execute`. These are harness diagnoses from source and
+generated code, not claims that a corrected binary passed on the card.
+
+| Test | Original result | Pass / instruction and cause | Disposition / corrected command flags |
+|---|---|---|---|
+| 930529-1.c | FAIL, raw 4 (SIGILL) | `main` is `ud2`; its braced, quoted `dg-options` value was ignored, losing `-fwrapv` for the signed-wrapping loop | harness parser miss; `$CC -fwrapv -march=knc -O3 930529-1.c -lm -o repro.mic` |
+| builtins/abs-1.c | FAIL, raw 6 | `main_test` checks `abs_called` without an `abs` call; `abs-1.x` supplies `-fno-builtin-abs` | harness `.x` miss; compile abs-1.c, abs-1-lib.c and lib/main.c with `-fno-builtin-abs` |
+| builtins/uabs-1.c | FAIL, raw 6 | same missing-call mechanism; `uabs-1.x` supplies `-fno-builtin-uabs -std=c2y` | harness `.x` miss; compile uabs-1.c, uabs-1-lib.c and lib/main.c with `-fno-builtin-uabs -std=c2y` |
+| ieee/20030331-1.c | FAIL, raw 6 | inlined `rintf` keeps the add/subtract sequence in x87 precision instead of rounding each float assignment | missing IEEE harness controls; `$CC -fno-inline -ffloat-store -march=knc -O3 ieee/20030331-1.c -lm -o repro.mic` |
+| ieee/pr109008.c | FAIL, raw 6 | `foo` compares x87 `1 + eps` before a double store, so the small epsilon remains distinguishable from 1 | excess-precision harness mismatch; same IEEE flags and command, substituting pr109008.c |
+| ieee/pr67218.c | FAIL, raw 6 | `foo` has `fildll` then `fstpl`, with no intervening float rounding for `(double)(float)` | excess-precision harness mismatch; same IEEE flags and command, substituting pr67218.c |
+
+`builtins.exp` delegates to `lib/c-torture.exp`, which sources a companion
+`.x` driver before compilation; a simple `set additional_flags` replaces the
+inherited flags. The two missing builtin options are therefore required test
+inputs, rather than a request to disable a failing optimization.
+`ieee.exp` supplies `-fno-inline` and conditionally adds `-ffloat-store` for
+ia32 x86 and m68k. Its target predicate does not name k1om; applying the latter
+flag to this sweep is an explicit adaptation for the x87 evaluation observed
+in these executables. The original IEEE aborts do not establish wrong code
+under the compiler's excess-precision mode.
+
+No new compiler defect is established by these six incorrectly configured
+tests, so there is no new defect ticket draft. Corrected native execution is
+required before claiming that these six pass.
 
 ## Card staging
 
@@ -98,9 +134,9 @@ Lead only, from the main checkout in an owner-approved window:
 python tools/card_run --threads 240 --timeout 7200 --file-list .work/_shared/S14-58/card/card-files.list .work/_shared/S14-58/card/claude-torture.mic -j 60 --limit-mb 128 claude-torture.list
 ```
 
-Native execution **NOT RUN**. A timeout is unresolved, not evidence of wrong
-code. Triage every native FAIL/TIMEOUT with the retained test name and details
-before claiming zero known wrong code for this run.
+Window 17 results and outstanding corrected-harness native checks are above.
+A timeout is unresolved, not evidence of wrong code. No zero-wrong-code
+acceptance claim is made from the original harness run.
 
 ## Tool regression
 

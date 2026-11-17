@@ -14,6 +14,23 @@ SHARED = Path(storage.shared_area(storage.main_root(ROOT)))
 
 
 class TortureOptionsTest(unittest.TestCase):
+    def test_s14_58_native_failure_options(self):
+        tool = runpy.run_path(str(ROOT / 'tools/torture_compile.py'))
+        with tempfile.TemporaryDirectory(dir=SHARED) as temporary:
+            root = Path(temporary)
+            source = root / '930529-1.c'
+            source.write_text('/* { dg-options { "-fwrapv" } } */\n')
+            self.assertEqual(tool['source_options'](source), ['-fwrapv'])
+            ieee = root / 'ieee/pr109008.c'
+            ieee.parent.mkdir()
+            ieee.write_text('int x;\n')
+            self.assertEqual(tool['source_options'](ieee), ['-fno-inline', '-ffloat-store'])
+            builtin = root / 'builtins/abs-1.c'
+            builtin.parent.mkdir()
+            builtin.write_text('int x;\n')
+            builtin.with_suffix('.x').write_text('set additional_flags -fno-builtin-abs\nreturn 0\n')
+            self.assertIn('-fno-builtin-abs', tool['source_options'](builtin))
+
     def test_s14_58_builtins_harness(self):
         tool = runpy.run_path(str(ROOT / 'tools/torture_compile.py'))
         with tempfile.TemporaryDirectory(dir=SHARED) as temporary:
