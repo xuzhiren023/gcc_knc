@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:17.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:18.
 
-**Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S12-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 281 of 308
 
@@ -15,8 +15,8 @@ Current tickets: `[##################--]` 281 of 308
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
-| M5 | Program corpus | In progress | 35 of 52 tickets |
-| M6 | Release | In progress | 0 of 10 tickets |
+| M5 | Program corpus | In progress | 35 of 51 tickets |
+| M6 | Release | In progress | 0 of 11 tickets |
 
 ## Tickets
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 281 of 308
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | Main merged into s13/S13-04 (23e078f8). Continue: fix the export's path handling so a Windows path from 'gi... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Question for the tech lead | 68953a72 fixes tools/source_release.py; 98a03b3f adds tests/regress/test_source_release.py regression: expe... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -150,7 +150,7 @@ Current tickets: `[##################--]` 281 of 308
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
 | S14-20 | knc-twin: an indirect jmp/call (PLT tail call through the GOT) on a never-executed path must not refuse the whole region | Done | a region containing an indirect jmp or call that never executes now runs; an executed one fails with the in... |
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
-| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
+| S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft | Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our windo... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
 | S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | In progress | Recorded by the lead (owner 2026-11-17 OK): input_tokens 12M (re-applied after the main reset); finish gree... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -333,20 +333,20 @@ Current tickets: `[##################--]` 281 of 308
 
 ## Recent activity
 
+- 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:25 **S14-04** lead approve: M5 has a written per-region measurement method: work the smallest margins over GCC 5.1.1 first, record seven properties with evidence for each hot ...
+- 2026-11-17 17:18 **S13-04** engineer ask: 68953a72 fixes tools/source_release.py; 98a03b3f adds tests/regress/test_source_release.py regression: expected red then 1 PASS. Log: .work/_state/...
 - 2026-11-17 17:16 **S14-50** lead changes: 1. docs/research/knc-machine.yaml:670: x87_compare_chain has value null although the note gives measured rows (7.076 ticks/site at 1 thread, 13.106...
 - 2026-11-17 17:15 **S14-16** engineer ask: GCC build needed at 494881688b9 (lane gcc; option 284a9d31805). Added --param=knc-mask-gpr-move-cost, default 4, range 1..8, for both transfers. Te...
 - 2026-11-17 17:14 **S14-64** engineer submit: Host CPUs 0-9: empty-folder and done-ticket checks passed in .work/_state/logs/S14_64_green-20261117-171308.log, and cleanup failure records done a...
-- 2026-11-17 17:13 **S14-50** engineer submit: knc-machine.yaml now carries the measured scatter cost and the x87 compare-chain cost from the card, and says where it still disagrees with knc-twin.
-- 2026-11-17 17:12 **S14-56** lead answer: Done by the lead: .work/_shared/corpus-build/milkyway-nbody is now an LF clone at branch m5-nbody-1.96-correctness (commit 064e2d7 = nbody_1.96 1e6...
 
 ## Cost
 
 - From the script, engineer: 881 sessions, 1871.7M input tokens
 - From the script, lead: 591 sessions, 161.9M input tokens
-- Started by hand, Claude: 375 sessions, 5083.5M input tokens
+- Started by hand, Claude: 375 sessions, 5084.4M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
