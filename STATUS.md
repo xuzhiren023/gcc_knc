@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:41.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:43.
 
 **Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
@@ -144,7 +144,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-13 | knc-twin: 8-tile multi-core unit on the full ring with all memory controllers (roadmap item 3) | Done | knc-twin simulates 1-8 detailed cores on the full 61-stop ring with all memory controllers and directory sl... |
 | S14-14 | knc-twin: scheduling explorer for modulo scheduling and reordering, evaluating S14-02/S14-03 (roadmap item 4) | Done | knc-twin gains a schedule command: beam search up to 60 instructions, list ordering, modulo II, GAS export ... |
 | S14-15 | knc-twin prepare-native: absolute memory operands come out as `N()` in kernel.S (k1om as 2.22 rejects them); emit them relocated into the image | Done | prepare-native emits absolute operands relocated into the memory image (knc_twin_mem+off(%rip)) instead of ... |
-| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | In progress | Not building 494881688b9 yet: it will not compile. struct processor_costs (i386.h:122 on) has const int mem... |
+| S14-16 | bzip2 slower than GCC 5.1.1: mask-to-GPR move cost below a GPR move makes RA park integers in k registers (M4 known limit, must-fix) | Question for the tech lead | GCC build needed at d2ab3509a1e (lane gcc). Replaced the invalid const-member cost_table assignments with a... |
 | S14-17 | Compare not folded with its load in merged return blocks (GCC 16 middle end, about half the remaining bzip2 mainGtU gap) | draft |  |
 | S14-18 | knc-twin regress: held-out replay runs under a 120 s wall-clock budget, so a slow interpreter turns a prediction into a budget_exhausted stub and the test fails as a false mismatch | Done | The knc-twin held-out replay no longer runs in t0 (KNC_TWIN_HELDOUT=1 or validate_heldout.py --max-seconds ... |
 | S14-19 | knc-twin x87 integer-load widths - fildl reads 8 bytes (must be 4), filds reads 4 (must be 2) | Done | The knc-twin now reads and writes x87 integer memory at the right widths (filds/fists 2 bytes, fildl/fistl ... |
@@ -335,18 +335,18 @@ Current tickets: `[##################--]` 282 of 308
 
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
+- 2026-11-17 17:43 **S14-16** engineer ask: GCC build needed at d2ab3509a1e (lane gcc). Replaced the invalid const-member cost_table assignments with a static const processor_costs[8][2], all...
 - 2026-11-17 17:40 **S14-04** lead note: State restored to done: merged at cb8f6b9e. The later escalate/defer rows came from a scripted lead acting on the pre-reset copy after main was res...
 - 2026-11-17 17:38 **S14-56** engineer ask: 4109c403: MilkyWay host/corruption PASS; donor/KNC serial O2 pair linted and staged in _shared/S14-56/correctness-jobs.json; no card runs. Logs: _s...
 - 2026-11-17 17:35 **S13-04** lead answer: Approved: submit with --override 'source export tool, Linux recipe and their tests as the ticket asks; 827 lines vs 800, no split'. Same note as pl...
 - 2026-11-17 17:32 **S14-24** engineer escalate: budget: 6 engineer sessions used; the budget is 6
 - 2026-11-17 17:31 **S12-38** lead approve: The -O3 -march=knc vectorizer crash on SLP reduction chains (gcc.dg vect-pr123221.c) is fixed: GCC-KNC now compiles it, with zero crashes across 8,...
-- 2026-11-17 17:29 **S13-04** engineer ask: Submission after the 17:21 lead instruction is refused: 827 changed lines exceed the 800-line budget. All work and staged exports remain as reporte...
 
 ## Cost
 
 - From the script, engineer: 886 sessions, 1883.5M input tokens
 - From the script, lead: 592 sessions, 162.0M input tokens
-- Started by hand, Claude: 379 sessions, 5098.5M input tokens
+- Started by hand, Claude: 380 sessions, 5098.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
