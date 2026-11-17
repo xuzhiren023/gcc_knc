@@ -178,7 +178,7 @@ Current tickets: `[##################--]` 283 of 309
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
 | S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | Done | The board tools now refuse to run git in a ticket folder unless it really is that ticket's worktree, never ... |
-| S14-66 | pm.py submit's "branch lacks real changes from main" check keeps refusing while main moves; accept a branch that merges cleanly and let approval integrate | Not started |  |
+| S14-66 | pm.py submit's "branch lacks real changes from main" check keeps refusing while main moves; accept a branch that merges cleanly and let approval integrate | In progress |  |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
