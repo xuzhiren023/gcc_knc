@@ -167,7 +167,7 @@ Current tickets: `[##################--]` 276 of 305
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Done | Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xe... |
-| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Question for the tech lead | lead merged main into s14/S14-44 and reviewed: approve as is |
+| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | In progress | Merge done by the lead (main merged into s14/S14-44; diff vs main is the four new files only). Lead review:... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress |  |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 10:42 **S14-44** lead answer: Merge done by the lead (main merged into s14/S14-44; diff vs main is the four new files only). Lead review: approve as is. Submit now with note: Sc...
 - 2026-11-17 10:41 **S14-44** lead resume: lead merged main into s14/S14-44 and reviewed: approve as is
 - 2026-11-17 10:41 **S12-38** engineer red: Red commit 32a04338: original main/local-assignment/return reproducer plus --slp-pr123221 T1 selection. Installed gcc-knc-16.2.0-2 passes -O3 -marc...
 - 2026-11-17 10:40 **S14-16** owner decide: input_tokens 12M -> 20M, recorded by the lead under the owner's standing budget rule (steady progress: GCC built by the lead at 407f1c63cc7, red te...
@@ -337,13 +338,12 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 10:36 **S14-16** engineer escalate: budget: 14669748 input tokens used; the budget is 12000000
 - 2026-11-17 10:35 **S14-56** lead answer: See the lead resume note: MilkyWay facts posted; start Q1-Q6 and MilkyWay; WRF inputs follow.
 - 2026-11-17 10:34 **S14-44** lead defer: Needs the interactive lead: no-go report done at 0f79b069 (4 new files: docs/research/s14-44-lane0-scalar.md, tools/s14_44_lane0.asm, s14_44_mix.c,...
-- 2026-11-17 10:32 **S14-56** owner decide: Owner decision recorded by the lead (owner 2026-11-17: 'Yes, allow it' - the lead records routine owner decisions for stuck tickets). The escalatio...
 
 ## Cost
 
 - From the script, engineer: 831 sessions, 1759.4M input tokens
 - From the script, lead: 570 sessions, 158.5M input tokens
-- Started by hand, Claude: 296 sessions, 4831.7M input tokens
+- Started by hand, Claude: 296 sessions, 4832.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
