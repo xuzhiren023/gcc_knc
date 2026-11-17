@@ -667,8 +667,8 @@ branch_mispredict_penalty:
 # latency; the twin validation rows retain x87_compare as assumed.
 
 x87_compare_chain:
-  value: null
-  unit: core cycles per compare dependency site
+  value: {threads_1: 7.076, threads_2: 13.106}
+  unit: TSC ticks per compare/status-transfer site (full chain, not isolated compare latency)
   scope: thread
   models: ["7120"]
   profiles: [full]
