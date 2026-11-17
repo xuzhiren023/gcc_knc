@@ -763,6 +763,10 @@ def main():
     join.add_argument('--pcs', required=True, type=Path)
     join.add_argument('--cpu-seconds', required=True, type=float)
     join.add_argument('--output', required=True, type=Path)
+    m5 = commands.add_parser('m5', help='extend existing development triage with M5 evidence')
+    m5.add_argument('--triage', required=True, type=Path)
+    m5.add_argument('--annotations', type=Path, help='reviewed per-region Model JSON')
+    m5.add_argument('--output', required=True, type=Path)
     args = parser.parse_args()
     if args.command == 'audit':
         audit_profiles(args.shared, args.output)
@@ -772,6 +776,13 @@ def main():
         analyze_collection(args.shared, args.output, args.program or DEVELOPMENT, args.resume)
     elif args.command == 'report':
         report_collection(args.output, args.program or DEVELOPMENT)
+    elif args.command == 'm5':
+        from m5_triage import extend
+        annotations = json.loads(args.annotations.read_text()) if args.annotations else {}
+        result = extend(json.loads(args.triage.read_text()), annotations)
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(json.dumps(result, indent=2, allow_nan=False) + '\n')
+        print(f'M5 {result["program"]}: {len(result["rows"])} regions; {args.output}')
     else:
         regions = regions_from_addr2line(args.addr2line.read_text(),
                                         json.loads(args.regions.read_text()), args.module)

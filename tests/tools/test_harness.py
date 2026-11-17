@@ -379,6 +379,82 @@ class MachineCheck(Sandbox):
         self.card_change_blocks_merge("tools/claude-pin.c")
 
 
+class BoardLockRaces(Sandbox):
+    def test_permission_errors_wait_until_clean_refusal(self):
+        import pm
+        for operation in ("open", "reclaim", "release"):
+            with self.subTest(operation=operation):
+                clock = iter([0, 0, 1])
+                opens = ([FileExistsError()] * 2 if operation == "reclaim" else
+                         [PermissionError()] * 2 if operation == "open" else [123])
+                with mock.patch.dict(os.environ, PM_LOCK_WAIT="1"), \
+                        mock.patch.object(pm.time, "monotonic", side_effect=lambda: next(clock)), \
+                        mock.patch.object(pm.time, "sleep") as sleep, \
+                        mock.patch.object(pm.os, "open", side_effect=opens), \
+                        mock.patch.object(pm.os, "remove", side_effect=PermissionError()), \
+                        mock.patch.object(pm.os, "write"), mock.patch.object(pm.os, "close"), \
+                        mock.patch.object(pm, "_lock_holder_gone", return_value=True):
+                    with self.assertRaisesRegex(pm.Refused, "board is busy"):
+                        with pm.board_lock(self.root):
+                            pass
+                    sleep.assert_called_once_with(0.2)
+                self.assertEqual(pm._lock_depth, 0)
+
+    def test_dispatcher_retries_the_same_busy_step(self):
+        import dispatch
+        import pm
+        board = mock.Mock()
+        board.policy = {"session_timeout_minutes": 1}
+        ticket = mock.Mock()
+        args = mock.Mock(max_sessions=1, lane="tools", dry_run=False)
+        board.tickets.return_value = []
+        with mock.patch.object(dispatch.storage, "check", return_value=("ok", "")), \
+                mock.patch.object(pm, "next_action", return_value=("engineer", ticket)), \
+                mock.patch.object(pm, "cmd_board"), \
+                mock.patch.object(pm, "cmd_start", side_effect=[pm.Refused("the board is busy: lock"),
+                                                               pm.Refused("the board is busy: lock"), None]) as step, \
+                mock.patch.object(dispatch, "engineer_command", return_value=[]), \
+                mock.patch.object(dispatch, "session_env", return_value={}), \
+                mock.patch.object(dispatch, "run_session_process", side_effect=FileNotFoundError), \
+                mock.patch.object(dispatch, "over_budget", return_value=None), \
+                mock.patch.object(dispatch.storage, "project_bytes", return_value=0), \
+                mock.patch.object(dispatch.shutil, "disk_usage"), \
+                mock.patch("time.sleep") as sleep:
+            dispatch.dispatch_loop(board, args)
+        self.assertEqual(step.call_count, 3)
+        self.assertEqual(sleep.call_args_list, [mock.call(60), mock.call(60)])
+        self.assertEqual(step.call_args_list, [step.call_args] * 3)
+
+    def test_approval_checks_release_lock_and_guard_main_changes(self):
+        self.assertEqual(self.pm("start", "A-1").returncode, 0)
+        wt = self.worktree("A-1")
+        selector = os.path.join(self.top, "change-path")
+        check = (
+            "import os, subprocess, sys\n"
+            "root = %r\n"
+            "env = dict(os.environ, PM_LOCK_WAIT='0')\n"
+            "subprocess.run([sys.executable, os.path.join(root, 'tools', 'pm.py'), 'status'], "
+            "cwd=root, env=env, check=True)\n"
+            "with open(%r) as f: path = f.read()\n"
+            "with open(os.path.join(root, path), 'w') as f: f.write('concurrent change\\n')\n"
+            "subprocess.run(['git', 'add', '--', path, 'STATUS.md'], cwd=root, check=True)\n"
+            "subprocess.run(['git', 'commit', '-qm', 'concurrent main change'], cwd=root, check=True)\n"
+        ) % (self.root, selector)
+        self.commit_file("tools/check", check, "test(A-1): concurrent check [red]", wt)
+        self.assertEqual(self.pm("submit", "A-1", "--note", "n", cwd=wt).returncode, 0)
+        for path, expected in (("tools/concurrent.py", 1), ("work/concurrent.txt", 0)):
+            with self.subTest(path=path):
+                with open(selector, "w") as f:
+                    f.write(path)
+                done = self.pm("approve", "A-1", role="lead")
+                self.assertEqual(done.returncode, expected, done.stdout)
+                if expected:
+                    self.assertIn("main changed during approval checks; approve again", done.stdout)
+                    self.assertEqual(self.state("A-1"), "review")
+                else:
+                    self.assertEqual(self.state("A-1"), "done")
+
+
 class RunWrapper(Sandbox):
     def run_tool(self, *args):
         return subprocess.run([sys.executable, os.path.join(self.root, "tools", "run.py")] + list(args),
