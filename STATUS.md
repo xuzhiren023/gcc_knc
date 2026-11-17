@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 11:49.
+Updated automatically at every ticket change. Last update: 2026-11-17 11:53.
 
 **Waiting for you:** S14-22, S14-50. Run `python tools/pm.py inbox`.
 
@@ -167,7 +167,7 @@ Current tickets: `[##################--]` 276 of 306
 | S14-39 | knc-twin prepare-native: pointer-rich captures (heap addresses sparse over tens of GB) need a relocating or multi-segment native image | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-41 | knc-twin prepare-native: the generated driver.c uses mfence, which the K1OM assembler rejects; emit a k1om-legal fence and add a build-and-lint test for generated programs | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-42 | knc-optimize skill - Intel's recommended KNC optimization method, rechecked against our sources and card data, as a portable skill other projects can use | Done | Any agent in any project can now install the knc-optimize skill, which walks through tuning code for the Xe... |
-| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Question for the tech lead | Submission after the lead merge and approve-as-is instruction was refused: the branch lacks real changes fr... |
+| S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | In progress | Main merged into s14/S14-44 again (c6e88d7b; main had moved). Size: approved, submit with --override 'resea... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | **Waiting for you** | budget: 3 engineer sessions used; the budget is 3 |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 276 of 306
 
 ## Recent activity
 
+- 2026-11-17 11:53 **S14-44** lead answer: Main merged into s14/S14-44 again (c6e88d7b; main had moved). Size: approved, submit with --override 'research report and model tools the ticket as...
 - 2026-11-17 11:49 **S14-22** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 11:45 **S14-04** engineer ask: Complete at 85d26a25 (red c652530b): M5 protocol and triage extension, seven properties, bounds/gaps, four outcomes/levels, style and donor-margin ...
 - 2026-11-17 11:40 **S14-50** engineer escalate: budget: 3 engineer sessions used; the budget is 3
@@ -338,16 +339,15 @@ Current tickets: `[##################--]` 276 of 306
 - 2026-11-17 11:37 **S14-44** engineer ask: Submission after the lead merge and approve-as-is instruction was refused: the branch lacks real changes from main (checker asks to merge main into...
 - 2026-11-17 11:36 **S12-38** engineer ask: GCC build needed at 41bc85cf422 (gcc2). Generic SLP indexes an empty scalar_stmts after cast forwarding folds the reduction cycle to a no-op conver...
 - 2026-11-17 11:33 **S14-56** engineer red: Red commit 0704996e: one host-only run of test_corpus_m5*.py completed with 15 expected assertion failures across 5 tests: seven missing scored uni...
-- 2026-11-17 11:32 **S14-16** lead answer: Good progress (zlib kmov 14->0). (1) Do not weaken knc-loop-store-mask.c: a flat 6 is too blunt, because it also pushes genuine mask values out of ...
 
 ## Cost
 
-- From the script, engineer: 841 sessions, 1784.5M input tokens
+- From the script, engineer: 842 sessions, 1786.1M input tokens
 - From the script, lead: 573 sessions, 159.1M input tokens
-- Started by hand, Claude: 309 sessions, 4857.4M input tokens
+- Started by hand, Claude: 310 sessions, 4860.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 314 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 315 GiB free on the drive.
