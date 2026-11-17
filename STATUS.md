@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 16:58.
+Updated automatically at every ticket change. Last update: 2026-11-17 16:59.
 
 **Waiting for you:** S14-22. Run `python tools/pm.py inbox`.
 
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 280 of 307
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | No download needed: the lead cloned the pinned source locally from knc-boinc's checkout into .work/_shared/... |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | Rule block: cannot read knc-boinc work branches. Supplied nbody-wrapper-files.patch includes knc_graphics_f... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
@@ -332,6 +332,7 @@ Current tickets: `[##################--]` 280 of 307
 
 ## Recent activity
 
+- 2026-11-17 16:59 **S14-56** engineer ask: Rule block: cannot read knc-boinc work branches. Supplied nbody-wrapper-files.patch includes knc_graphics_format.h; neither checkout nor support co...
 - 2026-11-17 16:55 **S14-24** owner decide: input_tokens 6M -> 12M (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: progress (fix 14df1710). Fi...
 - 2026-11-17 16:55 **S14-16** owner decide: sessions 8 -> 11 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the sessions since 15:01 were los...
 - 2026-11-17 16:55 **S12-38** engineer submit: T0-T2 PASS on gcc2 41bc85cf422. Torture 8012 cases and vect 2001 sources: zero ICEs; classifications match S12-09. Logs: .work/_state/logs/S12_38_t...
@@ -339,7 +340,6 @@ Current tickets: `[##################--]` 280 of 307
 - 2026-11-17 16:54 **S12-38** lead answer: Main merged into s12/S12-38 (1abf4e92, includes S14-62). Submit now with the 13:55 results, no reruns; note under 600 characters.
 - 2026-11-17 16:53 **S14-24** engineer escalate: budget: 7389102 input tokens used; the budget is 6000000
 - 2026-11-17 16:52 **S12-38** engineer ask: Submission still blocked: pm.py submit refuses because the branch lacks real changes from main and instructs asking the lead to merge main into the...
-- 2026-11-17 16:51 **S14-16** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 
 ## Cost
 
