@@ -170,7 +170,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Question for the tech lead | submit refused: the branch lacks real changes from main: ask the lead to merge main into the ticket branch |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | lead | Interactive lead: merge main into s14/S14-50 (submit refused: branch lacks real changes from main), then ap... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | WRF classic inputs are ready: .work/_shared/corpus-build/wrf-miami-classic/{wrfinput_d01,wrfinput_d02,wrfbd... |
@@ -334,19 +334,19 @@ Current tickets: `[##################--]` 282 of 308
 ## Recent activity
 
 - 2026-11-17 18:10 **S14-56** lead note: WRF classic inputs are ready: .work/_shared/corpus-build/wrf-miami-classic/{wrfinput_d01,wrfinput_d02,wrfbdy_d01} (NETCDF3_64BIT_OFFSET, same data ...
+- 2026-11-17 18:10 **S14-50** lead defer: Interactive lead: merge main into s14/S14-50 (submit refused: branch lacks real changes from main), then approve directly; the review changes are a...
 - 2026-11-17 18:10 **S13-04** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 18:09 **S13-04** lead resume: Lead merged main into s13/S13-04 cleanly (49e27821).
 - 2026-11-17 18:08 **S14-50** engineer ask: submit refused: the branch lacks real changes from main: ask the lead to merge main into the ticket branch
 - 2026-11-17 18:08 **S13-04** lead defer: Merge current main into s13/S13-04 by hand: main gained real code after the 17:21 merge (tools/check.py, pm.py, dispatch.py, harness/policy.json, t...
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
 - 2026-11-17 18:03 **S14-24** owner decide: sessions 6 -> 8 (header updated), recorded by the lead (owner 2026-11-17 OK). Lead ran the harness tests on your branch (Cygwin, tests/tools): 58 r...
-- 2026-11-17 18:01 **S14-16** lead defer: GCC build needed: build gcc16 at .work/_shared/gcc d2ab3509a1e (s14/S14-16). Reviewed: static const table[8][2] fixes the const-member error; index...
 
 ## Cost
 
 - From the script, engineer: 889 sessions, 1886.8M input tokens
 - From the script, lead: 595 sessions, 162.6M input tokens
-- Started by hand, Claude: 385 sessions, 5123.2M input tokens
+- Started by hand, Claude: 385 sessions, 5124.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
