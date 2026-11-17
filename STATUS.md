@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 18:15.
+Updated automatically at every ticket change. Last update: 2026-11-17 18:16.
 
 **Next: the tech lead, on S14-50.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 282 of 308
+Current tickets: `[##################--]` 283 of 308
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 282 of 308
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
-| M5 | Program corpus | In progress | 36 of 51 tickets |
+| M5 | Program corpus | In progress | 37 of 51 tickets |
 | M6 | Release | In progress | 0 of 11 tickets |
 
 ## Tickets
@@ -177,7 +177,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
-| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | lead | Review passed; ready to approve. My approve was killed at the 10-minute tool limit during T0, so nothing me... |
+| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | Done | The board tools now refuse to run git in a ticket folder unless it really is that ticket's worktree, never ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -333,6 +333,7 @@ Current tickets: `[##################--]` 282 of 308
 
 ## Recent activity
 
+- 2026-11-17 18:16 **S14-64** lead approve: The board tools now refuse to run git in a ticket folder unless it really is that ticket's worktree, never touch a finished ticket again, and recor...
 - 2026-11-17 18:15 **S14-56** lead answer: The donor toolchain has no libgomp; the lead asked PhiWeather where their GCC 5.1.1 OpenMP runtime comes from and will copy it into the donor area....
 - 2026-11-17 18:15 **S14-50** lead note: Set to review by the lead per the 18:10 scripted review (review changes done in 3fef5f08, main merged); the lead approves.
 - 2026-11-17 18:13 **S14-56** engineer ask: eda3c1e3: WRF classic pin test and 30-file fixed-step case staging PASS; _shared/S14-56/wrf-case.json. Two preflights failed: donor gcc and gfortra...
@@ -340,7 +341,6 @@ Current tickets: `[##################--]` 282 of 308
 - 2026-11-17 18:12 **S14-24** engineer submit: Preflight and diagnosis implemented; targeted PM integration test passes (including main-conflict path).
 - 2026-11-17 18:11 **S13-04** lead answer: Main is merged. Rerun tests/regress/test_source_release.py and the portability tests on CPUs 0-9, then submit with the approved --override (recount...
 - 2026-11-17 18:10 **S14-56** lead note: WRF classic inputs are ready: .work/_shared/corpus-build/wrf-miami-classic/{wrfinput_d01,wrfinput_d02,wrfbdy_d01} (NETCDF3_64BIT_OFFSET, same data ...
-- 2026-11-17 18:10 **S14-50** lead defer: Interactive lead: merge main into s14/S14-50 (submit refused: branch lacks real changes from main), then approve directly; the review changes are a...
 
 ## Cost
 
@@ -352,4 +352,4 @@ Current tickets: `[##################--]` 282 of 308
 
 ## Disk
 
-The project uses 44.7 GiB of 100 GiB. 300 GiB free on the drive.
+The project uses 44.7 GiB of 100 GiB. 301 GiB free on the drive.
