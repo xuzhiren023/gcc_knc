@@ -2,7 +2,7 @@
 
 Updated automatically at every ticket change. Last update: 2026-11-17 15:02.
 
-**Next: the tech lead, on S14-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S12-38.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 277 of 306
 
@@ -118,7 +118,7 @@ Current tickets: `[##################--]` 277 of 306
 | S12-35 | Clean single-compiler WRF build as dm+sm (MPI + OpenMP) against PhiWeather's k1om MPICH, plus a build recipe PhiWeather can apply to its own patched tree | Done | Upstream WRF 4.8.0 now builds clean as dm+sm (MPI + OpenMP) with the one GCC-KNC compiler (knc 7a3b34430e3,... |
 | S12-36 | card_run yields to a foreign queued row in the middle of our own turn - honor an open turn-level reservation so a multi-job window is not refused | Done | card_run --benchmark now keeps our turn across several jobs while an open claude-turn- ledger row was queue... |
 | S12-37 | Every T1/T2 check writes into the run's own output folder - no fixed paths in shared ticket folders (S10-01 vecarg, and any others) | Done | T1 and T2 checks now write every generated file into the run's own output folder, so a file left by another... |
-| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | In progress | Main is already merged into s12/S12-38 (ca37b628, 13:56); the branch now lacks only work/ and STATUS.md cha... |
+| S12-38 | ICE in the SLP vectorizer on gcc.dg vect-pr123221.c at -O3 -march=knc (found by S12-30's torture sweep) | Question for the tech lead | Submission blocked: pm.py submit waited 15 minutes and refused because .work/_state/board.lock is held by a... |
 | S12-39 | pm.py submit stops demanding an engineer-side rebase that the sandbox cannot perform (Permission denied on .git/worktrees/<id>/rebase-merge) | Done | Engineers no longer need to rebase before submitting: submit only refuses when main has real changes the br... |
 | S12-40 | Indirect prefetch recognizes Fortran sparse loops (array descriptors, ARRAY_REF offsets, nonzero and OpenMP-outlined starts) so NPB-CG benefits | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Folded into S12-30 (sparse indexed reductions),... |
 | S12-41 | Early donor check - corpus.py stages and runs only the development programs (no held-out build or run), smallest margins first, so the lead can measure every development program against GCC 5.1.1 now | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Closed: M4 harness item; the M5 donor-margin ch... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 15:02 **S12-38** engineer ask: Submission blocked: pm.py submit waited 15 minutes and refused because .work/_state/board.lock is held by another pm or dispatcher process (observe...
 - 2026-11-17 15:01 **S14-16** lead answer: Build ready (43801df4e93, cost 4). Check: knc-scalar-mask-cost.c green AND knc-loop-store-mask.c still emits kxor, vector_checks.py after-run (16 t...
 - 2026-11-17 14:59 **S14-24** owner decide: sessions 4 -> 6 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (red 9957076b, fix...
 - 2026-11-17 14:43 **S14-60** owner decide: sessions 3 -> 5 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (fix f92da326 rele...
@@ -338,16 +339,15 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 14:27 **S14-60** engineer escalate: budget: 3 engineer sessions used; the budget is 3
 - 2026-11-17 14:26 **S12-38** lead answer: Main is already merged into s12/S12-38 (ca37b628, 13:56); the branch now lacks only work/ and STATUS.md changes, which submit allows. Submit now wi...
 - 2026-11-17 14:11 **S14-04** engineer submit: Completed at 85d26a25 (red c652530b); main merged again at 5ec24581 per lead answer. Reused authorized passing host run: 15 tests including serial-...
-- 2026-11-17 14:10 **S14-56** lead approve-red: S14-56 red approved: the tests now require the seven new M5 scored units (Q1/Q2, Q3-Q6, MilkyWay N-body, WRF) in the corpus with pinned sources, st...
 
 ## Cost
 
 - From the script, engineer: 858 sessions, 1840.8M input tokens
 - From the script, lead: 585 sessions, 160.8M input tokens
-- Started by hand, Claude: 348 sessions, 4966.1M input tokens
+- Started by hand, Claude: 348 sessions, 4966.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 306 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 303 GiB free on the drive.
