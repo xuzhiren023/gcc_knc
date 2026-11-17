@@ -1,8 +1,8 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 09:33.
+Updated automatically at every ticket change. Last update: 2026-11-17 09:35.
 
-**Next: the tech lead, on S14-44.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
+**Next: the tech lead, on S13-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
 Current tickets: `[##################--]` 276 of 305
 
@@ -126,7 +126,7 @@ Current tickets: `[##################--]` 276 of 305
 | S13-01 | M4 final gate - stage the ADR-0015 gate run at the final head (17 programs, held-out unsealed, six pairs, three profiles) | Done | The M4 gate runner (SSH-only transfers, launch retry, adopt, full-profile scoring) and its card_run fixes a... |
 | S13-02 | Libgomp per-region thread density - choose 1-4 workers per core per parallel region instead of once per program | draft | Cross-project review (docs/research/s14-cross-project-review.md): Stronger case: WRF ~9,850 regions per ran... |
 | S13-03 | M4 retrospective - what we did wrong, what worked, and the practice changes carried into the next milestone and the agent-team skill | Done | The M4 retrospective is written (docs/research/m4-retrospective.md): it ranks where time was lost, settles ... |
-| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | In progress | Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json ... |
+| S13-04 | Clean source repositories for a fresh build - GCC-KNC fork and project code without build artifacts, plus a Linux-host build recipe the owner runs on the new workstation | Tests waiting for review | Red commit fce7a6fb. Via tools/run.py, Cygwin python3.12 ran tests/regress/test_source_release.py: 4 tests,... |
 | S13-05 | model-first skill - a project Claude Code skill that models a hot region and its run-time lower bound before any optimization, plus one sourced KNC machine file | Done | The model-first skill (.claude/skills/model-first with formulas, levers and a worked C7 example) and a sour... |
 | S13-06 | knc-twin trial and validation - run the KNC core twin on real GCC-KNC loop output, check it against characterization rows and held-out kernels we already timed, and report what it rejects or gets wrong | Done | knc-twin 0.2.1 is in the repo: it reads GCC-KNC assembly, predicts one-core cycles and loop bounds, and is ... |
 | S14-01 | 16- and 32-byte GCC generic vectors compile to IMCI in the low lanes of a zmm register, with a by-value ABI, so FFTW's generic-simd128/256 paths run vectorized | draft |  |
@@ -330,6 +330,7 @@ Current tickets: `[##################--]` 276 of 305
 
 ## Recent activity
 
+- 2026-11-17 09:35 **S13-04** engineer red: Red commit fce7a6fb. Via tools/run.py, Cygwin python3.12 ran tests/regress/test_source_release.py: 4 tests, 2 expected failures (POSIX selects Wind...
 - 2026-11-17 09:33 **S14-44** engineer ask: Completed no-go report at 0f79b069: neither gain gate established, conservative general flags retained, mix analytical bound and corpus gaps record...
 - 2026-11-17 09:28 **S14-56** engineer ask: Ticket-required acquisition question: please supply MilkyWay N-body 1.96 upstream URL/pin, correctness-only patches and locations, and core-small w...
 - 2026-11-17 09:20 **S14-04** lead note: Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json (model and effort by depth). Lane method...
@@ -337,7 +338,6 @@ Current tickets: `[##################--]` 276 of 305
 - 2026-11-17 09:20 **S12-38** lead note: Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json (model and effort by depth). Runs in the...
 - 2026-11-17 09:20 **S12-34** lead note: Sprint 14 started by the owner 2026-11-17 (Sprints 14-15 approved): Codex engineer per harness/policy.json (model and effort by depth). Lane gcc, a...
 - 2026-11-17 09:00 **S14-56** lead note: ADR-0016 amendment 2 (owner): each of the six S11-20 styles (H, S, N, C, G, B) needs at least one scored unit. This ticket supplies N (Q3, Q5), C (...
-- 2026-11-17 08:30 **S14-54** lead note: Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projects. Make it general: any loop whose trip...
 
 ## Cost
 
