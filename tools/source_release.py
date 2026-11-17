@@ -142,6 +142,60 @@ def audit(repo, revision, blob_cache, upstream=None):
     return excluded
 
 
+def historical_findings(repo, history, blob_cache, upstream):
+    """Report artifact versions from commit diffs without re-auditing whole trees.
+
+    Ignore rules apply to the release tip. Historical findings cover artifact
+    paths, sizes and signatures; they do not classify old ignore-rule matches.
+    """
+    records = git(repo, 'log', '--format=%H', '--raw', '-z', '--no-abbrev',
+                  '--no-renames', '--root', '--diff-merges=first-parent', history).split(b'\0')
+    versions = {}
+    commit = None
+    index = 0
+    while index < len(records):
+        record = records[index].lstrip(b'\n')
+        index += 1
+        if not record:
+            continue
+        if not record.startswith(b':'):
+            commit = record.decode().strip()
+            continue
+        oldmode, mode, oldoid, oid, status = record[1:].split()
+        name = os.fsdecode(records[index])
+        index += 1
+        if mode == b'000000':
+            continue
+        oid = oid.decode()
+        if upstream is not None:
+            original = upstream.get(name)
+            if original and original[0] == mode and original[2] == oid:
+                continue
+        versions.setdefault((name, mode, oid), commit)
+    oids = sorted({oid for name, mode, oid in versions if mode != b'160000'})
+    metadata = {}
+    if oids:
+        rows = git(repo, 'cat-file', '--batch-check',
+                   data=('\n'.join(oids) + '\n').encode()).splitlines()
+        for row in rows:
+            oid, kind, size = row.split()
+            metadata[oid.decode()] = (kind, int(size))
+    findings = {}
+    candidates = []
+    for (name, mode, oid), commit in versions.items():
+        kind, size = (b'commit', 0) if mode == b'160000' else metadata[oid]
+        reasons = path_reasons(name, mode, kind, size, upstream is None)
+        if reasons:
+            findings.setdefault((name, '; '.join(reasons)), commit)
+        else:
+            candidates.append((name, oid, commit))
+    binary_blobs(repo, (oid for name, oid, commit in candidates), blob_cache)
+    for name, oid, commit in candidates:
+        if blob_cache[oid]:
+            findings.setdefault((name, 'binary executable, archive or document signature'), commit)
+    return findings
+
+
 def export(repo, ref, revision, base, output):
     branch = git(repo, 'rev-parse', '--symbolic-full-name', ref).decode().strip()
     if not branch.startswith('refs/heads/'):
@@ -156,22 +210,13 @@ def export(repo, ref, revision, base, output):
     if output.exists() and any(output.iterdir()):
         raise ValueError('output must be empty; remove the previous release deliberately')
     upstream = {row[0]: row[1:] for row in entries(repo, base_commit)} if base_commit else None
-    cache, seen = {}, set()
+    cache = {}
     rejected = audit(repo, revision, cache, upstream)
     if rejected:
         print(json.dumps({'commit': revision, 'excluded': rejected}, indent=2))
         return 1
-    historical = {}
     history = base_commit + '..' + revision if base_commit else revision
-    for row in git(repo, 'log', '--format=%H %T', history).decode().splitlines():
-        commit, tree = row.split()
-        if tree in seen:
-            continue
-        seen.add(tree)
-        rejected = audit(repo, commit, cache, upstream)
-        if rejected:
-            for item in rejected:
-                historical.setdefault((item['path'], item['reason']), commit)
+    historical = historical_findings(repo, history, cache, upstream)
     # Freeze refs in a small temporary bare repository sharing only the source
     # object store. No refs are changed in the source repository, and a branch
     # advancing during export cannot change the already audited revision.
@@ -204,6 +249,7 @@ def export(repo, ref, revision, base, output):
            'Historical findings cover fork changes after the upstream tag.\n' if base else
            'The entire tip tree passed the source audit, including the 1 MiB file limit.\n')
         + 'Historical artifacts are retained; published history is never rewritten.\n'
+        + 'Historical findings check artifact paths, sizes and signatures; ignore rules are checked at the tip.\n'
         + 'Untracked/ignored workspace files are excluded because only Git objects are exported.\n'
         + ('Apply patches/0001-knc-squashed.patch with git apply from the upstream tag.\n'
            'The squashed diff includes merge resolutions; the bundle preserves full history.\n' if base else '')

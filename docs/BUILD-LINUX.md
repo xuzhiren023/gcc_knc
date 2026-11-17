@@ -37,6 +37,8 @@ the GCC audit covers only files differing from the upstream tag; unchanged
 upstream files remain in the bundle and are exempt. GCC has no 1 MiB limit.
 GCC historical findings cover fork changes after the tag, while project findings
 cover all reachable history. Neither export rewrites that history.
+Historical reports inspect artifact paths, sizes and binary signatures in
+committed file versions; committed ignore rules are checked at the release tip.
 It does not redistribute the external toolchain or sysroot. Shipped
 `contrib/knc-vecmath/` sources and their existing license files belong to the
 project bundle; `tools/knc_vmath.py` builds them.
