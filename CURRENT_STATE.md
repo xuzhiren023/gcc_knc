@@ -96,6 +96,9 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Window 12 closed 00:32:57Z (2026-11-17), card handed to PhiWeather (warm-start screen, then 25 h twin). Results: all
+  ten twin-generated natives segfaulted (generator bug, twin T1-15; rerun in the next window, owner-approved);
+  knc-boinc checks only, no BOINC task. Next GCC-KNC window: the ten twin programs plus knc-boinc's staged list.
 - Window 12 (owner 2026-11-16 19:15 EST): no BOINC launch tonight; knc-boinc runs short optimization checks in our
   turn until 02:59:39Z at the latest (extension to 04:15Z denied); PhiWeather's next ~3 h job goes after us, earlier
   if they are ready. knc-boinc's packaged S8-03 build passed core-small on the card (68 s, bit-identical); not run on
