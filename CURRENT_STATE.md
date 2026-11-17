@@ -101,9 +101,7 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 - x86 identity for S12-38 (generic tree-vect-slp.cc fix) restarted 2026-11-17 20:27Z, ~4 h, pinned, --shared .work/_shared/portability-lead (live worktrees are in portability-lead/portability/x86-a|b; portability-lead/x86-a|b are stale), was home
   .work/_shared/portability-lead (log .work/_state/logs/x86-S12-38-launch.log). .work/_shared/portability/x86-a/source
   was a broken non-worktree remnant from Nov 5; moved aside to source.broken-20261117 (use portability-lead).
-- 2026-11-17 14:45 EST (owner yes): board quieted so S14-60 (board lock held through approval checks) can finish;
-  the lane supervisor restarts only the boardlock lane (scratchpad lanes.txt). Restore all Sprint 14 lanes after S14-60
-  is approved: gcc gcc2 torture corpus method tools calib dispatch harness.
+- Board lock fixed by S14-62 (merged 2026-11-17 ~17:15 EST; S14-60 abandoned). All Sprint 14 lanes restored.
 - Sprint 14 started 2026-11-17 09:20 EST (owner approved Sprints 14-15; plan docs/sprints/SPRINT-14.md). Dispatchers
   (Codex per policy) on lanes gcc (S14-16, then S12-34), gcc2 (S12-38; gcc-2 checkout moved from s12/S12-30 to knc,
   S12-30 branch pushed to the fork), torture (S14-58), corpus (S14-56), method (S14-04), tools (S13-04), calib
