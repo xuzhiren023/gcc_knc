@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 15:21.
+Updated automatically at every ticket change. Last update: 2026-11-17 15:23.
 
 **Next: the tech lead, on S14-04.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
@@ -173,7 +173,7 @@ Current tickets: `[##################--]` 277 of 306
 | S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | In progress | sessions -> 5 (header updated), recorded by the lead under the owner's 2026-11-17 OK: the work is committed... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | correction to the ticket text above: no hashes (AGENTS.md); pins are URL plus tag or commit. |
+| S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Question for the tech lead | Hook blocked git clone --depth 1 --branch nbody_1.96 https://github.com/Milkyway-at-home/milkywayathome_cli... |
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | In progress | input_tokens 30M -> 36M, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK, onl... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | In progress | input_tokens 6M -> 16M (header updated), recorded by the lead under the owner's standing budget rule and 20... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
@@ -331,6 +331,7 @@ Current tickets: `[##################--]` 277 of 306
 
 ## Recent activity
 
+- 2026-11-17 15:23 **S14-56** engineer ask: Hook blocked git clone --depth 1 --branch nbody_1.96 https://github.com/Milkyway-at-home/milkywayathome_client ../_shared/corpus-build/milkyway-nbo...
 - 2026-11-17 15:21 **S14-58** owner decide: input_tokens 30M -> 36M, recorded by the lead under the owner's standing budget rule and 2026-11-17 OK, only to submit. CARD RERUN (window 18, 20:1...
 - 2026-11-17 15:18 **S14-58** engineer escalate: budget: 31228186 input tokens used; the budget is 30000000
 - 2026-11-17 15:17 **S14-58** lead answer: Main merged into s14/S14-58 (0dd60705). Submit now. Native rerun: the lead reruns only the six corrected programs on the card (same window approval...
@@ -338,16 +339,15 @@ Current tickets: `[##################--]` 277 of 306
 - 2026-11-17 15:14 **S14-60** owner decide: input_tokens 6M -> 16M (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: the lead committed the work...
 - 2026-11-17 15:13 **S14-58** engineer ask: Committed harness triage/fix dea23b27 (red 25f3e9c8); regression passes, corrected 74-case O2/O3 subset: 68 pass, 6 ordinary diagnostics per level,...
 - 2026-11-17 15:11 **S12-38** lead answer: The board lock is held briefly by the dispatcher and other pm commands; it is not stale and needs no clearing. Retry pm.py submit now with the 13:5...
-- 2026-11-17 15:10 **S14-56** lead answer: AGENTS.md wins; my ticket's 'and hash' was wrong. A pin is the upstream URL plus a release tag or git commit id (git identifies content); compute n...
 
 ## Cost
 
 - From the script, engineer: 861 sessions, 1855.0M input tokens
 - From the script, lead: 586 sessions, 161.0M input tokens
-- Started by hand, Claude: 351 sessions, 4987.5M input tokens
+- Started by hand, Claude: 352 sessions, 4989.3M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 42.5 GiB of 100 GiB. 305 GiB free on the drive.
+The project uses 42.5 GiB of 100 GiB. 306 GiB free on the drive.
