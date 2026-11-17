@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 17:56.
+Updated automatically at every ticket change. Last update: 2026-11-17 17:59.
 
 **Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
@@ -177,7 +177,7 @@ Current tickets: `[##################--]` 282 of 308
 | S14-58 | -O3 torture and vect sweep at the M5 head - compile everything, run the execute set on the card, triage every ICE and wrong-code failure | Done | The full -O2/-O3 -march=knc sweep of the GCC torture and vect suites (12,518 compiles) finds only the known... |
 | S14-60 | pm.py board_lock crashes a dispatcher with PermissionError (WinError 32) when another process holds or races board.lock | Done | Abandoned (owner); not merged. Replaced by S14-62. |
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
-| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | Waiting for review | Host CPUs 0-9: empty-folder and done-ticket checks passed in .work/_state/logs/S14_64_green-20261117-171308... |
+| S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | lead | Review passed; ready to approve. My approve was killed at the 10-minute tool limit during T0, so nothing me... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -334,19 +334,19 @@ Current tickets: `[##################--]` 282 of 308
 ## Recent activity
 
 - 2026-11-17 18:05 **S14-22** lead note: Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our window scripts avoid the bug (windows under 3...
+- 2026-11-17 17:59 **S14-64** lead defer: Review passed; ready to approve. My approve was killed at the 10-minute tool limit during T0, so nothing merged and the ticket is still in review. ...
 - 2026-11-17 17:54 **S14-50** owner decide: sessions 8 -> 9, recorded by the lead (owner 2026-11-17 OK). The review changes are already committed by the lead (3fef5f08) with main merged (0936...
 - 2026-11-17 17:52 **S14-56** owner decide: sessions 8 -> 12 (header updated), recorded by the lead under the owner's standing budget rule and 2026-11-17 OK: steady progress (Q1-Q6 built, lin...
 - 2026-11-17 17:50 **S13-04** engineer ask: Submit with the approved 827-line override now refuses: the branch lacks real changes from main. Please merge current main into s13/S13-04 and resu...
 - 2026-11-17 17:50 **S12-38** lead note: State set back to review: the engineer submitted at 16:55; the 17:07 escalate came from a session dispatched on the pre-reset copy (S14-64). The le...
 - 2026-11-17 17:49 **S14-56** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 17:48 **S14-56** lead answer: No host nccopy exists; the lead asked PhiWeather to write classic copies into .work/_shared/corpus-build/wrf-miami-classic/ (wrfinput_d01, wrfinput...
-- 2026-11-17 17:44 **S14-50** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 
 ## Cost
 
 - From the script, engineer: 888 sessions, 1886.7M input tokens
 - From the script, lead: 592 sessions, 162.0M input tokens
-- Started by hand, Claude: 382 sessions, 5107.2M input tokens
+- Started by hand, Claude: 383 sessions, 5107.5M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
