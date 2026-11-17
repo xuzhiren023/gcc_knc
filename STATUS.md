@@ -1,6 +1,6 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 18:29.
+Updated automatically at every ticket change. Last update: 2026-11-17 18:30.
 
 **Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
@@ -170,7 +170,7 @@ Current tickets: `[##################--]` 283 of 309
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Waiting for review | Set to review by the lead per the 18:10 scripted review (review changes done in 3fef5f08, main merged); the... |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | lead | Review passed (both findings fixed in 3fef5f08), but pm.py approve hung for 10 minutes and was killed with ... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | In progress | Main merged into s14/S14-56 (ce9fb633). Size approved: submit now with --override 'M5 corpus units (Q1-Q6, ... |
@@ -334,6 +334,7 @@ Current tickets: `[##################--]` 283 of 309
 
 ## Recent activity
 
+- 2026-11-17 18:30 **S14-50** lead defer: Review passed (both findings fixed in 3fef5f08), but pm.py approve hung for 10 minutes and was killed with no change; interactive lead: run approve...
 - 2026-11-17 18:30 **S13-04** lead note: Set to review by the lead: work complete, reruns PASS (source_release 9, portability 6, logs in the 18:25 ask), size override approved; submit kept...
 - 2026-11-17 18:29 **S14-24** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 - 2026-11-17 18:25 **S14-56** lead note: Donor OpenMP runtime ready: .work/_shared/donor-libgomp/lib64/{libgomp.a,libgomp.spec} (static GCC 5.1.1 libgomp that PhiWeather plain-GCC-5.1.1 WR...
@@ -341,7 +342,6 @@ Current tickets: `[##################--]` 283 of 309
 - 2026-11-17 18:23 **S14-24** lead answer: Yes. Add the two tests to the existing dispatcher test file (new_test_files: 0 is fine; that is a new test in an existing file, not a new file). Re...
 - 2026-11-17 18:21 **S14-56** lead answer: Main merged into s14/S14-56 (ce9fb633). Size approved: submit now with --override 'M5 corpus units (Q1-Q6, MilkyWay, WRF pin/case) with checkers an...
 - 2026-11-17 18:21 **S14-24** engineer ask: Two required tests are absent: the red commit 9957076b changes only tools/dispatch.py. Please allow adding/committing tests in the existing dispatc...
-- 2026-11-17 18:20 **S14-56** engineer ask: Submission refused: branch lacks real changes from main (pm requests lead merge main into ticket branch); 961 changed lines exceed 800-line budget....
 
 ## Cost
 
@@ -353,4 +353,4 @@ Current tickets: `[##################--]` 283 of 309
 
 ## Disk
 
-The project uses 44.7 GiB of 100 GiB. 301 GiB free on the drive.
+The project uses 44.7 GiB of 100 GiB. 300 GiB free on the drive.
