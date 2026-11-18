@@ -3,15 +3,22 @@
 Written 2026-11-17 by the lead on the laptop, before the move. The laptop stops new host work; the Xeon Phi card moves
 after the workstation is set up. Read with `docs/BUILDING.md` (Linux recipe) and `docs/handoff/NEW-LEAD-START.md`.
 
-## 1. Clone (lean)
+**Correction (later on 2026-11-17):** the workstation runs Windows with the laptop's layout
+(`C:/Users/xuzhi/Documents/gcc_knc`), so the laptop's Windows/Cygwin toolchain works there unchanged. The Linux notes
+below (binutils from MPSS source) apply only to a later Linux host.
+
+## 1. Clone (lean), in this order
 
 ```sh
-mkdir -p ~/knc && cd ~/knc
-git clone https://github.com/xuzhiren023/gcc_knc.git            # ~10 MB, project and board
-git clone --single-branch -b knc https://github.com/xuzhiren023/gcc_16_knc.git gcc   # ~1.4 GB, the GCC fork
+cd C:/Users/xuzhi/Documents
+git clone https://github.com/xuzhiren023/gcc_knc.git      # ~10 MB; clone FIRST, into a folder that does not exist yet
+git clone --single-branch -b knc https://github.com/xuzhiren023/gcc_16_knc.git gcc_knc/.work/_shared/gcc   # ~1.4 GB
 ```
 
-The project expects the GCC tree at `gcc_knc/.work/_shared/gcc` (see BUILDING.md); either clone it there or symlink.
+Then copy from the laptop into the same paths under gcc_knc (`.work/` is git-ignored): `.work/_shared/toolchain`
+(cygwin, cross, autotools, sysroot, sysroot-development), the installed prefix `.work/_shared/gcc-knc-16.2.0`,
+`.work/_shared/S10-02/host/libknc_vmath.a`, `config/card.local.json`, `.work/_state/card/known_hosts`. The knc-boinc
+session offered to copy these over ssh once the clone exists.
 Work-in-progress branches are on GitHub too (`git fetch origin s14/S14-16` and so on); open tickets name their branch.
 
 ## 2. Unpack the laptop-only data
