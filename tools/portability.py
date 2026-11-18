@@ -2,7 +2,7 @@
 """ADR-0006: forward-port conflicts and x86 assembly stability.
 
 Run through tools/run.py. No fetches. drill only writes Git objects and its report;
-x86 uses separate shared worktrees/builds and must run under Cygwin Python.
+x86 uses separate shared worktrees/builds under Linux or Cygwin Python.
 """
 import argparse
 import csv
@@ -24,8 +24,11 @@ PROJECT = ROOT.parent.parent if ROOT.parent.name == '.work' else ROOT
 SHARED = PROJECT / '.work/_shared'
 BASE = 'releases/gcc-16.2.0'
 CORPUS = 'gcc/testsuite/gcc.c-torture/compile'
-CONFIGURE_ARGS = ['--build=x86_64-pc-cygwin', '--host=x86_64-pc-cygwin',
-                  '--target=x86_64-pc-cygwin', '--enable-languages=c',
+WINDOWS_HOST = os.name == 'nt' or sys.platform == 'cygwin'
+EXE_SUFFIX = '.exe' if WINDOWS_HOST else ''
+# On Linux configure detects the native build/host/target triplet.
+CONFIGURE_ARGS = (['--build=x86_64-pc-cygwin', '--host=x86_64-pc-cygwin',
+                   '--target=x86_64-pc-cygwin'] if WINDOWS_HOST else []) + ['--enable-languages=c',
                   '--disable-bootstrap', '--disable-multilib', '--disable-nls', '--without-isl']
 # Two retained compiler builds leave less memory available for Cygwin DLLs.
 MAKE_ARGS = ['-j4', 'all-gcc', 'CFLAGS=-O2 -g1', 'CXXFLAGS=-O2 -g1']
@@ -116,6 +119,13 @@ def drill(args):
 
 
 def make_is_running():
+    if not WINDOWS_HOST:
+        try:
+            processes = subprocess.check_output(['ps', '-eo', 'comm='], text=True,
+                                                stderr=subprocess.STDOUT)
+        except (OSError, subprocess.CalledProcessError) as error:
+            raise RuntimeError('cannot inspect running builds with ps: ' + str(error)) from None
+        return any(name.strip() in ('make', 'gmake') for name in processes.splitlines())
     try:
         text = subprocess.check_output(['tasklist.exe', '/FI', 'IMAGENAME eq make.exe',
                                         '/FO', 'CSV', '/NH'], text=True,
@@ -153,7 +163,7 @@ def build_cc1(repo, shared, tree, slot, *, home=None, configure_args=None, make_
     stamp_path = build / '.cc1-build-stamp.json'
     configure_stamp = build / '.cc1-configure-stamp.json'
     stamp = {'commit': commit, 'configure_args': configure_args, 'make_args': make_args}
-    compiler = build / 'gcc/cc1.exe'
+    compiler = build / ('gcc/cc1' + EXE_SUFFIX)
     if read_stamp(stamp_path) == stamp and compiler.is_file():
         print('SKIP x86-' + slot + ': configure and make current for ' + commit, flush=True)
         return [str(compiler)]
@@ -188,7 +198,7 @@ def x86(args):
     if args.skip_make_check:
         print('make check skipped', flush=True)
     elif make_is_running():
-        raise RuntimeError('refusing x86 while make.exe is running')
+        raise RuntimeError('refusing x86 while make' + EXE_SUFFIX + ' is running')
     if len(args.tree) != 2:
         raise RuntimeError('x86 needs exactly two --tree arguments')
     corpus = args.repo / CORPUS
@@ -289,7 +299,7 @@ def main(argv=None):
     x86_parser.add_argument('--home', type=Path,
                             help='directory holding x86-a and x86-b (default: SHARED/portability)')
     x86_parser.add_argument('--skip-make-check', action='store_true',
-                            help='skip tasklist after independently confirming no build is running')
+                            help='skip process check after independently confirming no build is running')
     x86_parser.add_argument('--flags', action='append',
                             help='one flag set per use (default: "-O2" and "-O2 -mavx512f")')
     x86_parser.add_argument('--source', action='append',
