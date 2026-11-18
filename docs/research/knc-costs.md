@@ -48,7 +48,8 @@ alignment; arbitrary starting alignment may touch one more line. The estimate
 `7 * lines + floor(lines * (lines - 1) / 16)` matches the measured one-line
 cost of 7 and sixteen-line cost of 127 cycles. Its intermediate values are
 interpolations, not measurements; a stride-2 FP32 gather costs 14. Scatter
-uses the same line-service estimate until it is measured separately.
+uses the measured marginal service of 11.2 cycles per additional completion
+line at one thread; base occupancy and mask/index/retry setup remain separate.
 
 **S12-13 qualification:** R05 §V.D/Table II p.4 measures full gather loops,
 with distinct L1/L2 costs and active-line distributions. It does not validate
@@ -62,7 +63,12 @@ The memory bridge for scalar/vector transfers has a dependency cost of
 `ceil(12 / max(2, threads))` issues from `spill_reload.lat`; independent
 load/store costs use measured throughput. Register-allocation bridge costs
 remain conservative at the full dependent latency. x87 add/multiply/divide
-cost 1/2/38 cycles per core. Unmeasured integer division, branches, size
+cost 1/2/38 cycles per core. The x87 compare-chain observation is about 7
+ticks/site at one thread and 13 at two, but does not isolate compare latency;
+the twin's 3-cycle compare assumption remains unsettled. The branch-pattern
+delta is 5 cycles/branch at one thread, not a per-misprediction penalty;
+miss rate was not measured and the four-thread twin validation also misses.
+Unmeasured integer division, branches, size
 thresholds and alignment are estimates; comments identify the retained
 generic heuristics. String operations use libc pending measured crossovers.
 
