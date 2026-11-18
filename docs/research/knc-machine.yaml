@@ -659,7 +659,7 @@ branch_mispredict_penalty:
   profiles: *profiles
   evidence: E
   source: "knc-characterization.md C10 correction; R10 p.14; knc-twin parameters.md card-7120-measured C10 row"
-  note: Twin's value 5 is the one-thread pseudorandom-minus-fixed pattern delta in cycles/branch, not per-misprediction penalty: miss fraction is unmeasured. Window-10 has no branch calibration row separating miss rate, so no numeric penalty per misprediction is established.
+  note: Twin's value 5 is the one-thread pseudorandom-minus-fixed pattern delta in cycles/branch, not per-misprediction penalty; the miss fraction is unmeasured. Window-10 has no branch calibration row separating miss rate, so no numeric penalty per misprediction is established.
 
 # Reconciliation: twin latency.x87_compare remains 3 (assumed), while the
 # window-10 rows measure the full compare/status-transfer chain (about 7 ticks
