@@ -98,6 +98,15 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
 
 ## Not proven yet
 
+- Bandwidth sweep 3 (S11-06, card run 2026-11-12, analysed by the lead 2026-11-17): 58 valid cases, best medians read
+  185.1, write 171.0, copy 166.1, triad 167.1, RMW 179.7 GB/s, stencil 328.4 logical; all within about 1.3% of sweep
+  2, so deeper prefetch (16/128, 32/256), 120-thread triad controls and write dispatch/unroll found no lever. The
+  264-299 GB/s target is still unmet and no hardware ceiling is isolated; remaining levers are compiler GEMV work
+  (S11-09) and owner-only ECC/clock/MPSS changes. Raw `.work/_shared/tmp/claude-next28/membw-third.out` (laptop only).
+- Workstation setup 2026-11-17 (knc-boinc session's report, not checked by the lead): the clone, toolchain, installed
+  compiler, transfer archive (non-sysroot part) and card settings are in C:/Users/xuzhi/Documents/gcc_knc on the
+  Z840; k1om gcc builds a -march=knc ELF there. Missing: Git for Windows (owner), the GCC fork clone at
+  .work/_shared/gcc, skills. The copy came from a tar of a clone, so check `git status` there first.
 - MOVE 2026-11-17 ~20:00 EST: the owner moves to the HP Z840 (2x E5-2690 v3); the laptop stopped new host work
   (dispatchers and supervisor stopped; two engineer sessions may still finish and commit). Transfer archive
   C:/Users/xuzhi/Documents/gcc_knc-workstation-transfer-20261117.tar (card sysroot, M5 corpus sources and inputs, donor

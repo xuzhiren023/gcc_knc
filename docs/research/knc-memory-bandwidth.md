@@ -555,12 +555,16 @@ improvement remains explicit; fill the last column from sweep 3's raw output.
 
 | Class | Sweep-2 winner / case, GB/s | Forecast GB/s | Target GB/s | Gain required to lower / upper target | Sweep-3 result |
 |---|---:|---:|---:|---:|---|
-| read | 186.14 / 25 | 186.14 | 264-299.2 | 41.8% / 60.7% | pending |
-| write | 169.74 / 55 | 169.74 | 264-299.2 | 55.5% / 76.3% | pending |
-| copy | 163.90 / 33 | 163.90 | 264-299.2 | 61.1% / 82.6% | pending |
-| triad | 168.23 / 49 | 168.23 | 264-299.2 | 56.9% / 77.9% | pending |
-| RMW | 179.39 / 23 | 179.39 | 264-299.2 | 47.2% / 66.8% | pending |
-| stencil, logical | 326.22 / 42 | 326.22 logical | 264-299.2 logical | already exceeded; DRAM unknown | pending |
+| read | 186.14 / 25 | 186.14 | 264-299.2 | 41.8% / 60.7% | 185.14 / 2 (8/64 reference) |
+| write | 169.74 / 55 | 169.74 | 264-299.2 | 55.5% / 76.3% | 170.97 / 40 |
+| copy | 163.90 / 33 | 163.90 | 264-299.2 | 61.1% / 82.6% | 166.11 / 4 |
+| triad | 168.23 / 49 | 168.23 | 264-299.2 | 56.9% / 77.9% | 167.12 / 15 |
+| RMW | 179.39 / 23 | 179.39 | 264-299.2 | 47.2% / 66.8% | 179.66 / 48 |
+| stencil, logical | 326.22 / 42 | 326.22 logical | 264-299.2 logical | already exceeded; DRAM unknown | 328.38 / 24 |
+
+Sweep 3 (lead analysis 2026-11-17, 58 valid cases, best median / case): every class lands within about 1.3% of its
+sweep-2 winner, so none of the deeper prefetch, triad-collapse control, write dispatch/unroll or RMW eviction cases
+is an accepted lever. Raw output: `.work/_shared/tmp/claude-next28/membw-third.out`.
 
 `sweep.sh third` stages 58 cases at **2048 MiB x 32 passes**, five samples each.
 Calibration/reference cases come first; then matched 60/120-thread 16/128 and
