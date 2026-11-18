@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 18:55.
+Updated automatically at every ticket change. Last update: 2026-11-17 19:19.
 
 **Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
 
-Current tickets: `[##################--]` 284 of 309
+Current tickets: `[##################--]` 285 of 309
 
 ## Milestones
 
@@ -15,7 +15,7 @@ Current tickets: `[##################--]` 284 of 309
 | M2 | Useful vector target | Done | 51 of 51 tickets |
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
-| M5 | Program corpus | In progress | 38 of 52 tickets |
+| M5 | Program corpus | In progress | 39 of 52 tickets |
 | M6 | Release | In progress | 0 of 11 tickets |
 
 ## Tickets
@@ -170,7 +170,7 @@ Current tickets: `[##################--]` 284 of 309
 | S14-44 | Scalar double in zmm lane 0 instead of x87 - bound the gain with model-first and knc-twin before any compiler change (go/no-go) | Done | Scalar double in vector lane 0 is a no-go: the best tree-build case models 1.20x against the 1.5x bar and n... |
 | S14-46 | knc-optimize detects GCC-KNC on the host and chooses combined mode (compiler fixes as GCC-KNC tickets) or hand mode (intrinsics) | draft | Backlog pruning approved by the owner 2026-11-16 22:55 EST. Deferred to M6 (sprint s16): not needed for an ... |
 | S14-48 | Pointer-chasing tree walk (MilkyWay Barnes-Hut) runs 4-5x above its model on the card - emitted-code audit and next-node prefetch, model-first | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
-| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Waiting for review | lead session ended without a decision (exit 0) |
+| S14-50 | knc-machine.yaml vs knc-twin: reconcile scatter completion, branch mispredict and the x87 compare chain with the measured twin calibration rows | Done | knc-machine.yaml now carries the card-measured scatter completion cost and the x87 compare-chain cost in TS... |
 | S14-52 | Loop unswitching on loop-invariant tests does not fire for WRF sixth_order_diffusion under -mphinix, so the loop stays x87 (source specialisation: 6.1x fewer instructions per point) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-54 | Short-tile masked vector tails lower to gather/scatter retry loops and tiny zero loops to memset calls - use masked vloadunpack/vpackstore and inline short clears (issue #32) | draft | Owner 2026-11-17: refocus Sprints 14-15 on general-purpose GCC-KNC improvements, not fixes for other projec... |
 | S14-56 | M5 corpus additions - the new scored units (S11-20 Q1-Q6, MilkyWay N-body, WRF fixed-step) in corpus.py with frozen inputs and correctness checks | Waiting for review | Q1-Q6 and MilkyWay host/corruption checks passed and serial O2 donor/KNC pairs were linted and staged in _s... |
@@ -334,6 +334,7 @@ Current tickets: `[##################--]` 284 of 309
 
 ## Recent activity
 
+- 2026-11-17 19:19 **S14-50** lead approve: knc-machine.yaml now carries the card-measured scatter completion cost and the x87 compare-chain cost in TSC ticks, and lists where it still disagr...
 - 2026-11-17 18:55 **S13-04** lead approve: Anyone can rebuild GCC-KNC from source: the GCC fork exports as a git bundle plus one diff against GCC 16.2, the project exports cleanly, and docs/...
 - 2026-11-17 18:39 **S13-04** lead defer: Review passed and I ran approve, but its machine check ran past the 10-minute tool limit and was killed. The killed run left the main-merge commit ...
 - 2026-11-17 18:32 **S14-50** lead escalate: lead session ended without a decision (exit 0)
@@ -341,13 +342,12 @@ Current tickets: `[##################--]` 284 of 309
 - 2026-11-17 18:30 **S14-50** lead defer: Review passed (both findings fixed in 3fef5f08), but pm.py approve hung for 10 minutes and was killed with no change; interactive lead: run approve...
 - 2026-11-17 18:30 **S13-04** lead note: Set to review by the lead: work complete, reruns PASS (source_release 9, portability 6, logs in the 18:25 ask), size override approved; submit kept...
 - 2026-11-17 18:29 **S14-24** engineer escalate: budget: 8 engineer sessions used; the budget is 8
-- 2026-11-17 18:25 **S14-56** lead note: Donor OpenMP runtime ready: .work/_shared/donor-libgomp/lib64/{libgomp.a,libgomp.spec} (static GCC 5.1.1 libgomp that PhiWeather plain-GCC-5.1.1 WR...
 
 ## Cost
 
 - From the script, engineer: 895 sessions, 1891.8M input tokens
 - From the script, lead: 601 sessions, 164.3M input tokens
-- Started by hand, Claude: 394 sessions, 5188.3M input tokens
+- Started by hand, Claude: 399 sessions, 5202.1M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
