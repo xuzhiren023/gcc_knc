@@ -1,10 +1,10 @@
 # GCC-KNC status
 
-Updated automatically at every ticket change. Last update: 2026-11-17 19:19.
+Updated automatically at every ticket change. Last update: 2026-11-17 20:31.
 
-**Waiting for you:** S14-24. Run `python tools/pm.py inbox`.
+**Next: the tech lead, on S14-56.** Ask a Claude session in this folder: "Act as tech lead. Handle what the board needs."
 
-Current tickets: `[##################--]` 285 of 309
+Current tickets: `[##################--]` 285 of 310
 
 ## Milestones
 
@@ -16,7 +16,7 @@ Current tickets: `[##################--]` 285 of 309
 | M3 | Runtimes | Done | 48 of 48 tickets |
 | M4 | Broad optimization | Done | 64 of 64 tickets |
 | M5 | Program corpus | In progress | 39 of 52 tickets |
-| M6 | Release | In progress | 0 of 11 tickets |
+| M6 | Release | In progress | 0 of 12 tickets |
 
 ## Tickets
 
@@ -152,7 +152,7 @@ Current tickets: `[##################--]` 285 of 309
 | S14-21 | knc-twin multi-core: held-out validation of the 8-tile ring model against the measured GEMV, triad and core-scaling rows | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-22 | card_run turn row: refreshing an open turn row must keep its place in the queue | draft | Deferred to M6 (sprint s16) by the owner (2026-11-17, "defer"): no progress for several sessions; our windo... |
 | S14-23 | knc-twin: import the window-10 scatter rows (2 threads) and settle occupancy.scatter_cycles_per_line | Done | superseded by S14-33, which carries this ticket's committed work (wip 8d846ffe cherry-picked onto s14/S14-3... |
-| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | **Waiting for you** | budget: 8 engineer sessions used; the budget is 8 |
+| S14-24 | dispatch: refuse a session up front when its worktree git dir or ticket file is not writable from the sandbox | draft | Deferred to M6 (sprint s16) by the owner ("Defer to M6"): no progress over two extensions; the 18:13 review... |
 | S14-25 | knc-twin: recorded outputs carry absolute host paths (C:/Users/<name>/...); write repo-relative paths and scrub the committed records | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
 | S14-26 | knc-twin bound for software pipelining - how much could overlapping iterations gain on the M4 hot loops (go/no-go for S14-02) | Done | SMS bound: no-go for S14-02; five of six M4 hot loops are resource-bound at ResMII, only CG has headroom. M... |
 | S14-27 | knc-twin bounds: the dependency critical path charges cold lines their full miss latency, so the "lower bound" can exceed the simulation | Done | Backlog pruning approved by the owner 2026-11-16 22:55 EST. knc-twin is a skill with its own repository (C:... |
@@ -179,6 +179,7 @@ Current tickets: `[##################--]` 285 of 309
 | S14-62 | Board lock - a busy or racing lock never crashes a dispatcher, and approval runs its long checks without holding the lock (restart of S14-60, minimal) | Done | A busy board lock no longer crashes dispatchers, they wait and retry instead of exiting, and approvals rele... |
 | S14-64 | pm.py approve must never run git in the main checkout when a ticket worktree folder is missing or empty (it reset main to a ticket branch at 17:03:43) | Done | The board tools now refuse to run git in a ticket folder unless it really is that ticket's worktree, never ... |
 | S14-66 | pm.py submit's "branch lacks real changes from main" check keeps refusing while main moves; accept a branch that merges cleanly and let approval integrate | In progress |  |
+| S14-68 | Bandwidth moonshot - proposals to lift the 7120P's ~185 GB/s plateau toward the physical limit of its GDDR5 | Waiting for review | Committed the bandwidth budget, 14 ranked proposals and a 90-minute experiment plan; source and arithmetic ... |
 | S2-01 | Design for zmm and mask registers under -march=knc | Done | The register design for KNC is settled on paper: all 32 zmm and 8 mask registers become usable under -march... |
 | S2-02 | Float and double arguments and results in zmm lane 0 | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
 | S2-03 | Varargs with the donor's register save area | Done | Native line ticked: passed on the card in the lead's run of S2-10's batch (`docs/research/card-runs-s2.md`). |
@@ -334,23 +335,23 @@ Current tickets: `[##################--]` 285 of 309
 
 ## Recent activity
 
+- 2026-11-17 20:30 **S14-68** engineer submit: Committed the bandwidth budget, 14 ranked proposals and a 90-minute experiment plan; source and arithmetic review completed and whitespace check pa...
+- 2026-11-17 20:10 **S14-24** lead note: Deferred to M6 (sprint s16) by the owner ("Defer to M6"): no progress over two extensions; the 18:13 review findings (no tests; Claude backend bloc...
 - 2026-11-17 19:19 **S14-50** lead approve: knc-machine.yaml now carries the card-measured scatter completion cost and the x87 compare-chain cost in TSC ticks, and lists where it still disagr...
 - 2026-11-17 18:55 **S13-04** lead approve: Anyone can rebuild GCC-KNC from source: the GCC fork exports as a git bundle plus one diff against GCC 16.2, the project exports cleanly, and docs/...
 - 2026-11-17 18:39 **S13-04** lead defer: Review passed and I ran approve, but its machine check ran past the 10-minute tool limit and was killed. The killed run left the main-merge commit ...
 - 2026-11-17 18:32 **S14-50** lead escalate: lead session ended without a decision (exit 0)
 - 2026-11-17 18:30 **S14-56** engineer submit: Q1-Q6 and MilkyWay host/corruption checks passed and serial O2 donor/KNC pairs were linted and staged in _shared/{S14-56,m4-sealed/S14-56}/correctn...
 - 2026-11-17 18:30 **S14-50** lead defer: Review passed (both findings fixed in 3fef5f08), but pm.py approve hung for 10 minutes and was killed with no change; interactive lead: run approve...
-- 2026-11-17 18:30 **S13-04** lead note: Set to review by the lead: work complete, reruns PASS (source_release 9, portability 6, logs in the 18:25 ask), size override approved; submit kept...
-- 2026-11-17 18:29 **S14-24** engineer escalate: budget: 8 engineer sessions used; the budget is 8
 
 ## Cost
 
-- From the script, engineer: 895 sessions, 1891.8M input tokens
+- From the script, engineer: 896 sessions, 1896.2M input tokens
 - From the script, lead: 601 sessions, 164.3M input tokens
-- Started by hand, Claude: 399 sessions, 5202.1M input tokens
+- Started by hand, Claude: 413 sessions, 5223.8M input tokens
 - Started by hand, GPT: 1 sessions, 0.9M input tokens
 - Input tokens include the context re-read on every turn, most of it cached and cheap.
 
 ## Disk
 
-The project uses 44.7 GiB of 100 GiB. 300 GiB free on the drive.
+The project uses 44.7 GiB of 100 GiB. 299 GiB free on the drive.
