@@ -21,7 +21,7 @@ Sprint 14 at the move: done S14-44, S14-58 (-O3 sweep 1803/1803 on the card), S1
 S13-04 (and S14-50 if its approve landed). Open: S14-16 bzip2 (GCC branch s14/S14-16 in both repos; needs a GCC build
 at the fork's s14/S14-16 head, then the engineer's checks), S12-34 ICE (ready), S14-56 M5 corpus units (in review; WRF
 donor build follows with .work/_shared/donor-libgomp), S14-66 submit accepts clean-merging branches (in progress),
-S14-24 dispatcher preflight (owner to decide: defer to M6 recommended). Sprint 15 tickets are drafts (s15).
+S14-24 deferred to M6. Sprint 15 tickets are drafts (s15).
 
 Approvals: pm.py approve runs tools/check t0 (~20 min); scripted lead sessions cannot finish it (10-minute tool limit),
 so the interactive lead approves, in the background, with main clean (commit STATUS.md and ticket edits first).

@@ -102,7 +102,7 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
   (dispatchers and supervisor stopped; two engineer sessions may still finish and commit). Transfer archive
   C:/Users/xuzhi/Documents/gcc_knc-workstation-transfer-20261117.tar (card sysroot, M5 corpus sources and inputs, donor
   libgomp, knc-twin bundle). The card moves after the workstation is set up. Sprint 14 done today: S14-44, S14-58,
-  S14-04, S12-38, S14-62, S14-64, S13-04, S14-50. Open: S14-16, S12-34, S14-56 (review), S14-66, S14-24 (owner).
+  S14-04, S12-38, S14-62, S14-64, S13-04, S14-50. Open: S14-16, S12-34, S14-56 (review), S14-66; S14-24 deferred to M6.
 - Scripted lead sessions cannot finish pm.py approve (their tool calls stop at 10 min; approve checks take ~20 min);
   they review and defer to the interactive lead, who approves. Do approvals from the interactive session (background).
 - x86 identity for S12-38 (generic tree-vect-slp.cc fix) restarted 2026-11-17 20:27Z, ~4 h, pinned, --shared .work/_shared/portability-lead (live worktrees are in portability-lead/portability/x86-a|b; portability-lead/x86-a|b are stale), was home
