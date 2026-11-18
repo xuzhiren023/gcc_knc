@@ -103,10 +103,19 @@ M5 definition frozen: ADR-0016 accepted by the owner 2026-11-16 15:15 EST (A 1.2
   2, so deeper prefetch (16/128, 32/256), 120-thread triad controls and write dispatch/unroll found no lever. The
   264-299 GB/s target is still unmet and no hardware ceiling is isolated; remaining levers are compiler GEMV work
   (S11-09) and owner-only ECC/clock/MPSS changes. Raw `.work/_shared/tmp/claude-next28/membw-third.out` (laptop only).
-- Workstation setup 2026-11-17 (knc-boinc session's report, not checked by the lead): the clone, toolchain, installed
-  compiler, transfer archive (non-sysroot part) and card settings are in C:/Users/xuzhi/Documents/gcc_knc on the
-  Z840; k1om gcc builds a -march=knc ELF there. Missing: Git for Windows (owner), the GCC fork clone at
-  .work/_shared/gcc, skills. The copy came from a tar of a clone, so check `git status` there first.
+- S14-68 bandwidth moonshot (lead review 2026-11-17, approved): `docs/research/knc-bandwidth-moonshot.md` ranks
+  P1-P14; forecast 205-240 GB/s read ECC on if successful, 264-299 a target. Verified: sweep-3 120-thread triad 73.6
+  block vs 147.9 cyclic (cases 27/32). Finding: the raw card logs report kernel `2.6.38.8+mpss3.7.1`, not the MPSS
+  3.8.6 we record; the next card session must record the real image. Its 90-minute first session (P1/P2/P4/P8, no
+  system changes) needs three prep tickets first (equal-path hint variants, fixed-allocation scheduling controls,
+  low-rate latency probe) and the owner's card approval.
+- Workstation (Z840, 192.168.4.45, ssh key ~/.ssh/z840_phiweather_ed25519, portable Git at
+  C:/Users/xuzhi/Tools/Git/cmd/git.exe), lead-checked 2026-11-17: gcc_knc is a git checkout tracking GitHub; GCC fork
+  cloned from GitHub into .work/_shared/gcc with core.autocrlf=false (as on the laptop); knc-twin cloned from a bundle
+  into C:/Users/xuzhi/Documents/knc-twin (origin is the bundle; no GitHub remote); skills knc-twin/knc-optimize match
+  the laptop; raw membw outputs and .work/_shared/S11-05 copied. Toolchain and transfer archive per the knc-boinc
+  session's report; k1om gcc builds a -march=knc ELF there. Its Cygwin needs `export PATH=/usr/bin:/bin` in
+  non-login shells.
 - MOVE 2026-11-17 ~20:00 EST: the owner moves to the HP Z840 (2x E5-2690 v3); the laptop stopped new host work
   (dispatchers and supervisor stopped; two engineer sessions may still finish and commit). Transfer archive
   C:/Users/xuzhi/Documents/gcc_knc-workstation-transfer-20261117.tar (card sysroot, M5 corpus sources and inputs, donor
