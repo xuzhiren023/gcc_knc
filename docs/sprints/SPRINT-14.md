@@ -22,6 +22,9 @@ written, a fresh Linux build, and bzip2 no longer slower than GCC 5.1.1.
 
 # Sprint 15: faster on more kinds of code (Milestone M5, part 2)
 
+**Status:** started 2026-11-17 on the Z840 workstation (owner: run many more Codex engineers there), alongside Sprint
+14's last tickets. S15-01 adds GCC slots 3-4 so more GCC tickets run at once.
+
 Every item is modelled first (model-first, knc-twin for one-core loops) and built only if its bound clears 5%
 whole-program on at least two corpus programs. Then the M5 measurement on the widened corpus.
 

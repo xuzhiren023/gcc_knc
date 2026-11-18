@@ -79,7 +79,9 @@ def engineer_command(board, ticket, worktree):
         for d in dirs:
             command += ["--add-dir", d]
         return command
-    codex = newest(r"%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe") or "codex"
+    # The Microsoft Store Codex app (the Z840) ships its CLI inside the package and never copies it to %LOCALAPPDATA%.
+    codex = newest(r"%LOCALAPPDATA%\OpenAI\Codex\bin\*\codex.exe",
+                   r"%ProgramFiles%\WindowsApps\OpenAI.Codex_*\app\resources\codex.exe") or "codex"
     # The policy can fix effort and service tier ("priority" is Codex's fast mode) for every engineer session.
     effort = board.policy.get("engineer_effort") or board.budget(ticket)["effort"]
     tier = board.policy.get("engineer_service_tier")
